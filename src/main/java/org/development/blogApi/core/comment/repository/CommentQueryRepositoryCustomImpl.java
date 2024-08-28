@@ -44,7 +44,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
     }
 
     @Override
-    public Optional<ViewPublicCommentDto> findById(UUID commentId, UUID currentUserId) {
+    public Optional<ViewPublicCommentDto> findByAndUserId(UUID commentId, UUID currentUserId) {
         String jpql = "SELECT ct FROM Comment ct " +
                 "LEFT JOIN ct.user u " +
                 "LEFT JOIN ct.post pt " +

@@ -1,9 +1,8 @@
 package org.development.blogApi.core.comment;
 
 import org.development.blogApi.core.comment.dto.request.UpdateCommentDto;
-import org.development.blogApi.core.comment.entity.Comment;
+import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
-import org.development.blogApi.core.comment.utils.CommentMapper;
 import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
 import org.development.blogApi.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("api/comments")
 public class CommentController {
     private final CommentQueryRepository commentQueryRepository;
     private final CommentService commentService;
@@ -33,10 +32,10 @@ public class CommentController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        Comment comment = this.commentQueryRepository.findByIdAndUserId(UUID.fromString(id), UUID.fromString(customUserDetails.getUserId()))
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findByAndUserId(UUID.fromString(id), UUID.fromString(customUserDetails.getUserId()))
+                .orElse(null);
 
-        return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.OK);
+        return new ResponseEntity<>(viewPublicCommentDto, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

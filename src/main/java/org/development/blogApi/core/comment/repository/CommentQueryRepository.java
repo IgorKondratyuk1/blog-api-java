@@ -9,6 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface CommentQueryRepository extends JpaRepository<Comment, UUID>, CommentQueryRepositoryCustom {
-
-    Optional<Comment> findByIdAndUserId(UUID id, UUID userId);
+//    Optional<Comment> findByIdAndUserId(UUID id, UUID userId);
 }
