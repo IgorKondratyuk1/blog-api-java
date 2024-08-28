@@ -10,7 +10,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "comment")
+@Table(name = "\"comment\"")
 public class Comment {
 
     @Id

@@ -30,12 +30,12 @@ public class UserEntity {
     private LocalDateTime createdAt;
 
     // TODO change fk to EmailConfirmation
-    @OneToOne(optional = false)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "email_confirmation_id", referencedColumnName = "id")
     private EmailConfirmation emailConfirmation;
 
     // TODO change fk to PasswordRecovery
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "password_recovery_id", referencedColumnName = "id")
     private PasswordRecovery passwordRecovery;
 
