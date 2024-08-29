@@ -3,7 +3,7 @@ package org.development.blogApi.auth;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.development.blogApi.auth.dto.*;
+import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;

@@ -1,4 +1,4 @@
-package org.development.blogApi.security.exceptionhandlers;
+package org.development.blogApi.security.exceptionHandlers;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

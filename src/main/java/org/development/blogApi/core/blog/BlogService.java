@@ -4,6 +4,8 @@ import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogRepository;
+import org.development.blogApi.user.entity.UserEntity;
+import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,12 @@ public class BlogService {
 
     private final BlogRepository blogsRepository;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public BlogService(BlogRepository blogsRepository) {
+    public BlogService(BlogRepository blogsRepository, UserRepository userRepository) {
         this.blogsRepository = blogsRepository;
+        this.userRepository = userRepository;
     }
 
     public Optional<Blog> findById(UUID id) {
@@ -53,6 +58,18 @@ public class BlogService {
     public void removeByAdmin(UUID blogId) {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
         this.blogsRepository.deleteById(blogId);
+    }
+
+    public void bindBlogWithUser(UUID userId, UUID blogId) {
+        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Wrong blogId"));
+
+        if (blog.getUserId() != null) {
+            throw new RuntimeException("blog is already bounded");
+        }
+
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("wrong userId"));
+        blog.setOwner(user.getId());
+        blogsRepository.save(blog);
     }
 
 //    public void setBlogBanStatus(String blogId, BanBlogDto banBlogDto) {

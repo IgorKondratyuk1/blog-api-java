@@ -1,10 +1,15 @@
-package org.development.blogApi.security;
+package org.development.blogApi.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.development.blogApi.security.CustomUserDetails;
+import org.development.blogApi.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +22,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
-    private UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
     public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {
@@ -33,6 +39,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        log.info("JwtAuthFilter");
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String usernameOrEmail;
