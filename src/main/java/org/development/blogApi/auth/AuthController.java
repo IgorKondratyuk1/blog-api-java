@@ -3,6 +3,7 @@ package org.development.blogApi.auth;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -48,26 +50,26 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> register(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<Void> register(@Valid @RequestBody CreateUserDto createUserDto) {
         authService.register(createUserDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/registration-confirmation")
-    public ResponseEntity<Void> confirmRegistration(@RequestBody RegistrationConfirmationDto registrationConfirmationDto) {
+    public ResponseEntity<Void> confirmRegistration(@Valid @RequestBody RegistrationConfirmationDto registrationConfirmationDto) {
         this.authService.confirmEmail(registrationConfirmationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
     @PostMapping("/registration-email-resending")
-    public ResponseEntity<Void> resendConfirmationCode(@RequestBody RegistrationEmailResendDto registrationEmailResendDto) {
+    public ResponseEntity<Void> resendConfirmationCode(@Valid @RequestBody RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto,
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto loginDto,
                                                  @RequestHeader(value = "User-Agent") String userAgent,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
@@ -120,13 +122,13 @@ public class AuthController {
     }
 
     @PostMapping("/new-password")
-    public ResponseEntity<?> newPassword(@RequestBody NewPasswordDto newPasswordDto) {
+    public ResponseEntity<?> newPassword(@Valid @RequestBody NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<?> passwordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) {
+    public ResponseEntity<?> passwordRecovery(@Valid @RequestBody PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

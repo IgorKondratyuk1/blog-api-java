@@ -55,7 +55,6 @@ public class AuthService {
         this.securityDevicesService = securityDevicesService;
     }
 
-    @Async
     public void register(CreateUserDto createUserDto) {
         if (userRepository.existsByLogin(createUserDto.getLogin())) throw new RuntimeException("User is taken");
 
@@ -75,7 +74,6 @@ public class AuthService {
         this.userRepository.save(user);
     }
 
-    @Async
     public void resendConfirmCode(RegistrationEmailResendDto registrationEmailResendDto) {
         // 1. Check user
         UserEntity user = this.userRepository.findByLoginOrEmail(registrationEmailResendDto.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
@@ -140,7 +138,6 @@ public class AuthService {
         this.userRepository.save(userEntity);
     }
 
-    @Async
     public void sendRecoveryCode(PasswordRecoveryDto passwordRecoveryDto) {
         UserEntity userEntity = this.userRepository.findByLoginOrEmail(passwordRecoveryDto.getEmail()).orElseThrow(() -> new RuntimeException("User with email " + passwordRecoveryDto.getEmail() + " not found"));
         userEntity.createNewPasswordRecoveryCode();
