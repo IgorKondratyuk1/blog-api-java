@@ -62,9 +62,7 @@ public class SecurityDevicesController {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         String userId = this.jwtService.extractUserId(refreshToken);
 
-        System.out.println(refreshToken);
-        System.out.println(userId);
-        System.out.println(deviceId);
+        System.out.println("refreshToken: " + refreshToken + "\nuserId: " + userId + "\ndeviceId: " + deviceId);
 
         securityDevicesService.deleteDeviceSession(userId, deviceId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

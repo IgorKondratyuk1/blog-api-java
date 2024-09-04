@@ -1,10 +1,9 @@
-package org.development.blogApi;
+package org.development.blogApi.e2e;
 
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -23,20 +22,11 @@ public class BloggerTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
-//    @Autowired
-//    private RoleRepository roleRepository;
-
     @BeforeAll
     public static void beforeAll(@Autowired RoleRepository roleRepository) {
         roleRepository.save(new RoleEntity(1, "ADMIN"));
         roleRepository.save(new RoleEntity(2, "USER"));
     }
-
-//    @BeforeEach
-//    public void setUp() {
-//        roleRepository.save(new RoleEntity(1, "ADMIN"));
-//        roleRepository.save(new RoleEntity(2, "USER"));
-//    }
 
     @Test
     void contextLoads() {}

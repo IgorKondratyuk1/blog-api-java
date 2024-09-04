@@ -25,7 +25,7 @@ public class EmailManager {
     }
 
     public void sendPasswordRecoveryMessage(String to, String recoveryCode) {
-        String subject = "Email Confirmation";
+        String subject = "Email Password Recovery";
 
         String mailText = String.format("<h1>Password recovery</h1>\n" +
                 "<p>To finish password recovery please follow the link below:\n" +

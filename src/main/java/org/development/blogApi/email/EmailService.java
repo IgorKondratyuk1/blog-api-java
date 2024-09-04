@@ -13,7 +13,10 @@ public class EmailService implements EmailSender {
     @Value("${mail.use-sout}")
     private boolean useSout;
 
-    private final JavaMailSender mailSender;
+    @Value("${mail.sender-email}")
+    private String senderEmail;
+
+    private JavaMailSender mailSender;
 
     @Autowired
     public EmailService(JavaMailSender mailSender) {
@@ -24,7 +27,7 @@ public class EmailService implements EmailSender {
     @Override
     public void send(String to, String subject, String mailText) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@baeldung.com");
+        message.setFrom(senderEmail);
         message.setTo(to);
         message.setSubject(subject);
         message.setText(mailText);

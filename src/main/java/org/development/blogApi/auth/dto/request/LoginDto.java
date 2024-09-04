@@ -1,30 +1,15 @@
 package org.development.blogApi.auth.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
+@AllArgsConstructor
 public class LoginDto {
+    @NotEmpty(message = "loginOrEmail must not be empty")
     private String loginOrEmail;
+
+    @NotEmpty(message = "password must not be empty")
     private String password;
-
-    public LoginDto(String loginOrEmail, String password) {
-        this.loginOrEmail = loginOrEmail;
-        this.password = password;
-    }
-
-    public LoginDto() {}
-
-    public String getLoginOrEmail() {
-        return loginOrEmail;
-    }
-
-    public void setLoginOrEmail(String loginOrEmail) {
-        this.loginOrEmail = loginOrEmail;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
