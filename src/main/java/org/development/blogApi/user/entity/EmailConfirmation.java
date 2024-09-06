@@ -1,6 +1,8 @@
 package org.development.blogApi.user.entity;
 
 import jakarta.persistence.*;
+import org.development.blogApi.helper.ApplicationEnvHelper;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "email_confirmation")
 public class EmailConfirmation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -63,12 +66,17 @@ public class EmailConfirmation {
 
     // Static factory method
     public static EmailConfirmation createInstance() {
+        return EmailConfirmation.createInstance(false);
+    }
+
+    // For SA
+    public static EmailConfirmation createInstance(boolean isConfirmed) {
         UUID confirmationCode = UUID.randomUUID();
-        return new EmailConfirmation(confirmationCode, generateNewExpirationDate(), false);
+        return new EmailConfirmation(confirmationCode, generateNewExpirationDate(), isConfirmed);
     }
 
     // Static method to generate a new expiration date
     private static LocalDateTime generateNewExpirationDate() {
-        return LocalDateTime.now().plusHours(1); // TODO make env value
+        return LocalDateTime.now().plusHours(ApplicationEnvHelper.getEmailConfirmationExpirationHours());
     }
 }

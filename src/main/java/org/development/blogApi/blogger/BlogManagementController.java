@@ -1,12 +1,17 @@
 package org.development.blogApi.blogger;
 
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
+import org.development.blogApi.common.dto.PaginationDto;
+import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
 import org.development.blogApi.core.blog.repository.BlogQueryRepository;
 import org.development.blogApi.core.blog.BlogService;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
+import org.development.blogApi.core.blog.utils.BlogMapper;
+import org.development.blogApi.core.comment.dto.response.ViewBloggerCommentDto;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
+import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.core.post.PostService;
 import org.development.blogApi.core.post.dto.request.CreatePostOfBlogDto;
@@ -52,14 +57,6 @@ public class BlogManagementController {
         this.commentQueryRepository = commentQueryRepository;
     }
 
-    // TODO Test
-    @GetMapping("/test/users")
-    public ResponseEntity<?> testFindUserBlogs(QueryUserDto queryUserDto) {
-        System.out.println(queryUserDto);
-        return ResponseEntity.ok(this.userQueryRepository.findAllUsersWithCustomQueries(queryUserDto));
-    }
-
-
     @GetMapping
     public ResponseEntity<?> findUserBlogs(
             CommonQueryParamsDto commonQueryParamsDto,
@@ -70,7 +67,7 @@ public class BlogManagementController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        var blogs = blogQueryRepository.findBlogsByCreatedUserId(customUserDetails.getUserId(), commonQueryParamsDto);
+        PaginationDto<ViewBlogDto> blogs = blogQueryRepository.findBlogsByCreatedUserId(customUserDetails.getUserId(), commonQueryParamsDto);
         return new ResponseEntity<>(blogs, HttpStatus.OK);
     }
 
@@ -85,11 +82,10 @@ public class BlogManagementController {
         }
 
         Blog blog = blogService.create(UUID.fromString(customUserDetails.getUserId()), createBlogDto);
-        return new ResponseEntity<>(blog, HttpStatus.OK);
+        return new ResponseEntity<>(BlogMapper.toView(blog), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> updateBlog(
             @PathVariable String id,
             @RequestBody UpdateBlogDto updateBlogDto,
@@ -105,7 +101,6 @@ public class BlogManagementController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> removeBlog(
             @PathVariable String id,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -145,11 +140,11 @@ public class BlogManagementController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(postQueryRepository.findPostsOfBlogByUserId(blogId, commonQueryParamsDto, customUserDetails.getUserId()), HttpStatus.OK);
+        PaginationDto<ViewPostDto> postsOfBlogByUserId = postQueryRepository.findPostsOfBlogByUserId(blogId, commonQueryParamsDto, customUserDetails.getUserId());
+        return new ResponseEntity<>(postsOfBlogByUserId, HttpStatus.OK);
     }
 
     @PutMapping("/{blogId}/posts/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> updatePost(
             @PathVariable String blogId,
             @PathVariable String postId,
@@ -166,7 +161,6 @@ public class BlogManagementController {
     }
 
     @DeleteMapping("/{blogId}/posts/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> removePost(
             @PathVariable String blogId,
             @PathVariable String postId,
@@ -191,6 +185,7 @@ public class BlogManagementController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(commentQueryRepository.findAllCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto), HttpStatus.OK);
+        PaginationDto<ViewBloggerCommentDto> allCommentsOfUserBlogs = commentQueryRepository.findAllCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto);
+        return new ResponseEntity<>(allCommentsOfUserBlogs, HttpStatus.OK);
     }
 }

@@ -29,7 +29,7 @@ public class UserService {
     @Transactional
     public UserEntity create(CreateUserDto createUserDto, boolean isConfirmed) {
         RoleEntity roles = roleRepository.findRoleEntityByName("USER").orElseThrow(() -> new RuntimeException("Role not found"));
-        UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), isConfirmed,  Collections.singletonList(roles));
+        UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), Collections.singletonList(roles), isConfirmed);
         return userRepository.save(user);
     }
 

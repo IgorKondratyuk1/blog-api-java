@@ -139,6 +139,8 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
                 .map(blog -> BlogMapper.toView(blog))
                 .collect(Collectors.toList());
 
+        System.out.println(Arrays.toString(blogViewModels.toArray()));
+
         return new PaginationDto<>(
                 pagesCount,
                 commonQueryParamsDto.getPageNumber(),

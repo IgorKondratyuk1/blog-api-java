@@ -149,8 +149,13 @@ public class UserEntity {
 //    }
 
     // Static factory method
-    public static UserEntity createInstance(CreateUserDto createUserDto, String passwordHash, boolean isConfirmed, List<RoleEntity> roles) {
-        EmailConfirmation emailConfirmation = EmailConfirmation.createInstance();
+    public static UserEntity createInstance(CreateUserDto createUserDto, String passwordHash, List<RoleEntity> roles) {
+        return UserEntity.createInstance(createUserDto, passwordHash, roles, false);
+    }
+
+    // For SA user creation
+    public static UserEntity createInstance(CreateUserDto createUserDto, String passwordHash, List<RoleEntity> roles, boolean isConfirmed) {
+        EmailConfirmation emailConfirmation = EmailConfirmation.createInstance(isConfirmed);
 
         UserEntity user = new UserEntity(
                 UUID.randomUUID(),

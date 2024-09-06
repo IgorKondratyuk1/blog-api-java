@@ -1,6 +1,5 @@
 package org.development.blogApi.security;
 
-import org.development.blogApi.security.exceptionHandlers.CustomAccessDeniedHandler;
 import org.development.blogApi.security.exceptionHandlers.CustomAuthenticationEntryPoint;
 import org.development.blogApi.security.filters.JwtAuthFilter;
 import org.development.blogApi.security.filters.RateLimitingFilter;

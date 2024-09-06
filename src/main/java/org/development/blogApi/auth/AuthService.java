@@ -60,7 +60,7 @@ public class AuthService {
 
         // 1. Create new user
         RoleEntity roles = roleRepository.findRoleEntityByName("USER").orElseThrow(() -> new RuntimeException("Role not found"));
-        UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), false, Collections.singletonList(roles));
+        UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), Collections.singletonList(roles));
         userRepository.save(user);
 
         // 2. Try to send password confirmation email

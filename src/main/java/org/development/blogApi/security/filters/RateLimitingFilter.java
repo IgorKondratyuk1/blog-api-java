@@ -30,15 +30,23 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     @Value("${rate-limit.requestsLimit}")
     private int requestsLimit;
 
+    @Value("${rate-limit.enable}")
+    private boolean isRateLimitingEnable;
+
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        if (!isRateLimitingEnable) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         log.info("RateLimitingFilter");
 
         // TODO make exclude rate limiting for specific routes
-
         String userIdentifier = getUserIdentifier(request); // e.g., IP address
         Bucket bucket = buckets.computeIfAbsent(userIdentifier, key -> {
             Bandwidth limit = Bandwidth.classic(requestsLimit, Refill.greedy(requestsLimit, Duration.ofSeconds(requestsTTL)));
