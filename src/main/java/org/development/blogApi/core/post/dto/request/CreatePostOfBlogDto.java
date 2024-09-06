@@ -2,7 +2,11 @@ package org.development.blogApi.core.post.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
+@AllArgsConstructor
 public class CreatePostOfBlogDto {
     @NotEmpty
     @Size(min = 1, max = 30)
@@ -15,29 +19,4 @@ public class CreatePostOfBlogDto {
     @NotEmpty
     @Size(min = 1, max = 1000)
     private String content;
-
-    // Getters and Setters
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

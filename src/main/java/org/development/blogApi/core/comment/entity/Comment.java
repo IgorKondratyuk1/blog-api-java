@@ -24,12 +24,12 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
-    @OneToOne()
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @ManyToOne()
+    @JoinColumn(name = "post_id", referencedColumnName = "id", updatable = false)
     private Post post;
 
-    @OneToOne()
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne()
+    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
     private UserEntity user;
 
 //    @Column(name = "id")

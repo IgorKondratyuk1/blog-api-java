@@ -12,6 +12,8 @@ import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.utils.PostMapper;
+import org.development.blogApi.user.entity.UserEntity;
+import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,33 +26,36 @@ public class PostService {
     private final BlogRepository blogsRepository;
     private final LikeService likeService;
 
+    private final UserRepository userRepository;
+
     @Autowired
     public PostService(
             PostRepository postsRepository,
             BlogRepository blogsRepository,
-            LikeService likeService) {
+            LikeService likeService,
+            UserRepository userRepository) {
         this.postsRepository = postsRepository;
         this.blogsRepository = blogsRepository;
         this.likeService = likeService;
+        this.userRepository = userRepository;
     }
 
     public Post findById(UUID postId) {
         return postsRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
-    @Transactional
     public Post create(UUID userId, UUID blogId, CreatePostOfBlogDto createPostOfBlogDto) {
         Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!blog.getUserId().equals(userId)) {
+        if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Blog doesn't belong to the current user");
         }
 
-        Post post = Post.createInstance(userId, blog, createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getTitle());
+        Post post = Post.createInstance(user, blog, createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getContent(), createPostOfBlogDto.getTitle());
         return postsRepository.save(post);
     }
 
-    @Transactional
     public ViewPostDto createByAdmin(UUID blogId, CreatePostOfBlogDto createPostOfBlogDto) {
         Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
         Post post = Post.createInstance(null, blog, createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getContent(), createPostOfBlogDto.getTitle());
@@ -58,13 +63,11 @@ public class PostService {
         return PostMapper.toView(createdPost);
     }
 
-    @Transactional
     public void updateLikeStatus(UUID id, String userId, String userLogin, LikeStatus status) {
         Post post = postsRepository.findById(id).orElseThrow(() -> new RuntimeException("Blog not found"));
         this.likeService.like(userId, userLogin, LikeLocation.POST, post.getId().toString(), status);
     }
 
-    @Transactional
     public void updateWithBlogId(String userId, String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -72,7 +75,7 @@ public class PostService {
             throw new RuntimeException("Can not update with wrong blog id");
         }
 
-        if (!post.getUserId().toString().equals(userId)) {
+        if (!post.getUser().getId().toString().equals(userId)) {
             throw new RuntimeException("Cannot update post with wrong user id");
         }
 
@@ -80,7 +83,6 @@ public class PostService {
         postsRepository.save(post);
     }
 
-    @Transactional
     public void updateWithBlogIdByAdmin(String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -92,7 +94,6 @@ public class PostService {
         postsRepository.save(post);
     }
 
-    @Transactional
     public void removeWithBlogId(String userId, String postId, String blogId) {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -100,14 +101,13 @@ public class PostService {
             throw new RuntimeException("Wrong blog id");
         }
 
-        if (!post.getUserId().toString().equals(userId)) {
+        if (!post.getUser().getId().toString().equals(userId)) {
             throw new RuntimeException("Can not remove a post that is not owned");
         }
 
         postsRepository.deleteById(UUID.fromString(postId));
     }
 
-    @Transactional
     public void removeWithBlogIdByAdmin(String postId, String blogId) {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -119,12 +119,10 @@ public class PostService {
     }
 
 
-//    @Transactional
 //    public boolean setBanStatusByUserId(String userId, boolean isBanned) {
 //        return postsRepository.setBanStatusByUserId(userId, isBanned);
 //    }
 //
-//    @Transactional
 //    public boolean setBanStatusByBlogId(String blogId, boolean isBanned) {
 //        return postsRepository.setBanStatusByBlogId(blogId, isBanned);
 //    }

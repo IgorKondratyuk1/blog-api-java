@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 // TODO divide repositories for comment and post
-// +
 @Repository
 public interface LikeRepository extends JpaRepository<Like, UUID>, LikeQueryRepositoryCustom {
 
@@ -34,10 +33,10 @@ public interface LikeRepository extends JpaRepository<Like, UUID>, LikeQueryRepo
         return likeOptional.isPresent() ? likeOptional.get().getMyStatus() : LikeStatus.NONE;
     }
 
-    @Query("SELECT count(*) FROM CommentLike cl WHERE cl.commentId = :commentId AND cl.status = :likeStatus")
+    @Query("SELECT count(*) FROM CommentLike cl WHERE cl.comment.id = :commentId AND cl.status = :likeStatus")
     int getLikeOrDislikesCountOnComment(UUID commentId, LikeStatus likeStatus);
 
-    @Query("SELECT count(*) FROM PostLike pl WHERE pl.postId = :postId AND pl.status = :likeStatus")
+    @Query("SELECT count(*) FROM PostLike pl WHERE pl.post.id = :postId AND pl.status = :likeStatus")
     int getLikeOrDislikesCountOnPost(UUID postId, LikeStatus likeStatus);
 
     default int getLikeOrDislikesCount(UUID locationId, LikeLocation locationName, LikeStatus likeStatus) {
@@ -57,17 +56,17 @@ public interface LikeRepository extends JpaRepository<Like, UUID>, LikeQueryRepo
         return new LikesDislikesCountDto(likesCount, dislikesCount);
     }
 
-    @Query("SELECT u FROM CommentLike u WHERE u.userId = :userId AND u.commentId = :commentId")
+    @Query("SELECT u FROM CommentLike u WHERE u.userId = :userId AND u.comment.id = :commentId")
     Optional<Like> getCommentUserLike(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
 
-    @Query("SELECT u FROM PostLike u WHERE u.userId = :userId AND u.postId = :postId")
+    @Query("SELECT u FROM PostLike u WHERE u.userId = :userId AND u.post.id = :postId")
     Optional<Like> getPostUserLike(@Param("userId") UUID userId, @Param("postId") UUID postId);
 
     @Modifying
-    @Query("DELETE FROM PostLike u WHERE u.userId = :userId AND u.postId = :locationId")
+    @Query("DELETE FROM PostLike u WHERE u.userId = :userId AND u.post.id = :locationId")
     int deletePostLikeByUserIdAndLocationId(UUID userId, UUID locationId);
 
     @Modifying
-    @Query("DELETE FROM CommentLike u WHERE u.userId = :userId AND u.commentId = :locationId")
+    @Query("DELETE FROM CommentLike u WHERE u.userId = :userId AND u.comment.id = :locationId")
     int deleteCommentLikeByUserIdAndLocationId(UUID userId, UUID locationId);
 }

@@ -17,11 +17,11 @@ public class Post {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "user_id")
-    private UUID userId;
+//    @Column(name = "user_id")
+//    private UUID userId;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", updatable = false)
     private UserEntity user;
 
     @Column(name = "title")
@@ -33,8 +33,8 @@ public class Post {
     @Column(name = "content")
     private String content;
 
-    @OneToOne()
-    @JoinColumn(name = "blog_id", referencedColumnName = "id")
+    @ManyToOne()
+    @JoinColumn(name = "blog_id", referencedColumnName = "id", updatable = false)
     private Blog blog;
 
     @Column(name = "created_at")
@@ -44,9 +44,9 @@ public class Post {
     private boolean isBanned;
 
     // Constructor
-    public Post(UUID id, UUID userId, Blog blog, String shortDescription, String content, String title, LocalDateTime createdAt, boolean isBanned) {
+    public Post(UUID id, UserEntity user, Blog blog, String shortDescription, String content, String title, LocalDateTime createdAt, boolean isBanned) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.shortDescription = shortDescription;
         this.content = content;
@@ -66,12 +66,12 @@ public class Post {
         this.id = id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(UserEntity userId) {
+        this.user = user;
     }
 
     public String getTitle() {
@@ -122,13 +122,13 @@ public class Post {
         isBanned = banned;
     }
 
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
+//    public UserEntity getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
     // Methods
     public void updatePost(UpdatePostOfBlogDto updatePostDto) {
@@ -145,10 +145,10 @@ public class Post {
 //        this.isBanned = isBanned;
 //    }
 
-    public static Post createInstance(UUID userId, Blog blog, String shortDescription, String content, String title) {
+    public static Post createInstance(UserEntity user, Blog blog, String shortDescription, String content, String title) {
         return new Post(
                 UUID.randomUUID(),
-                userId,
+                user,
                 blog,
                 shortDescription,
                 content,

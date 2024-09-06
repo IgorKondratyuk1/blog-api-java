@@ -1,9 +1,9 @@
 package org.development.blogApi.core.like.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.development.blogApi.core.comment.entity.Comment;
 import org.development.blogApi.core.like.enums.LikeStatus;
+import org.development.blogApi.core.post.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,12 +12,18 @@ import java.util.UUID;
 @Table(name = "comment_like")
 public class CommentLike extends Like {
 
-    @Column(name = "comment_id")
-    private UUID commentId;
+//    @Column(name = "comment_id")
+//    private UUID commentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id", updatable = false)
+    private Comment comment;
 
     public CommentLike(UUID id, UUID userId, String userLogin, LikeStatus status, LocalDateTime createdAt, UUID commentId) {
         super(id, userId, userLogin, status, createdAt);
-        this.commentId = commentId;
+//        this.commentId = commentId;
+        this.comment = new Comment();
+        this.comment.setId(commentId);
     }
 
     public CommentLike() {}
@@ -50,11 +56,11 @@ public class CommentLike extends Like {
 
     @Override
     public UUID getLocationId() {
-        return commentId;
+        return this.comment.getId();
     }
 
     @Override
     public void setLocationId(UUID locationId) {
-        this.commentId = locationId;
+        comment.setId(locationId);
     }
 }

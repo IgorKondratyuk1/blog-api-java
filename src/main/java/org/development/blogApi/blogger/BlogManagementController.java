@@ -62,7 +62,6 @@ public class BlogManagementController {
             CommonQueryParamsDto commonQueryParamsDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -76,7 +75,6 @@ public class BlogManagementController {
             @RequestBody CreateBlogDto createBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -85,13 +83,13 @@ public class BlogManagementController {
         return new ResponseEntity<>(BlogMapper.toView(blog), HttpStatus.OK);
     }
 
+    // TODO Make annotation that will be check AuthenticationPrincipal
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(
             @PathVariable String id,
             @RequestBody UpdateBlogDto updateBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -105,7 +103,6 @@ public class BlogManagementController {
             @PathVariable String id,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -120,7 +117,6 @@ public class BlogManagementController {
             @RequestBody CreatePostOfBlogDto createPostOfBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }

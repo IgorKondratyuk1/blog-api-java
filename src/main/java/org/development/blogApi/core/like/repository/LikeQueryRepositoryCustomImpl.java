@@ -31,7 +31,7 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
     @Override
     public List<Like> getLastCommentLikesInfo(String locationId, int limitCount) {
         String jpql = "SELECT cl FROM CommentLike cl " +
-                        "WHERE cl.status = :status AND cl.commentId = :locationId " +
+                        "WHERE cl.status = :status AND cl.comment.id = :locationId " +
                         "ORDER BY cl.createdAt DESC";
 
         return entityManager.createQuery(jpql, Like.class)
@@ -45,7 +45,7 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
     public List<Like> getLastPostLikesInfo(String locationId, int limitCount) {
         String selectLastPostLikes =
                 "SELECT pl FROM PostLike pl " +
-                        "WHERE pl.status = :status AND pl.postId = :locationId " +
+                        "WHERE pl.status = :status AND pl.post.id = :locationId " +
                         "ORDER BY pl.createdAt DESC";
 
         return entityManager.createQuery(selectLastPostLikes, Like.class)

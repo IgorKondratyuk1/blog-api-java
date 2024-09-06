@@ -30,14 +30,15 @@ public class BlogService {
     }
 
     public Blog create(UUID userId, CreateBlogDto createBlogDto) {
-        Blog blog = Blog.createInstance(userId, createBlogDto);
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Blog blog = Blog.createInstance(user, createBlogDto);
         return this.blogsRepository.save(blog);
     }
 
     public void update(UUID userId, UUID blogId, UpdateBlogDto updateBlogDto) {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        if (!blog.getUserId().equals(userId)) {
+        if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Cannot update a blog that does not belong to the user");
         }
 
@@ -48,7 +49,7 @@ public class BlogService {
     public void remove(UUID userId, UUID blogId) {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        if (!blog.getUserId().equals(userId)) {
+        if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Cannot delete a blog that does not belong to the user");
         }
 
@@ -63,12 +64,12 @@ public class BlogService {
     public void bindBlogWithUser(UUID userId, UUID blogId) {
         Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Wrong blogId"));
 
-        if (blog.getUserId() != null) {
+        if (blog.getUser().getId() != null) {
             throw new RuntimeException("blog is already bounded");
         }
 
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("wrong userId"));
-        blog.setOwner(user.getId());
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        blog.setUser(user);
         blogsRepository.save(blog);
     }
 

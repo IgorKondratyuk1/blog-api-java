@@ -18,11 +18,11 @@ public class Blog {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "user_id")
-    private UUID userId;
+//    @Column(name = "user_id")
+//    private UUID userId;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
     @Column(name = "name")
@@ -49,19 +49,19 @@ public class Blog {
         this.websiteUrl = updateBlogDto.getWebsiteUrl();
     }
 
-    public void setOwner(UUID userId) {
-        this.userId = userId;
-    }
+//    public void setOwner(UUID userId) {
+//        this.userId = userId;
+//    }
 
 //    public void setIsBanned(boolean isBanned) {
 //        this.banInfo.setBanned(isBanned);
 //        this.banInfo.setBanDate(isBanned ? new Date() : null);
 //    }
 
-    public static Blog createInstance(UUID userId, CreateBlogDto createBlogDto) {
+    public static Blog createInstance(UserEntity user, CreateBlogDto createBlogDto) {
         return new Blog(
                 UUID.randomUUID(),
-                userId,
+                user,
                 createBlogDto.getName(),
                 createBlogDto.getWebsiteUrl(),
                 createBlogDto.getDescription(),
@@ -70,9 +70,9 @@ public class Blog {
         );
     }
 
-    public Blog(UUID id, UUID userId, String name, String websiteUrl, String description, boolean isMembership, LocalDateTime createdAt) {
+    public Blog(UUID id, UserEntity user, String name, String websiteUrl, String description, boolean isMembership, LocalDateTime createdAt) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.name = name;
         this.websiteUrl = websiteUrl;
         this.description = description;
@@ -92,12 +92,12 @@ public class Blog {
         this.id = id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public String getName() {
@@ -140,19 +140,19 @@ public class Blog {
         this.createdAt = createdAt;
     }
 
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
+//    public UserEntity getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(UserEntity user) {
+//        this.user = user;
+//    }
 
     @Override
     public String toString() {
         return "Blog{" +
-                "id='" + id + '\'' +
-                ", userId='" + userId + '\'' +
+                "id=" + id +
+                ", user=" + user +
                 ", name='" + name + '\'' +
                 ", websiteUrl='" + websiteUrl + '\'' +
                 ", description='" + description + '\'' +
@@ -166,11 +166,11 @@ public class Blog {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Blog blog = (Blog) o;
-        return isMembership == blog.isMembership && Objects.equals(id, blog.id) && Objects.equals(userId, blog.userId) && Objects.equals(name, blog.name) && Objects.equals(websiteUrl, blog.websiteUrl) && Objects.equals(description, blog.description) && Objects.equals(createdAt, blog.createdAt);
+        return isMembership == blog.isMembership && Objects.equals(id, blog.id) && Objects.equals(user, blog.user) && Objects.equals(name, blog.name) && Objects.equals(websiteUrl, blog.websiteUrl) && Objects.equals(description, blog.description) && Objects.equals(createdAt, blog.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, name, websiteUrl, description, isMembership, createdAt);
+        return Objects.hash(id, user, name, websiteUrl, description, isMembership, createdAt);
     }
 }
