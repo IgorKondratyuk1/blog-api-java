@@ -44,7 +44,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
     }
 
     @Override
-    public Optional<ViewPublicCommentDto> findByAndUserId(UUID commentId, UUID currentUserId) {
+    public Optional<ViewPublicCommentDto> findCommentByIdAndUserId(UUID commentId, UUID currentUserId) {
         String jpql = "SELECT ct FROM Comment ct " +
                 "LEFT JOIN ct.user u " +
                 "LEFT JOIN ct.post pt " +
@@ -103,7 +103,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
     }
 
     @Override
-    public PaginationDto<ViewBloggerCommentDto> findAllCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto commonQueryParamsDto) {
+    public PaginationDto<ViewBloggerCommentDto> findCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto commonQueryParamsDto) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
 

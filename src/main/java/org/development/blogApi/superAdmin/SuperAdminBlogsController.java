@@ -43,7 +43,7 @@ public class SuperAdminBlogsController {
 
     @GetMapping
     public ResponseEntity<PaginationDto<ViewBlogDto>> findAll(@RequestParam CommonQueryParamsDto query) {
-        PaginationDto<ViewBlogDto> result = blogQueryRepository.findAll(query, false);
+        PaginationDto<ViewBlogDto> result = blogQueryRepository.findAllBlogs(query, false);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -54,7 +54,8 @@ public class SuperAdminBlogsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBlog(@PathVariable("id") String id, @RequestBody UpdateBlogDto updateBlogDto) {
+    public ResponseEntity<Void> updateBlog(@PathVariable("id") String id,
+                                           @RequestBody UpdateBlogDto updateBlogDto) {
         blogService.update(null, UUID.fromString(id), updateBlogDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -67,13 +68,15 @@ public class SuperAdminBlogsController {
     }
 
     @PostMapping("/{blogId}/posts")
-    public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") String blogId, @RequestBody CreatePostOfBlogDto createPostOfBlogDto) {
+    public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") String blogId,
+                                                        @RequestBody CreatePostOfBlogDto createPostOfBlogDto) {
         ViewPostDto viewPostDto = postService.createByAdmin(UUID.fromString(blogId), createPostOfBlogDto);
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
 
     @GetMapping("/{blogId}/posts")
-    public ResponseEntity<PaginationDto<ViewPostDto>> findUserPosts(@PathVariable("blogId") String blogId, @RequestParam CommonQueryParamsDto query) {
+    public ResponseEntity<PaginationDto<ViewPostDto>> findUserPosts(@PathVariable("blogId") String blogId,
+                                                                    @RequestParam CommonQueryParamsDto query) {
         PaginationDto<ViewPostDto> viewPostDto = postQueryRepository.findPostsOfBlog(blogId, query, null);
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
@@ -87,13 +90,15 @@ public class SuperAdminBlogsController {
     }
 
     @DeleteMapping("/{blogId}/posts/{postId}")
-    public ResponseEntity<Void> removePost(@PathVariable("blogId") String blogId, @PathVariable("postId") String postId) {
+    public ResponseEntity<Void> removePost(@PathVariable("blogId") String blogId,
+                                           @PathVariable("postId") String postId) {
         postService.removeWithBlogIdByAdmin(postId, blogId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{blogId}/bind-with-user/{userId}")
-    public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") String blogId, @PathVariable("userId") String userId) {
+    public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") String blogId,
+                                             @PathVariable("userId") String userId) {
         blogService.bindBlogWithUser(UUID.fromString(userId), UUID.fromString(blogId));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -2,6 +2,7 @@ package org.development.blogApi.securityDevice;
 
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
+import org.development.blogApi.securityDevice.repository.SecurityDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

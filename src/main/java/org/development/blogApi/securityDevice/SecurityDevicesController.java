@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/security/devices")
+@RequestMapping("api/security/devices")
 public class SecurityDevicesController {
-    private final SecurityDevicesService securityDevicesService;
 
+    private final SecurityDevicesService securityDevicesService;
     private final JwtService jwtService;
 
     public SecurityDevicesController(SecurityDevicesService securityDevicesService, JwtService jwtService) {
@@ -24,7 +24,7 @@ public class SecurityDevicesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ViewSecurityDeviceDto>> findAll(HttpServletRequest request) {  // TODO check what is the ResponseEntity and maybe delete from response
+    public ResponseEntity<List<ViewSecurityDeviceDto>> findAllSecurityDevices(HttpServletRequest request) {  // TODO check what is the ResponseEntity and maybe delete from response
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         System.out.println(refreshToken);
         String userId = this.jwtService.extractUserId(refreshToken);
@@ -44,7 +44,7 @@ public class SecurityDevicesController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> removeAllExceptCurrent(HttpServletRequest request) {
+    public ResponseEntity<Void> deleteAllSecurityDevicesExceptCurrent(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         String userId = this.jwtService.extractUserId(refreshToken);
         String deviceId = this.jwtService.extractDeviceId(refreshToken);
@@ -58,7 +58,7 @@ public class SecurityDevicesController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeById(@PathVariable("id") String deviceId, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteSecurityDeviceById(@PathVariable("id") String deviceId, HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         String userId = this.jwtService.extractUserId(refreshToken);
 

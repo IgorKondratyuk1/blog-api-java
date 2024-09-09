@@ -29,7 +29,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
     }
 
     @Override
-    public Optional<ViewBlogDto> findOne(String id) {
+    public Optional<ViewBlogDto> findOneBlog(String id) {
         String jpql = "SELECT bt FROM Blog bt WHERE bt.id = :blogId";
         // AND bt.isBanned = FALSE";
 
@@ -45,7 +45,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
     }
 
     @Override
-    public PaginationDto<ViewBlogDto> findAll(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedBlogs) {
+    public PaginationDto<ViewBlogDto> findAllBlogs(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedBlogs) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, skipBannedBlogs, null);

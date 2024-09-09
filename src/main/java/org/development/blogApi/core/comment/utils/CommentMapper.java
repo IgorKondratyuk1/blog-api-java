@@ -47,11 +47,19 @@ public class CommentMapper {
                 post.getBlog().getName()
         );
 
+        LikeInfoDto likeInfoDto = new LikeInfoDto(likesCount, dislikesCount, likeStatus);
+
         return new ViewBloggerCommentDto(
                 comment.getId().toString(),
                 comment.getContent(),
                 new CommentatorInfoDto(comment.getUser().getId().toString(), comment.getUser().getLogin()),
                 comment.getCreatedAt().toString(),
-                viewPostInfoDto);
+                viewPostInfoDto,
+                likeInfoDto
+        );
+    }
+
+    public static ViewBloggerCommentDto toBloggerView(Comment comment, Post post) {
+        return CommentMapper.toBloggerView(comment, post, LikeStatus.NONE, 0, 0);
     }
 }

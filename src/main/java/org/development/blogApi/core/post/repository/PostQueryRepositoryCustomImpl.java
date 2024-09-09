@@ -36,10 +36,11 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
     }
 
     @Override
-    public Optional<ViewPostDto> findOne(String postId, String currentUserId) {
+    public Optional<ViewPostDto> findOnePost(String postId, String currentUserId) {
         String jpql = "SELECT pt FROM Post pt " +
                 "LEFT JOIN pt.blog bt " +
-                "WHERE pt.id = :postId AND pt.isBanned = FALSE";
+                "WHERE pt.id = :postId";
+//                " AND pt.isBanned = FALSE";
 
 
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
@@ -64,7 +65,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
     }
 
     @Override
-    public PaginationDto<ViewPostDto> findAll(CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
+    public PaginationDto<ViewPostDto> findAllPosts(CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, null, null);
@@ -90,7 +91,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
         // Convert to ViewPostDto
         List<ViewPostDto> postViewModels = foundedPosts.stream()
-                .map(post -> findOne(post.getId().toString(), currentUserId).get())
+                .map(post -> findOnePost(post.getId().toString(), currentUserId).get())
                 .collect(Collectors.toList());
 
         return new PaginationDto<>(
@@ -128,7 +129,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
         // Convert to ViewPostDto
         List<ViewPostDto> postViewModels = foundedPosts.stream()
-                .map(post -> findOne(post.getId().toString(), currentUserId).get())
+                .map(post -> findOnePost(post.getId().toString(), currentUserId).get())
                 .collect(Collectors.toList());
 
         return new PaginationDto<>(
@@ -167,7 +168,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
         // Convert to ViewPostDto
         List<ViewPostDto> postViewModels = foundedPosts.stream()
-                .map(post -> findOne(post.getId().toString(), userId).get())
+                .map(post -> findOnePost(post.getId().toString(), userId).get())
                 .collect(Collectors.toList());
 
         return new PaginationDto<>(

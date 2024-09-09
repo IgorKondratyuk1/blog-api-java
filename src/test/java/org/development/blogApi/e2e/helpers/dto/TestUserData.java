@@ -1,4 +1,4 @@
-package org.development.blogApi.e2e.helpers;
+package org.development.blogApi.e2e.helpers.dto;
 
 import lombok.Data;
 

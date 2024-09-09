@@ -76,7 +76,7 @@ public class PostService {
         }
 
         if (!post.getUser().getId().toString().equals(userId)) {
-            throw new RuntimeException("Cannot update post with wrong user id");
+            throw new RuntimeException("Can not update post with wrong user id");
         }
 
         post.updatePost(updatePostDto);

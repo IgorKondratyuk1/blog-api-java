@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public interface BlogQueryRepositoryCustom {
     // Method to find a blog by its ID
-    Optional<ViewBlogDto> findOne(String id);
+    Optional<ViewBlogDto> findOneBlog(String id);
 
     // Method to find all blogs with pagination and filtering
-    PaginationDto<ViewBlogDto> findAll(CommonQueryParamsDto queryObj, boolean skipBannedBlogs);
+    PaginationDto<ViewBlogDto> findAllBlogs(CommonQueryParamsDto queryObj, boolean skipBannedBlogs);
 
     // Method to find blogs with extended information
     PaginationDto<ViewExtendedBlogDto> findBlogsWithExtendedInfo(CommonQueryParamsDto queryObj);
