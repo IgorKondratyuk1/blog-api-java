@@ -7,10 +7,13 @@ import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("api/testing")
+@RestController
+@RequestMapping("api/testing")
 public class DeleteDataController {
 
     private final LikeRepository likeRepository;
@@ -31,9 +34,11 @@ public class DeleteDataController {
         this.userRepository = userRepository;
     }
 
-    @DeleteMapping
+    @Transactional
+    @DeleteMapping("/all-data")
     public ResponseEntity<Void> deleteAllData() {
-        likeRepository.deleteAll();
+        likeRepository.deleteAllCommentLikes();
+        likeRepository.deleteAllPostLikes();
         commentRepository.deleteAll();
         postRepository.deleteAll();
         blogRepository.deleteAll();
