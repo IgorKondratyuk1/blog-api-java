@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CommentQueryRepositoryCustom {
-    Optional<ViewPublicCommentDto> findByAndUserId(UUID commentId, UUID currentUserId);
+    Optional<ViewPublicCommentDto> findCommentByIdAndUserId(UUID commentId, UUID currentUserId);
 
     PaginationDto<ViewPublicCommentDto> findCommentsOfPost(UUID postId, CommonQueryParamsDto queryObj, UUID currentUserId);
 
-    PaginationDto<ViewBloggerCommentDto> findAllCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto queryObj);
+    PaginationDto<ViewBloggerCommentDto> findCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto queryObj);
 }

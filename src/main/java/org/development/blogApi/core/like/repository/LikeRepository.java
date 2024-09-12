@@ -69,4 +69,12 @@ public interface LikeRepository extends JpaRepository<Like, UUID>, LikeQueryRepo
     @Modifying
     @Query("DELETE FROM CommentLike u WHERE u.userId = :userId AND u.comment.id = :locationId")
     int deleteCommentLikeByUserIdAndLocationId(UUID userId, UUID locationId);
+
+    @Modifying
+    @Query("DELETE FROM CommentLike")
+    void deleteAllCommentLikes();
+
+    @Modifying
+    @Query("DELETE FROM PostLike")
+    void deleteAllPostLikes();
 }

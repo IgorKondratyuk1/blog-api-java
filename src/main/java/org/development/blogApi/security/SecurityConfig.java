@@ -50,7 +50,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/sa/**").permitAll()
+<<<<<<< HEAD
                         .requestMatchers("/testing/**").permitAll() // TODO Test
+=======
+                        .requestMatchers("/api/testing/**").permitAll()
+>>>>>>> 6d0c0cd051d977ed945e4cd72866a38e78df7de6
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

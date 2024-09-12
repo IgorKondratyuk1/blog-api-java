@@ -5,10 +5,10 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.Data;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.e2e.helpers.TestHelpers;
-import org.development.blogApi.e2e.helpers.TestUserData;
+import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
+import org.development.blogApi.e2e.helpers.dto.TestUserData;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -205,32 +205,10 @@ class AuthTests {
         @DisplayName("User can login after SA creation")
         @Order(2)
         void successLoginAfterSACreation() {
-            // Set up headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json");
+            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
 
-            String body = "{\"loginOrEmail\":\"" + passwordRecoveryUserData.getUsername() + "\", \"password\":\"" + passwordRecoveryUserData.getPassword() + "\"}";
-            HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
-
-            ResponseEntity<AuthResponseDto> response = restTemplate
-                    .exchange(
-                            "/api/auth/login",
-                            HttpMethod.POST,
-                            httpEntity,
-                            AuthResponseDto.class
-                    );
-
-
-            String accessToken = response.getBody().getAccessToken();
-            String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")
-                    .orElseThrow(() -> new RuntimeException("No refresh token for test"));
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(accessToken).isNotNull();
-            assertThat(refreshToken).isNotNull();
-
-            passwordRecoveryUserData.setAccessToken(accessToken);
-            passwordRecoveryUserData.setAccessToken(refreshToken);
+            passwordRecoveryUserData.setAccessToken(tokensPairData.getAccessToken());
+            passwordRecoveryUserData.setRefreshToken(tokensPairData.getRefreshToken());
         }
 
         @Test
@@ -298,32 +276,10 @@ class AuthTests {
         @DisplayName("User can login after password-recovery")
         @Order(5)
         void successLoginAfterPasswordRecovery() {
-            // Set up headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json");
+            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
 
-            String body = "{\"loginOrEmail\":\"" + passwordRecoveryUserData.getUsername() + "\", \"password\":\"" + passwordRecoveryUserData.getPassword() + "\"}";
-            HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
-
-            ResponseEntity<AuthResponseDto> response = restTemplate
-                    .exchange(
-                            "/api/auth/login",
-                            HttpMethod.POST,
-                            httpEntity,
-                            AuthResponseDto.class
-                    );
-
-
-            String accessToken = response.getBody().getAccessToken();
-            String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")
-                    .orElseThrow(() -> new RuntimeException("No refresh token for test"));
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(accessToken).isNotNull();
-            assertThat(refreshToken).isNotNull();
-
-            passwordRecoveryUserData.setAccessToken(accessToken);
-            passwordRecoveryUserData.setAccessToken(refreshToken);
+            passwordRecoveryUserData.setAccessToken(tokensPairData.getAccessToken());
+            passwordRecoveryUserData.setRefreshToken(tokensPairData.getRefreshToken());
         }
     }
 }

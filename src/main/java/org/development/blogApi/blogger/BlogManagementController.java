@@ -181,7 +181,7 @@ public class BlogManagementController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        PaginationDto<ViewBloggerCommentDto> allCommentsOfUserBlogs = commentQueryRepository.findAllCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto);
+        PaginationDto<ViewBloggerCommentDto> allCommentsOfUserBlogs = commentQueryRepository.findCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto);
         return new ResponseEntity<>(allCommentsOfUserBlogs, HttpStatus.OK);
     }
 }

@@ -1,4 +1,4 @@
-package org.development.blogApi.securityDevice;
+package org.development.blogApi.securityDevice.repository;
 
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.springframework.data.jpa.repository.JpaRepository;

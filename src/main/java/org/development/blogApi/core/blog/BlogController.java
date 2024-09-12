@@ -1,17 +1,25 @@
 package org.development.blogApi.core.blog;
 
+import org.development.blogApi.common.dto.CommonQueryParamsDto;
+import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogQueryRepository;
-import org.development.blogApi.core.blog.utils.BlogMapper;
-import org.development.blogApi.common.dto.CommonQueryParamsDto;
+import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
+import org.development.blogApi.security.CustomUserDetails;
+import org.development.blogApi.user.dto.request.QueryUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/blogs")
@@ -29,24 +37,35 @@ public class BlogController {
     }
 
     @GetMapping()
-    public List<ViewBlogDto> getAllBlogs(CommonQueryParamsDto query) { // TODO check query params
-        return this.blogQueryRepository.findAll().stream().map(blog -> BlogMapper.toView(blog)).collect(Collectors.toList()); // Create method
+    public ResponseEntity<PaginationDto<ViewBlogDto>> findAllBlogs(CommonQueryParamsDto query) { // TODO check query params
+        PaginationDto<ViewBlogDto> paginationDto = this.blogQueryRepository.findAllBlogs(query, false);
+        return new ResponseEntity<>(paginationDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ViewBlogDto findBlog(@PathVariable String id) {
-        Blog blog = this.blogQueryRepository.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("User not found"));
-        return BlogMapper.toView(blog);
+    public ResponseEntity<?> findBlogById(@PathVariable String id) {
+        Optional<ViewBlogDto> optionalViewBlogDto = this.blogQueryRepository.findOneBlog(id);
+
+        if (optionalViewBlogDto.isEmpty()) {
+            return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(optionalViewBlogDto.get(), HttpStatus.OK);
     }
 
-//    @GetMapping("/{id}/posts")
-//    public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-//        Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Blog not found"));
-//        if (blog == null) {
-//            return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);
-//        }
-//
-//        List<ViewPostDto> posts = this.postQueryRepository.findPostsOfBlog(id, query, userId);
-//        return ResponseEntity.ok(posts);
-//    }
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query,
+                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Blog not found"));
+        if (blog == null) {
+            return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);
+        }
+
+        PaginationDto<ViewPostDto> paginationDto = this.postQueryRepository.findPostsOfBlog(id, query, customUserDetails.getUserId());
+        return ResponseEntity.ok(paginationDto);
+    }
 }

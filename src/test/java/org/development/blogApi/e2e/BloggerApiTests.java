@@ -2,10 +2,6 @@ package org.development.blogApi.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.checkerframework.checker.units.qual.A;
-import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
@@ -16,12 +12,11 @@ import org.development.blogApi.core.post.dto.request.UpdatePostOfBlogDto;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.e2e.helpers.TestHelpers;
-import org.development.blogApi.e2e.helpers.TestUserData;
+import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
+import org.development.blogApi.e2e.helpers.dto.TestUserData;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
-import org.development.blogApi.utils.CookieUtil;
-import org.development.blogApi.utils.UuidUtil;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,8 +25,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BloggerTests {
+public class BloggerApiTests {
 
     // TODO extract user data to help method
     private static TestUserData testUserData = new TestUserData("gotevi9602@konetas.com", "oneUser", "1111111");
@@ -79,32 +72,10 @@ public class BloggerTests {
     @DisplayName("User can login after password-recovery")
     @Order(2)
     void successLogin() {
-        // Set up headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
+        TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, testUserData.getUsername(), testUserData.getPassword());
 
-        String body = "{\"loginOrEmail\":\"" + testUserData.getUsername() + "\", \"password\":\"" + testUserData.getPassword() + "\"}";
-        HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<AuthResponseDto> response = restTemplate
-                .exchange(
-                        "/api/auth/login",
-                        HttpMethod.POST,
-                        httpEntity,
-                        AuthResponseDto.class
-                );
-
-
-        String accessToken = response.getBody().getAccessToken();
-        String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")
-                .orElseThrow(() -> new RuntimeException("No refresh token for test"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(accessToken).isNotNull();
-        assertThat(refreshToken).isNotNull();
-
-        testUserData.setAccessToken(accessToken);
-        testUserData.setAccessToken(refreshToken);
+        testUserData.setAccessToken(tokensPairData.getAccessToken());
+        testUserData.setRefreshToken(tokensPairData.getRefreshToken());
     }
 
     @Nested
@@ -170,8 +141,7 @@ public class BloggerTests {
                             "/api/blogger/blogs?sortDirection=asc",
                             HttpMethod.GET,
                             httpEntity,
-                            new ParameterizedTypeReference<PaginationDto<ViewBlogDto>>() {
-                            }
+                            new ParameterizedTypeReference<PaginationDto<ViewBlogDto>>() {}
                     );
 
             assertThat(response.getBody().getTotalCount()).isEqualTo(2);
@@ -416,6 +386,6 @@ public class BloggerTests {
 
 
 
-
+        // TODO Delete Blog
     }
 }

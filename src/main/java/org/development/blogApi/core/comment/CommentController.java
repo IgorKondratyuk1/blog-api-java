@@ -26,20 +26,19 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        System.out.println("customUserDetails: " + customUserDetails);
+    public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findByAndUserId(UUID.fromString(id), UUID.fromString(customUserDetails.getUserId()))
+        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), UUID.fromString(customUserDetails.getUserId()))
                 .orElse(null);
 
         return new ResponseEntity<>(viewPublicCommentDto, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(
+    public ResponseEntity<?> updateComment(
             @PathVariable("id") String id,
             @RequestBody UpdateCommentDto updateCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -54,7 +53,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}/like-status")
-    public ResponseEntity<?> updateLikeStatus(
+    public ResponseEntity<?> updateCommentLikeStatus(
             @PathVariable("id") String id,
             @RequestBody UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -69,7 +68,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> remove(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<?> deleteComment(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
