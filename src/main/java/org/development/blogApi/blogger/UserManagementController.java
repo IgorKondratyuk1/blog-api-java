@@ -24,7 +24,7 @@
 //    public List<BanQueryRepository.BannedUserDto> getBannedForBlogUsers(
 //            @PathVariable String blogId,
 //            @RequestAttribute("tokenPayload") AuthTokenPayloadDto tokenPayload,
-//            @RequestParam Map<String, String> query) {
+//            Map<String, String> query) {
 //
 //        return blogsService.findById(blogId).thenCompose(blog -> {
 //            if (blog == null) {

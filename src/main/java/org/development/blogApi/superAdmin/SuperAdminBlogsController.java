@@ -42,7 +42,7 @@ public class SuperAdminBlogsController {
     }
 
     @GetMapping
-    public ResponseEntity<PaginationDto<ViewBlogDto>> findAll(@RequestParam CommonQueryParamsDto query) {
+    public ResponseEntity<PaginationDto<ViewBlogDto>> findAll(CommonQueryParamsDto query) {
         PaginationDto<ViewBlogDto> result = blogQueryRepository.findAllBlogs(query, false);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -76,7 +76,7 @@ public class SuperAdminBlogsController {
 
     @GetMapping("/{blogId}/posts")
     public ResponseEntity<PaginationDto<ViewPostDto>> findUserPosts(@PathVariable("blogId") String blogId,
-                                                                    @RequestParam CommonQueryParamsDto query) {
+                                                                    CommonQueryParamsDto query) {
         PaginationDto<ViewPostDto> viewPostDto = postQueryRepository.findPostsOfBlog(blogId, query, null);
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }

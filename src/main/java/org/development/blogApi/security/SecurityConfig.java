@@ -42,6 +42,21 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
+    public SecurityFilterChain basicFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/actuator/*", "/api/sa/*")
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(customBasicAuthProvider.basicAuthProvider());
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
@@ -49,7 +64,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/sa/**").permitAll()
                         .requestMatchers("/api/testing/**").permitAll() // TODO Test
                         .anyRequest().authenticated()
                 )
@@ -58,23 +72,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
                         httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain basicFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/actuator/**", "/api/sa/**")
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
-                .authorizeHttpRequests(auth -> auth
-                                .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authenticationProvider(customBasicAuthProvider.basicAuthProvider());
 
         return http.build();
     }

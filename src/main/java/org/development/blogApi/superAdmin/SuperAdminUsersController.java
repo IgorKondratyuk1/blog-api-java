@@ -42,7 +42,7 @@ public class SuperAdminUsersController {
     }
 
     @GetMapping
-    public ResponseEntity<PaginationDto<ViewUserDto>> findAll(@RequestParam QueryUserDto queryUserDto) {
+    public ResponseEntity<PaginationDto<ViewUserDto>> findAll(QueryUserDto queryUserDto) {
         PaginationDto<ViewUserDto> result = userQueryRepository.findAllUsersWithCustomQueries(queryUserDto);
         return ResponseEntity.ok(result);
     }
