@@ -1,5 +1,6 @@
 package org.development.blogApi.blogger;
 
+import jakarta.validation.Valid;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
@@ -72,7 +73,7 @@ public class BlogManagementController {
 
     @PostMapping
     public ResponseEntity<?> createBlog(
-            @RequestBody CreateBlogDto createBlogDto,
+            @RequestBody @Valid CreateBlogDto createBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         if (customUserDetails == null) {
@@ -87,7 +88,7 @@ public class BlogManagementController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(
             @PathVariable String id,
-            @RequestBody UpdateBlogDto updateBlogDto,
+            @RequestBody @Valid UpdateBlogDto updateBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         if (customUserDetails == null) {
@@ -114,7 +115,7 @@ public class BlogManagementController {
     @PostMapping("/{blogId}/posts")
     public ResponseEntity<?> createPostOfBlog(
             @PathVariable String blogId,
-            @RequestBody CreatePostOfBlogDto createPostOfBlogDto,
+            @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         if (customUserDetails == null) {
@@ -144,7 +145,7 @@ public class BlogManagementController {
     public ResponseEntity<?> updatePost(
             @PathVariable String blogId,
             @PathVariable String postId,
-            @RequestBody UpdatePostOfBlogDto updatePostOfBlogDto,
+            @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         System.out.println("customUserDetails: " + customUserDetails);

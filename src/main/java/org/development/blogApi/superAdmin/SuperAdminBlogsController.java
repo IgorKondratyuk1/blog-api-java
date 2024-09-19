@@ -1,5 +1,6 @@
 package org.development.blogApi.superAdmin;
 
+import jakarta.validation.Valid;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.BlogService;
@@ -48,14 +49,14 @@ public class SuperAdminBlogsController {
     }
 
     @PostMapping
-    public ResponseEntity<ViewBlogDto> createBlog(@RequestBody CreateBlogDto createBlogDto) {
+    public ResponseEntity<ViewBlogDto> createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
         Blog blog = blogService.create(null, createBlogDto);
         return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateBlog(@PathVariable("id") String id,
-                                           @RequestBody UpdateBlogDto updateBlogDto) {
+                                           @RequestBody @Valid UpdateBlogDto updateBlogDto) {
         blogService.update(null, UUID.fromString(id), updateBlogDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -69,7 +70,7 @@ public class SuperAdminBlogsController {
 
     @PostMapping("/{blogId}/posts")
     public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") String blogId,
-                                                        @RequestBody CreatePostOfBlogDto createPostOfBlogDto) {
+                                                        @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto) {
         ViewPostDto viewPostDto = postService.createByAdmin(UUID.fromString(blogId), createPostOfBlogDto);
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
@@ -84,7 +85,7 @@ public class SuperAdminBlogsController {
     @PutMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable("blogId") String blogId,
                                            @PathVariable("postId") String postId,
-                                           @RequestBody UpdatePostOfBlogDto updatePostOfBlogDto) {
+                                           @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto) {
         postService.updateWithBlogIdByAdmin(postId, blogId, updatePostOfBlogDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }

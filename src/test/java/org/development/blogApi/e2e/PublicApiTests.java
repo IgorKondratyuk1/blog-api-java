@@ -2,6 +2,7 @@ package org.development.blogApi.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
@@ -16,6 +17,7 @@ import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
+import org.development.blogApi.user.dto.request.CreateUserDto;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -59,42 +61,35 @@ public class PublicApiTests {
     @Test
     @DisplayName("Create first user by SA")
     @Order(1)
-    void createFirstUser() {
-        ResponseEntity<ViewUserDto> response = TestHelpers.createUserBySa(
-                restTemplate,
+    void createFirstUser() throws JsonProcessingException {
+        CreateUserDto createUserDto = new CreateUserDto(
                 firstUserData.getUsername(),
                 firstUserData.getPassword(),
                 firstUserData.getEmail());
+        ViewUserDto viewUserDto = TestHelpers.createUserBySa(restTemplate, createUserDto);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getLogin()).isEqualTo(firstUserData.getUsername());
-        assertThat(response.getBody().getEmail()).isEqualTo(firstUserData.getEmail());
-
-        firstUserData.setId(UUID.fromString(response.getBody().getId()));
+        firstUserData.setId(UUID.fromString(viewUserDto.getId()));
     }
 
     @Test
     @DisplayName("Create second user by SA")
     @Order(2)
-    void createSecondUser() {
-        ResponseEntity<ViewUserDto> response = TestHelpers.createUserBySa(
-                restTemplate,
+    void createSecondUser() throws JsonProcessingException {
+        CreateUserDto createUserDto = new CreateUserDto(
                 secondUserData.getUsername(),
                 secondUserData.getPassword(),
                 secondUserData.getEmail());
+        ViewUserDto viewUserDto = TestHelpers.createUserBySa(restTemplate,createUserDto);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getLogin()).isEqualTo(secondUserData.getUsername());
-        assertThat(response.getBody().getEmail()).isEqualTo(secondUserData.getEmail());
-
-        secondUserData.setId(UUID.fromString(response.getBody().getId()));
+        secondUserData.setId(UUID.fromString(viewUserDto.getId()));
     }
 
     @Test
     @DisplayName("First user can login")
     @Order(3)
-    void successLoginWithFirstUser() {
-        TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, firstUserData.getUsername(), firstUserData.getPassword());
+    void successLoginWithFirstUser() throws JsonProcessingException {
+        LoginDto loginDto = new LoginDto(firstUserData.getUsername(), firstUserData.getPassword());
+        TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, loginDto);
 
         firstUserData.setAccessToken(tokensPairData.getAccessToken());
         firstUserData.setRefreshToken(tokensPairData.getRefreshToken());

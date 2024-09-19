@@ -1,5 +1,6 @@
 package org.development.blogApi.superAdmin;
 
+import jakarta.validation.Valid;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.user.UserService;
 import org.development.blogApi.user.dto.request.CreateUserDto;
@@ -35,7 +36,7 @@ public class SuperAdminUsersController {
 //    }
 
     @PostMapping
-    public ResponseEntity<ViewUserDto> create(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<ViewUserDto> create(@RequestBody @Valid CreateUserDto createUserDto) {
         UserEntity createdUser = userService.create(createUserDto, true);
         ViewUserDto viewUserDto = UserMapper.toView(createdUser);
         return new ResponseEntity<>(viewUserDto, HttpStatus.CREATED);

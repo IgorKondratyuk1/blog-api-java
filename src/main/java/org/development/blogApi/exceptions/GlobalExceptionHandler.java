@@ -1,16 +1,15 @@
-package org.development.blogApi.exeption;
+package org.development.blogApi.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.development.blogApi.exeption.dto.APIErrorResult;
-import org.development.blogApi.exeption.dto.APIFieldError;
-import org.development.blogApi.exeption.dto.APIValidationErrorResult;
+import org.antlr.v4.runtime.atn.SemanticContext;
+import org.development.blogApi.exceptions.dto.APIErrorResult;
+import org.development.blogApi.exceptions.dto.APIFieldError;
+import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,11 +21,11 @@ import java.util.List;
 
 @Slf4j
 @ControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
     // For field validation Error
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleRuntimeException(MethodArgumentNotValidException exception) {
         log.info("GlobalExceptionHandler MethodArgumentNotValidException");
 
@@ -43,9 +42,9 @@ public class GlobalExceptionHandler {
     }
 
     // For expired Jwt token Error
-    @ExceptionHandler(value = {ExpiredJwtException.class})
+    @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<Object> handleRuntimeException(ExpiredJwtException exception) {
-        log.error("GlobalExceptionHandler Exception");
+        log.error("GlobalExceptionHandler JWT");
         exception.printStackTrace();
 
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Jwt token is expired");
@@ -63,7 +62,7 @@ public class GlobalExceptionHandler {
                 .body(apiErrorResult);
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
         log.error("GlobalExceptionHandler Exception");
         exception.printStackTrace();

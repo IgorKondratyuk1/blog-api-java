@@ -1,5 +1,6 @@
 package org.development.blogApi.core.comment;
 
+import jakarta.validation.Valid;
 import org.development.blogApi.core.comment.dto.request.UpdateCommentDto;
 import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
@@ -40,7 +41,7 @@ public class CommentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateComment(
             @PathVariable("id") String id,
-            @RequestBody UpdateCommentDto updateCommentDto,
+            @RequestBody @Valid UpdateCommentDto updateCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         System.out.println("customUserDetails: " + customUserDetails);
@@ -55,7 +56,7 @@ public class CommentController {
     @PutMapping("/{id}/like-status")
     public ResponseEntity<?> updateCommentLikeStatus(
             @PathVariable("id") String id,
-            @RequestBody UpdateLikeDto updateLikeDto,
+            @RequestBody @Valid UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         System.out.println("customUserDetails: " + customUserDetails);

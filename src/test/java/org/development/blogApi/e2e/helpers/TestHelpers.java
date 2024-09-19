@@ -2,6 +2,7 @@ package org.development.blogApi.e2e.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
@@ -10,8 +11,10 @@ import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.post.dto.request.CreatePostOfBlogDto;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
+import org.development.blogApi.user.dto.request.CreateUserDto;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.utils.CookieUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
@@ -19,28 +22,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestHelpers {
 
-    public static ResponseEntity<ViewUserDto> createUserBySa(TestRestTemplate restTemplate, String login, String password, String email) {
+    public static ViewUserDto createUserBySa(TestRestTemplate restTemplate, CreateUserDto createUserDto) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
+        headers.set("Authorization", "Basic YWRtaW46cXdlcnR5");
 
-        String body = "{\"login\":\"" + login + "\",\"password\":\"" + password + "\",\"email\":\"" + email + "\"}";
+        ObjectMapper Obj = new ObjectMapper();
+        String body = Obj.writeValueAsString(createUserDto);
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
-        // TODO add assertThat
-
-        return restTemplate.exchange(
+        ResponseEntity<ViewUserDto> response = restTemplate.exchange(
                 "/api/sa/users",
                 HttpMethod.POST,
                 httpEntity,
                 ViewUserDto.class
         );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getLogin()).isEqualTo(createUserDto.getLogin());
+        assertThat(response.getBody().getEmail()).isEqualTo(createUserDto.getEmail());
+
+        return response.getBody();
     }
 
-    public static TestTokensPairData login(TestRestTemplate restTemplate, String username, String password) {
+    public static TestTokensPairData login(TestRestTemplate restTemplate, LoginDto loginDto) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
-        String body = "{\"loginOrEmail\":\"" + username + "\", \"password\":\"" + password + "\"}";
+        ObjectMapper Obj = new ObjectMapper();
+        String body = Obj.writeValueAsString(loginDto);
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
         ResponseEntity<AuthResponseDto> response = restTemplate
@@ -50,7 +60,6 @@ public class TestHelpers {
                         httpEntity,
                         AuthResponseDto.class
                 );
-
 
         String accessToken = response.getBody().getAccessToken();
         String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")

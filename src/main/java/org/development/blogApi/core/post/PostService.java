@@ -12,6 +12,7 @@ import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.utils.PostMapper;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class PostService {
 
     public Post create(UUID userId, UUID blogId, CreatePostOfBlogDto createPostOfBlogDto) {
         Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Blog doesn't belong to the current user");

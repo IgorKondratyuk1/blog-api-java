@@ -121,7 +121,7 @@ public class PostController {
     @PostMapping("/{id}/comments")
     public ResponseEntity<?> createCommentsOfPost(
             @PathVariable String id,
-            @Valid @RequestBody CreateCommentDto createCommentDto,
+            @RequestBody @Valid CreateCommentDto createCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         if (customUserDetails == null) {
@@ -141,7 +141,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> updateLikeStatus(
             @PathVariable String id,
-            @Valid @RequestBody UpdateLikeDto updateLikeDto,
+            @RequestBody @Valid UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         if (customUserDetails == null) {

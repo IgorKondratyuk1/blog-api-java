@@ -2,6 +2,7 @@ package org.development.blogApi.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
@@ -14,6 +15,7 @@ import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
+import org.development.blogApi.user.dto.request.CreateUserDto;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -54,25 +56,22 @@ public class BloggerApiTests {
     @Test
     @DisplayName("Create User By SA")
     @Order(1)
-    void createUser() {
-        ResponseEntity<ViewUserDto> response = TestHelpers.createUserBySa(
-                restTemplate,
+    void createUser() throws JsonProcessingException {
+        CreateUserDto createUserDto = new CreateUserDto(
                 testUserData.getUsername(),
                 testUserData.getPassword(),
                 testUserData.getEmail());
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getLogin()).isEqualTo(testUserData.getUsername());
-        assertThat(response.getBody().getEmail()).isEqualTo(testUserData.getEmail());
-
-        testUserData.setId(UUID.fromString(response.getBody().getId()));
+        ViewUserDto viewUserDto = TestHelpers.createUserBySa(restTemplate, createUserDto);
+        testUserData.setId(UUID.fromString(viewUserDto.getId()));
     }
 
     @Test
     @DisplayName("User can login after password-recovery")
     @Order(2)
-    void successLogin() {
-        TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, testUserData.getUsername(), testUserData.getPassword());
+    void successLogin() throws JsonProcessingException {
+        LoginDto loginDto = new LoginDto(testUserData.getUsername(), testUserData.getPassword());
+        TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, loginDto);
 
         testUserData.setAccessToken(tokensPairData.getAccessToken());
         testUserData.setRefreshToken(tokensPairData.getRefreshToken());

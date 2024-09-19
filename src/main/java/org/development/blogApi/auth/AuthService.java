@@ -7,6 +7,7 @@ import org.development.blogApi.auth.dto.request.RegistrationConfirmationDto;
 import org.development.blogApi.auth.dto.request.RegistrationEmailResendDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.email.EmailManager;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.securityDevice.SecurityDevicesService;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
@@ -76,7 +77,7 @@ public class AuthService {
 
     public void resendConfirmCode(RegistrationEmailResendDto registrationEmailResendDto) {
         // 1. Check user
-        UserEntity user = this.userRepository.findByLoginOrEmail(registrationEmailResendDto.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity user = this.userRepository.findByLoginOrEmail(registrationEmailResendDto.getEmail()).orElseThrow(() -> new UserNotFoundException());
         if (user.getEmailConfirmation().isConfirmed()) { throw new RuntimeException("User is already confirmed"); }
 
         // 2. Renew and save ConfirmationCode
@@ -88,7 +89,7 @@ public class AuthService {
     }
 
     public AuthTokensDto login(ExtendedLoginDataDto extendedLoginDataDto) {
-        UserEntity userEntity = this.userRepository.findByLoginOrEmail(extendedLoginDataDto.getLoginOrEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity userEntity = this.userRepository.findByLoginOrEmail(extendedLoginDataDto.getLoginOrEmail()).orElseThrow(() -> new UserNotFoundException());
         if (!userEntity.getEmailConfirmation().isConfirmed()) { throw new RuntimeException("User not confirmed"); }
 
         CreateSecurityDeviceDto createSecurityDeviceDto = new CreateSecurityDeviceDto(
@@ -117,7 +118,7 @@ public class AuthService {
 
         if (login == null || deviceId == null) { throw new RuntimeException("Refresh Token not valid!"); }
 
-        UserEntity userEntity = this.userRepository.findByLoginOrEmail(login).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity userEntity = this.userRepository.findByLoginOrEmail(login).orElseThrow(() -> new UserNotFoundException());
         SecurityDevice securityDevice = this.securityDevicesService.findDeviceSessionByDeviceId(deviceId);
 
         if(jwtService.isTokenValid(refreshToken, userEntity)) {

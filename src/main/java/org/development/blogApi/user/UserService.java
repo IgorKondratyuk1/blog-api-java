@@ -1,6 +1,7 @@
 package org.development.blogApi.user;
 
 import jakarta.transaction.Transactional;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.dto.request.CreateUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;
@@ -33,12 +34,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserEntity findById(String id) {
-        return userRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new RuntimeException("User not found")); // TODO create own errors .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public UserEntity findById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException()); // TODO create own errors .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public void remove(UUID id) {
+        userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
         userRepository.deleteById(id);
     }
 

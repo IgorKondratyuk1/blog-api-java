@@ -1,12 +1,9 @@
-package org.development.blogApi.exeption.dto;
+package org.development.blogApi.exceptions.dto;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class APIErrorResult {

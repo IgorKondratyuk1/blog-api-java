@@ -4,6 +4,7 @@ import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogRepository;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,13 @@ public class BlogService {
     }
 
     public Blog create(UUID userId, CreateBlogDto createBlogDto) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         Blog blog = Blog.createInstance(user, createBlogDto);
         return this.blogsRepository.save(blog);
     }
 
     public void update(UUID userId, UUID blogId, UpdateBlogDto updateBlogDto) {
-        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new UserNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Cannot update a blog that does not belong to the user");
@@ -68,7 +69,7 @@ public class BlogService {
             throw new RuntimeException("blog is already bounded");
         }
 
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
         blog.setUser(user);
         blogsRepository.save(blog);
     }

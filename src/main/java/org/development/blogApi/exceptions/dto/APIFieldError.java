@@ -1,4 +1,4 @@
-package org.development.blogApi.exeption.dto;
+package org.development.blogApi.exceptions.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

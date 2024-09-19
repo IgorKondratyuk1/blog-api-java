@@ -1,14 +1,18 @@
 package org.development.blogApi.e2e;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.java.Log;
+import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
+import org.development.blogApi.user.dto.request.CreateUserDto;
 import org.development.blogApi.user.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -26,7 +30,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 
 @AutoConfigureTestDatabase
@@ -184,28 +187,26 @@ class AuthTests {
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class PasswordRecovery {
 
-        private static TestUserData passwordRecoveryUserData = new TestUserData("gotevi9602@konetas.com", "anotherUser", "1111111");
+        private static TestUserData passwordRecoveryUserData = new TestUserData("gotevi9602@konetas.com", "username2", "1111111");
 
         @Test
         @DisplayName("Create User By SA")
         @Order(1)
-        void create() {
-            ResponseEntity<ViewUserDto> response = TestHelpers.createUserBySa(
-                    restTemplate,
+        void create() throws JsonProcessingException {
+            CreateUserDto createUserDto = new CreateUserDto(
                     passwordRecoveryUserData.getUsername(),
                     passwordRecoveryUserData.getPassword(),
                     passwordRecoveryUserData.getEmail());
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody().getLogin()).isEqualTo(passwordRecoveryUserData.getUsername());
-            assertThat(response.getBody().getEmail()).isEqualTo(passwordRecoveryUserData.getEmail());
+            ViewUserDto response = TestHelpers.createUserBySa(restTemplate, createUserDto);
         }
 
         @Test
         @DisplayName("User can login after SA creation")
         @Order(2)
-        void successLoginAfterSACreation() {
-            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
+        void successLoginAfterSACreation() throws JsonProcessingException {
+            LoginDto loginDto = new LoginDto(passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
+            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, loginDto);
 
             passwordRecoveryUserData.setAccessToken(tokensPairData.getAccessToken());
             passwordRecoveryUserData.setRefreshToken(tokensPairData.getRefreshToken());
@@ -275,8 +276,9 @@ class AuthTests {
         @Test
         @DisplayName("User can login after password-recovery")
         @Order(5)
-        void successLoginAfterPasswordRecovery() {
-            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
+        void successLoginAfterPasswordRecovery() throws JsonProcessingException {
+            LoginDto loginDto = new LoginDto(passwordRecoveryUserData.getUsername(), passwordRecoveryUserData.getPassword());
+            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, loginDto);
 
             passwordRecoveryUserData.setAccessToken(tokensPairData.getAccessToken());
             passwordRecoveryUserData.setRefreshToken(tokensPairData.getRefreshToken());

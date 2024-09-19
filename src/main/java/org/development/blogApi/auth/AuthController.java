@@ -22,6 +22,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -42,10 +44,10 @@ public class AuthController {
     public ResponseEntity<?> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        UserEntity user = this.userService.findById(customUserDetails.getUserId());
+        UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
         return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
     }
 
