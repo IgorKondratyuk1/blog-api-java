@@ -1,7 +1,7 @@
 package org.development.blogApi.user.entity;
 
 import jakarta.persistence.*;
-import org.development.blogApi.user.dto.request.CreateUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -150,12 +150,12 @@ public class UserEntity {
 //    }
 
     // Static factory method
-    public static UserEntity createInstance(CreateUserDto createUserDto, String passwordHash, List<RoleEntity> roles) {
+    public static UserEntity createInstance(RegistrationDto createUserDto, String passwordHash, List<RoleEntity> roles) {
         return UserEntity.createInstance(createUserDto, passwordHash, roles, false);
     }
 
     // For SA user creation
-    public static UserEntity createInstance(CreateUserDto createUserDto, String passwordHash, List<RoleEntity> roles, boolean isConfirmed) {
+    public static UserEntity createInstance(RegistrationDto createUserDto, String passwordHash, List<RoleEntity> roles, boolean isConfirmed) {
         EmailConfirmation emailConfirmation = EmailConfirmation.createInstance(isConfirmed);
 
         UserEntity user = new UserEntity(

@@ -11,10 +11,9 @@ import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.post.dto.request.CreatePostOfBlogDto;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
-import org.development.blogApi.user.dto.request.CreateUserDto;
-import org.development.blogApi.user.dto.response.ViewUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
+import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.utils.CookieUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
@@ -22,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestHelpers {
 
-    public static ViewUserDto createUserBySa(TestRestTemplate restTemplate, CreateUserDto createUserDto) throws JsonProcessingException {
+    public static ViewUserDto createUserBySa(TestRestTemplate restTemplate, RegistrationDto createUserDto) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         headers.set("Authorization", "Basic YWRtaW46cXdlcnR5");

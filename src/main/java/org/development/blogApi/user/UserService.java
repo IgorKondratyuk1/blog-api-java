@@ -2,7 +2,7 @@ package org.development.blogApi.user;
 
 import jakarta.transaction.Transactional;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
-import org.development.blogApi.user.dto.request.CreateUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -28,15 +28,14 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity create(CreateUserDto createUserDto, boolean isConfirmed) {
+    public UserEntity create(RegistrationDto createUserDto, boolean isConfirmed) {
         RoleEntity roles = roleRepository.findRoleEntityByName("USER").orElseThrow(() -> new RuntimeException("Role not found"));
         UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), Collections.singletonList(roles), isConfirmed);
         return userRepository.save(user);
     }
 
     public UserEntity findById(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException()); // TODO create own errors .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
     }
 
     public void remove(UUID id) {

@@ -11,7 +11,7 @@ import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.user.UserService;
-import org.development.blogApi.user.dto.request.CreateUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -52,8 +51,8 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> register(@Valid @RequestBody CreateUserDto createUserDto) {
-        authService.register(createUserDto);
+    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationDto registrationDto) {
+        authService.register(registrationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -75,22 +74,27 @@ public class AuthController {
                                                  @RequestHeader(value = "User-Agent") String userAgent,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
-        String ipAddress = request.getRemoteAddr();
+        try {
+            String ipAddress = request.getRemoteAddr();
 
-        // X-Forwarded-For header for proxies or load balancers
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader != null) {
-            ipAddress = xfHeader.split(",")[0];
+            // X-Forwarded-For header for proxies or load balancers
+            String xfHeader = request.getHeader("X-Forwarded-For");
+            if (xfHeader != null) {
+                ipAddress = xfHeader.split(",")[0];
+            }
+
+            ExtendedLoginDataDto extendedLoginDataDto = new ExtendedLoginDataDto(loginDto.getLoginOrEmail(),
+                    loginDto.getPassword(), ipAddress, userAgent);
+            AuthTokensDto authTokensDto = authService.login(extendedLoginDataDto);
+
+            AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
+            jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
+
+            return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
-        ExtendedLoginDataDto extendedLoginDataDto = new ExtendedLoginDataDto(loginDto.getLoginOrEmail(),
-                loginDto.getPassword(), ipAddress, userAgent);
-        AuthTokensDto authTokensDto = authService.login(extendedLoginDataDto);
-
-        AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
-        jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
-
-        return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/logout")

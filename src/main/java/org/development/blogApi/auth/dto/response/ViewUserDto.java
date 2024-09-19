@@ -1,4 +1,4 @@
-package org.development.blogApi.user.dto.response;
+package org.development.blogApi.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package org.development.blogApi.user.dto.request;
+package org.development.blogApi.auth.dto.request;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

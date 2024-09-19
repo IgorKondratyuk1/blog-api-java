@@ -1,7 +1,6 @@
 package org.development.blogApi.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
@@ -17,8 +16,8 @@ import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
-import org.development.blogApi.user.dto.request.CreateUserDto;
-import org.development.blogApi.user.dto.response.ViewUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
+import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.junit.jupiter.api.*;
@@ -62,7 +61,7 @@ public class PublicApiTests {
     @DisplayName("Create first user by SA")
     @Order(1)
     void createFirstUser() throws JsonProcessingException {
-        CreateUserDto createUserDto = new CreateUserDto(
+        RegistrationDto createUserDto = new RegistrationDto(
                 firstUserData.getUsername(),
                 firstUserData.getPassword(),
                 firstUserData.getEmail());
@@ -75,7 +74,7 @@ public class PublicApiTests {
     @DisplayName("Create second user by SA")
     @Order(2)
     void createSecondUser() throws JsonProcessingException {
-        CreateUserDto createUserDto = new CreateUserDto(
+        RegistrationDto createUserDto = new RegistrationDto(
                 secondUserData.getUsername(),
                 secondUserData.getPassword(),
                 secondUserData.getEmail());

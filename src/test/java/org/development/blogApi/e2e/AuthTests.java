@@ -6,14 +6,13 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.extern.java.Log;
 import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
-import org.development.blogApi.user.dto.request.CreateUserDto;
-import org.development.blogApi.user.dto.response.ViewUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
+import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.development.blogApi.utils.CookieUtil;
@@ -193,7 +192,7 @@ class AuthTests {
         @DisplayName("Create User By SA")
         @Order(1)
         void create() throws JsonProcessingException {
-            CreateUserDto createUserDto = new CreateUserDto(
+            RegistrationDto createUserDto = new RegistrationDto(
                     passwordRecoveryUserData.getUsername(),
                     passwordRecoveryUserData.getPassword(),
                     passwordRecoveryUserData.getEmail());

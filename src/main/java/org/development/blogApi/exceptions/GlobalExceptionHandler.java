@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 
         List<APIFieldError> errors = new ArrayList<>();
         exception.getAllErrors().forEach(e -> {
-            APIFieldError apiFieldError = new APIFieldError(((FieldError) e).getField(), e.getDefaultMessage());
+            APIFieldError apiFieldError = new APIFieldError(e.getDefaultMessage(), ((FieldError) e).getField());
             errors.add(apiFieldError);
         });
 

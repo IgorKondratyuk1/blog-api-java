@@ -20,7 +20,6 @@ import org.development.blogApi.core.post.dto.request.UpdatePostOfBlogDto;
 import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.utils.PostMapper;
 import org.development.blogApi.security.CustomUserDetails;
-import org.development.blogApi.user.dto.request.QueryUserDto;
 import org.development.blogApi.user.repository.UserQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

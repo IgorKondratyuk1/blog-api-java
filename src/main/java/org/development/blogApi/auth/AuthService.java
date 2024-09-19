@@ -14,11 +14,10 @@ import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.development.blogApi.user.repository.UserRepository;
-import org.development.blogApi.user.dto.request.CreateUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,7 +55,7 @@ public class AuthService {
         this.securityDevicesService = securityDevicesService;
     }
 
-    public void register(CreateUserDto createUserDto) {
+    public void register(RegistrationDto createUserDto) {
         if (userRepository.existsByLogin(createUserDto.getLogin())) throw new RuntimeException("User is taken");
 
         // 1. Create new user

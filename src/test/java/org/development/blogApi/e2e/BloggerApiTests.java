@@ -15,8 +15,8 @@ import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
-import org.development.blogApi.user.dto.request.CreateUserDto;
-import org.development.blogApi.user.dto.response.ViewUserDto;
+import org.development.blogApi.auth.dto.request.RegistrationDto;
+import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.junit.jupiter.api.*;
@@ -57,7 +57,7 @@ public class BloggerApiTests {
     @DisplayName("Create User By SA")
     @Order(1)
     void createUser() throws JsonProcessingException {
-        CreateUserDto createUserDto = new CreateUserDto(
+        RegistrationDto createUserDto = new RegistrationDto(
                 testUserData.getUsername(),
                 testUserData.getPassword(),
                 testUserData.getEmail());

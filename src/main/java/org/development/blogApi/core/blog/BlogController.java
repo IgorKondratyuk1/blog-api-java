@@ -8,7 +8,7 @@ import org.development.blogApi.core.blog.repository.BlogQueryRepository;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.security.CustomUserDetails;
-import org.development.blogApi.user.dto.request.QueryUserDto;
+import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

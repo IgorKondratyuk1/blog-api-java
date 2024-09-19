@@ -1,7 +1,7 @@
 package org.development.blogApi.user.utils;
 
-import org.development.blogApi.user.dto.response.ViewMeDto;
-import org.development.blogApi.user.dto.response.ViewUserDto;
+import org.development.blogApi.auth.dto.response.ViewMeDto;
+import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.UserEntity;
 
 public class UserMapper {
