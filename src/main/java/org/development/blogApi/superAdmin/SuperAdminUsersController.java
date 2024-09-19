@@ -38,7 +38,7 @@ public class SuperAdminUsersController {
     public ResponseEntity<ViewUserDto> create(@RequestBody CreateUserDto createUserDto) {
         UserEntity createdUser = userService.create(createUserDto, true);
         ViewUserDto viewUserDto = UserMapper.toView(createdUser);
-        return new ResponseEntity<>(viewUserDto, HttpStatus.OK);
+        return new ResponseEntity<>(viewUserDto, HttpStatus.CREATED);
     }
 
     @GetMapping
