@@ -21,8 +21,8 @@ public class RegistrationDto {
     private String password;
 
     @NotEmpty(message = "Email must not be empty")
-    @Email(message = "Invalid email format")
     @Length(min = 3, max = 200, message = "Email must be between 3 and 200 characters")
+    @Email(message = "Invalid email format")
     @LoginOrEmailNotUsed(message = "Email is already used")
     private String email;
 }

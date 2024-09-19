@@ -51,26 +51,26 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationDto registrationDto) {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegistrationDto registrationDto) {
         authService.register(registrationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/registration-confirmation")
-    public ResponseEntity<Void> confirmRegistration(@Valid @RequestBody RegistrationConfirmationDto registrationConfirmationDto) {
+    public ResponseEntity<Void> confirmRegistration(@RequestBody @Valid RegistrationConfirmationDto registrationConfirmationDto) {
         this.authService.confirmEmail(registrationConfirmationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
     @PostMapping("/registration-email-resending")
-    public ResponseEntity<Void> resendConfirmationCode(@Valid @RequestBody RegistrationEmailResendDto registrationEmailResendDto) {
+    public ResponseEntity<Void> resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto loginDto,
+    public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid LoginDto loginDto,
                                                  @RequestHeader(value = "User-Agent") String userAgent,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
@@ -128,13 +128,13 @@ public class AuthController {
     }
 
     @PostMapping("/new-password")
-    public ResponseEntity<?> newPassword(@Valid @RequestBody NewPasswordDto newPasswordDto) {
+    public ResponseEntity<?> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<?> passwordRecovery(@Valid @RequestBody PasswordRecoveryDto passwordRecoveryDto) {
+    public ResponseEntity<?> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

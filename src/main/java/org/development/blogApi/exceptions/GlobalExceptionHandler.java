@@ -2,7 +2,6 @@ package org.development.blogApi.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.atn.SemanticContext;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.development.blogApi.exceptions.dto.APIFieldError;
 import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
@@ -17,7 +16,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
@@ -35,7 +37,15 @@ public class GlobalExceptionHandler {
             errors.add(apiFieldError);
         });
 
-        APIValidationErrorResult apiErrorResult = new APIValidationErrorResult(errors);
+        // Set to track fields that we have already seen
+        Set<String> seenFields = new HashSet<>();
+
+        // Filter the list to include only unique fields
+        List<APIFieldError> uniqueErrorFields = errors.stream()
+                .filter(error -> seenFields.add(error.getField())) // Add to set and check if added successfully
+                .collect(Collectors.toList());
+
+        APIValidationErrorResult apiErrorResult = new APIValidationErrorResult(uniqueErrorFields);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(apiErrorResult);

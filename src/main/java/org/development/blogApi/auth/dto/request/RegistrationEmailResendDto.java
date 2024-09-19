@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.development.blogApi.common.validation.isEmailNotConfirmed.IsEmailNotConfirmed;
 import org.hibernate.validator.constraints.Length;
 
 @Data
@@ -12,7 +13,8 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 public class RegistrationEmailResendDto {
     @NotEmpty(message = "Email should not be empty")
-    @Email(message = "Email should be valid")
     @Length(min = 3, max = 200, message = "Email length must be between 3 and 200 characters")
+    @Email(message = "Email should be valid")
+    @IsEmailNotConfirmed(message = "Email is already confirmed")
     private String email;
 }
