@@ -43,8 +43,8 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
         int pagesCount = PaginationHelper.getPagesCount(totalCount, queryUserParams.getPageSize());
         int skipValue = PaginationHelper.getSkipValue(queryUserParams.getPageNumber(), queryUserParams.getPageSize());
 
-//        query.setFirstResult(skipValue);
-//        query.setMaxResults(queryUserParams.getPageSize());
+        query.setFirstResult(skipValue);
+        query.setMaxResults(queryUserParams.getPageSize());
 
         List<UserEntity> userEntities = query.getResultList();
         System.out.println(userEntities.size());
