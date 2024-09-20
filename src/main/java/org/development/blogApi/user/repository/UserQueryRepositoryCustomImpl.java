@@ -86,12 +86,17 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 //            filters.add("u.saUserBan IS NULL");
 //        }
 
+        List<String> searchFilters = new ArrayList<>();
         if (queryObj.getSearchLoginTerm() != null && !queryObj.getSearchLoginTerm().isEmpty()) {
-            filters.add("UPPER(u.login) LIKE :searchLoginTerm");
+            searchFilters.add("UPPER(u.login) LIKE :searchLoginTerm");
         }
 
         if (queryObj.getSearchEmailTerm() != null && !queryObj.getSearchEmailTerm().isEmpty()) {
-            filters.add("UPPER(u.email) LIKE :searchEmailTerm");
+            searchFilters.add("UPPER(u.email) LIKE :searchEmailTerm");
+        }
+
+        if (searchFilters.size() > 0) {
+            filters.add(String.join(" OR ", searchFilters));
         }
 
         if (!filters.isEmpty()) {

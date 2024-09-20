@@ -172,10 +172,6 @@ class AuthTests {
                             APIValidationErrorResult.class
                     );
 
-            System.out.println("shouldReturnErrorIfConfirmationCodeDoesntExist");
-            System.out.println(response.getStatusCode());
-            System.out.println(response.getBody());
-
             List<APIFieldError> expectedApiFieldErrors = new ArrayList<>();
             expectedApiFieldErrors.add(new APIFieldError("Invalid code or code is already used", "code"));
             APIValidationErrorResult expectedApiValidationErrorResult = new APIValidationErrorResult(expectedApiFieldErrors);
