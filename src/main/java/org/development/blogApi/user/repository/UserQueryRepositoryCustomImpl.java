@@ -23,6 +23,7 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 
     @Override
     public PaginationDto<ViewUserDto> findAllUsersWithCustomQueries(QueryUserDto queryUserParams) {
+        System.out.println(queryUserParams);
         String filters = getUsersFilters(queryUserParams);
         String jpql = "SELECT u FROM UserEntity u LEFT JOIN FETCH u.emailConfirmation ec " +
                 "LEFT JOIN FETCH u.passwordRecovery pr "
@@ -32,21 +33,21 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 
         TypedQuery<UserEntity> query = entityManager.createQuery(jpql, UserEntity.class);
         if (queryUserParams.getSearchLoginTerm() != null && !queryUserParams.getSearchLoginTerm().isEmpty()) {
-            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm() + "%");
+            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm().toUpperCase() + "%");
         }
-
         if (queryUserParams.getSearchEmailTerm() != null && !queryUserParams.getSearchEmailTerm().isEmpty()) {
-            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm() + "%");
+            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm().toUpperCase() + "%");
         }
 
         Long totalCount = getTotalCountWithFilters(queryUserParams);
         int pagesCount = PaginationHelper.getPagesCount(totalCount, queryUserParams.getPageSize());
         int skipValue = PaginationHelper.getSkipValue(queryUserParams.getPageNumber(), queryUserParams.getPageSize());
 
-        query.setFirstResult(skipValue);
-        query.setMaxResults(queryUserParams.getPageSize());
+//        query.setFirstResult(skipValue);
+//        query.setMaxResults(queryUserParams.getPageSize());
 
         List<UserEntity> userEntities = query.getResultList();
+        System.out.println(userEntities.size());
         List<ViewUserDto> viewUserDto = userEntities.stream().map((user) -> UserMapper.toView(user)).collect(Collectors.toList());
         System.out.println(viewUserDto);
 
@@ -66,10 +67,10 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 
         TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
         if (queryUserParams.getSearchLoginTerm() != null && !queryUserParams.getSearchLoginTerm().isEmpty()) {
-            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm() + "%");
+            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm().toUpperCase() + "%");
         }
         if (queryUserParams.getSearchEmailTerm() != null && !queryUserParams.getSearchEmailTerm().isEmpty()) {
-            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm() + "%");
+            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm().toUpperCase() + "%");
         }
 
         return query.getSingleResult();
@@ -86,11 +87,11 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 //        }
 
         if (queryObj.getSearchLoginTerm() != null && !queryObj.getSearchLoginTerm().isEmpty()) {
-            filters.add("u.login LIKE :searchLoginTerm");
+            filters.add("UPPER(u.login) LIKE :searchLoginTerm");
         }
 
         if (queryObj.getSearchEmailTerm() != null && !queryObj.getSearchEmailTerm().isEmpty()) {
-            filters.add("u.email LIKE :searchEmailTerm");
+            filters.add("UPPER(u.email) LIKE :searchEmailTerm");
         }
 
         if (!filters.isEmpty()) {

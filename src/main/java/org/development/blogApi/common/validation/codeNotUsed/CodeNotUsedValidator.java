@@ -2,6 +2,7 @@ package org.development.blogApi.common.validation.codeNotUsed;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.development.blogApi.common.utils.UUIDHelper;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class CodeNotUsedValidator implements ConstraintValidator<CodeNotUsed, St
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (value.isBlank() || !UUIDHelper.isValidUUID(value)) {
             return false;
         }
 

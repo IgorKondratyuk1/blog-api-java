@@ -13,6 +13,8 @@ import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.auth.dto.response.ViewUserDto;
+import org.development.blogApi.exceptions.dto.APIFieldError;
+import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.development.blogApi.utils.CookieUtil;
@@ -26,6 +28,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,11 +128,11 @@ class AuthTests {
                             String.class
                     );
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         }
 
         @Test
-        @DisplayName("Confirm User")
+        @DisplayName("Confirm user")
         @Order(3)
         void registerConfirmation() {
             // Set up headers
@@ -138,20 +142,51 @@ class AuthTests {
             String body = "{\"code\":\"" + registerUserData.getConfirmationCode() + "\"}";
             HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
-            ResponseEntity<String> response = restTemplate
+            ResponseEntity<Void> response = restTemplate
                     .exchange(
                             "/api/auth/registration-confirmation",
                             HttpMethod.POST,
                             httpEntity,
-                            String.class
+                            Void.class
                     );
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         }
 
         @Test
-        @DisplayName("User can login after confirmation")
+        @DisplayName("Should return error if confirm-code doesn't exist")
         @Order(4)
+        void shouldReturnErrorIfConfirmationCodeDoesntExist() {
+            // Set up headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+
+            String body = "{\"code\":\"" + "invalid code" + "\"}";
+            HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<APIValidationErrorResult> response = restTemplate
+                    .exchange(
+                            "/api/auth/registration-confirmation",
+                            HttpMethod.POST,
+                            httpEntity,
+                            APIValidationErrorResult.class
+                    );
+
+            System.out.println("shouldReturnErrorIfConfirmationCodeDoesntExist");
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+
+            List<APIFieldError> expectedApiFieldErrors = new ArrayList<>();
+            expectedApiFieldErrors.add(new APIFieldError("Invalid code or code is already used", "code"));
+            APIValidationErrorResult expectedApiValidationErrorResult = new APIValidationErrorResult(expectedApiFieldErrors);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(response.getBody()).isEqualTo(expectedApiValidationErrorResult);
+        }
+
+        @Test
+        @DisplayName("User can login after confirmation")
+        @Order(5)
         void successLoginWithoutConfirmation() {
             // Set up headers
             HttpHeaders headers = new HttpHeaders();
