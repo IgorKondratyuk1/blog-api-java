@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.development.blogApi.user.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,19 +26,24 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // TODO make refresh token methods and secret (in another service)
+    private String secretKey;
+    public String JWT_REFRESH_COOKIE_NANE = "refreshToken";
+    public Integer ACCESS_TOKEN_VALIDITY_TIME;
+    public Integer REFRESH_TOKEN_VALIDITY_TIME;
 
-    // TODO replace values to properties
-    private static final String SECRET_KEY = "qwertyuiopasdfghjklzxcvbnm1234566546545fdsfdsfds";
-    public static final int ACCESS_TOKEN_VALIDITY_TIME = 1000 * 60 * 24;
-    public static final int REFRESH_TOKEN_VALIDITY_TIME = 1000 * 60 * 24 * 3;
-
-    public static String JWT_REFRESH_COOKIE_NANE = "refreshToken";
+    public JwtService(@Value("${token.access-token-seconds}") Integer accessTokenSeconds,
+                      @Value("${token.refresh-token-seconds}") Integer refreshTokenSeconds,
+                      @Value("${token.secret-key}") String secretKey) {
+        this.secretKey = secretKey;
+        this.ACCESS_TOKEN_VALIDITY_TIME = 1000 * accessTokenSeconds;
+        this.REFRESH_TOKEN_VALIDITY_TIME = 1000 * refreshTokenSeconds;
+    }
 
 
     public String extractLogin(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
     public String extractDeviceId(String token) {
         return extractClaim(token, claims -> claims.get("deviceId", String.class));
     }
@@ -56,6 +62,8 @@ public class JwtService {
     }
 
     public String generateAccessToken(Map<String, Object> extractClaims, UserEntity userEntity) {
+        System.out.println("Access: " + ACCESS_TOKEN_VALIDITY_TIME);
+        System.out.println("Refresh: " + REFRESH_TOKEN_VALIDITY_TIME);
         return Jwts.builder()
                 .subject(userEntity.getLogin())
                 .claims(extractClaims)
@@ -93,7 +101,7 @@ public class JwtService {
     }
 
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return new SecretKeySpec(keyBytes,"HmacSHA256");
     }
 
@@ -136,7 +144,7 @@ public class JwtService {
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false); // Use secure cookies in production
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge((int) JwtService.REFRESH_TOKEN_VALIDITY_TIME / 1000); // Convert milliseconds to seconds
+        refreshTokenCookie.setMaxAge((int) REFRESH_TOKEN_VALIDITY_TIME / 1000); // Convert milliseconds to seconds
         response. addCookie(refreshTokenCookie);
     }
 

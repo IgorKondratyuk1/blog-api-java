@@ -105,7 +105,7 @@ public class AuthController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Cookie refreshCookie = new Cookie(JwtService.JWT_REFRESH_COOKIE_NANE, "");
+        Cookie refreshCookie = new Cookie(jwtService.JWT_REFRESH_COOKIE_NANE, "");
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);

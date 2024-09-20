@@ -2,7 +2,7 @@ package org.development.blogApi.common.utils;
 
 import java.util.UUID;
 
-public class UUIDHelper {
+public class UuidHelper {
     public static boolean isValidUUID(String input) {
         try {
             UUID.fromString(input);
