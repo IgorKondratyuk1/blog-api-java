@@ -27,16 +27,26 @@ import java.util.function.Function;
 public class JwtService {
 
     private String secretKey;
+    private boolean cookiesSecure;
+    private boolean cookiesHttpOnly;
     public String JWT_REFRESH_COOKIE_NANE = "refreshToken";
     public Integer ACCESS_TOKEN_VALIDITY_TIME;
     public Integer REFRESH_TOKEN_VALIDITY_TIME;
 
+
+
     public JwtService(@Value("${token.access-token-seconds}") Integer accessTokenSeconds,
                       @Value("${token.refresh-token-seconds}") Integer refreshTokenSeconds,
-                      @Value("${token.secret-key}") String secretKey) {
+                      @Value("${token.secret-key}") String secretKey,
+                      @Value("${token.cookies-secure}") Boolean cookiesSecure,
+                      @Value("${token.cookies-httpOnly}") Boolean cookiesHttpOnly) {
         this.secretKey = secretKey;
         this.ACCESS_TOKEN_VALIDITY_TIME = 1000 * accessTokenSeconds;
         this.REFRESH_TOKEN_VALIDITY_TIME = 1000 * refreshTokenSeconds;
+        this.cookiesHttpOnly = cookiesHttpOnly;
+        this.cookiesSecure = cookiesSecure;
+        System.out.println(cookiesHttpOnly);
+        System.out.println(cookiesSecure);
     }
 
 
@@ -139,13 +149,12 @@ public class JwtService {
     }
 
     public void setRefreshTokenInCookie(HttpServletResponse response, String refreshToken) {
-        // Set refresh token in secure cookie
         Cookie refreshTokenCookie = new Cookie(JWT_REFRESH_COOKIE_NANE, refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false); // Use secure cookies in production
+        refreshTokenCookie.setHttpOnly(cookiesHttpOnly);
+        refreshTokenCookie.setSecure(cookiesSecure);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge((int) REFRESH_TOKEN_VALIDITY_TIME / 1000); // Convert milliseconds to seconds
-        response. addCookie(refreshTokenCookie);
+        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_VALIDITY_TIME / 1000); // Convert milliseconds to seconds
+        response.addCookie(refreshTokenCookie);
     }
 
     public Map<String, Object> createClaims(UUID userId, UUID deviceId, LocalDateTime lastActiveDate) {
