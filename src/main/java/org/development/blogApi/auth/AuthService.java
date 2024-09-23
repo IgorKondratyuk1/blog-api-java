@@ -9,6 +9,7 @@ import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.email.EmailManager;
 import org.development.blogApi.exceptions.authExceprion.AuthException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.securityDevice.SecurityDevicesService;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
@@ -112,20 +113,13 @@ public class AuthService {
         return new AuthTokensDto(accessToken, refreshToken);
     }
 
-    public AuthTokensDto refresh(String refreshToken) {
-        String login = jwtService.extractLogin(refreshToken);
-        String deviceId = jwtService.extractDeviceId(refreshToken);
-
-        if (login == null || deviceId == null) {
-            throw new AuthException("Refresh token not valid");
+    public AuthTokensDto generateNewTokensPair(CustomUserDetails customUserDetails) {
+        if (customUserDetails.getUsername() == null || customUserDetails.getDeviceId() == null) {
+            throw new AuthException("User details not valid");
         }
 
-        UserEntity userEntity = this.userRepository.findByLoginOrEmail(login).orElseThrow(() -> new UserNotFoundException());
-        SecurityDevice securityDevice = this.securityDevicesService.findDeviceSessionByDeviceId(deviceId);
-
-        if(!jwtService.isTokenValid(refreshToken, userEntity)) {
-            throw new AuthException("Refresh token not valid");
-        }
+        UserEntity userEntity = this.userRepository.findByLoginOrEmail(customUserDetails.getUsername()).orElseThrow(() -> new UserNotFoundException());
+        SecurityDevice securityDevice = this.securityDevicesService.findDeviceSessionByDeviceId(customUserDetails.getDeviceId());
 
         Map<String, Object> claims = jwtService.createClaims(userEntity.getId(), securityDevice.getDeviceId(), securityDevice.getLastActiveDate());
         String newAccessToken = jwtService.generateAccessToken(claims, userEntity);

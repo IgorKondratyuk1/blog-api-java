@@ -34,7 +34,7 @@ public class SecurityDevicesService {
     }
 
     public SecurityDevice findDeviceSessionByDeviceId(String deviceId) {
-        return securityDevicesRepository.findByDeviceId(UUID.fromString(deviceId)).orElseThrow(() -> new RuntimeException("No Security Device founded"));
+        return securityDevicesRepository.findByDeviceId(UUID.fromString(deviceId)).orElseThrow(() -> new RuntimeException("No security device founded"));
     }
 
     public List<SecurityDevice> getAllDeviceSessions(String userId) {

@@ -8,7 +8,6 @@ import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
-import org.development.blogApi.exceptions.authExceprion.AuthException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.user.UserService;
@@ -18,7 +17,6 @@ import org.development.blogApi.user.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,9 +40,9 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            throw new AuthException("User not found");
-        }
+//        if (customUserDetails == null) {
+//            throw new AuthException("User not found");
+//        }
 
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
         return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
@@ -105,19 +103,13 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refresh(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            throw new AuthException("User not found");
-        }
+    public ResponseEntity<?> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
+//        String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
+//        if (refreshToken == null || refreshToken.isEmpty()) {
+//            return new ResponseEntity("Refresh token is empty", HttpStatus.UNAUTHORIZED);
+//        }
 
-        String refreshToken = this.jwtService.getJwtRefreshFromCookies(request); // make annotation
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            return new ResponseEntity("Refresh token is empty", HttpStatus.UNAUTHORIZED);
-        }
-
-        AuthTokensDto authTokensDto = this.authService.refresh(refreshToken);
+        AuthTokensDto authTokensDto = this.authService.generateNewTokensPair(customUserDetails);
         AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
         jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
         return new ResponseEntity<>(authResponseDto, HttpStatus.OK);

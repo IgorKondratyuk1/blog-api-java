@@ -1,18 +1,13 @@
 package org.development.blogApi.security.filters;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.development.blogApi.exceptions.authExceprion.AuthException;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,24 +18,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtAccessSoftAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
-//    @Autowired
-//    @Qualifier("handlerExceptionResolver")
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
-    public JwtAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
-                         JwtService jwtService,
-                         UserDetailsService userDetailsService) {
+    public JwtAccessSoftAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
+                                   JwtService jwtService,
+                                   UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
@@ -52,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) {
 
         try {
-            log.info("JwtAuthFilter");
+            log.info("Jwt Soft Auth Filter");
 
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
@@ -62,7 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             final LocalDateTime lastActiveDate;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//                throw new AuthException("Token is not found");
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -74,7 +64,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             lastActiveDate = jwtService.extractLastActiveDate(jwt);
 
             if (usernameOrEmail == null || userId == null) {
-//                throw new AuthException("User is not found");
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -88,8 +77,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
             CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
-            if(!jwtService.isTokenValid(jwt, userDetails)) {
-//                throw new AuthException("Token is not valid");
+            if (!jwtService.isTokenValid(jwt, userDetails)) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -104,9 +92,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            log.error("Spring Security Filter Chain Exception:", e);
+            log.error("Jwt Soft Auth Filter Chain Exception:", e);
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
-
     }
 }

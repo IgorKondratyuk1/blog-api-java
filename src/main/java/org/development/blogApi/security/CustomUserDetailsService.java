@@ -1,5 +1,6 @@
 package org.development.blogApi.security;
 
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.repository.UserRepository;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;
@@ -27,8 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByLoginOrEmail(usernameOrEmail).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+    public UserDetails loadUserByUsername(String usernameOrEmail) {
+        UserEntity user = userRepository.findByLoginOrEmail(usernameOrEmail).orElseThrow(() -> new UserNotFoundException());
         return new User(user.getLogin(), user.getPasswordHash(), mapRolesToAuthorities(user.getRoles()));
     }
 

@@ -1,12 +1,14 @@
 package org.development.blogApi.security;
 
 import org.development.blogApi.security.exceptionHandlers.CustomAuthenticationEntryPoint;
-import org.development.blogApi.security.filters.JwtAuthFilter;
-import org.development.blogApi.security.filters.RateLimitingFilter;
+import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
+import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;
+import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -18,24 +20,26 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableAsync
 public class SecurityConfig {
     private final CustomBasicAuthProvider customBasicAuthProvider;
-    private final JwtAuthFilter jwtAuthFilter;
-    private final RateLimitingFilter rateLimitingFilter;
+    private final JwtAccessStrictAuthFilter jwtAccessStrictAuthFilter;
+    private final JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter;
+    private final JwtRefreshAuthFilter jwtRefreshAuthFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
-                          RateLimitingFilter rateLimitingFilter,
+    public SecurityConfig(JwtAccessStrictAuthFilter jwtAccessStrictAuthFilter,
+                          JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter,
+                          JwtRefreshAuthFilter jwtRefreshAuthFilter,
                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
                           CustomBasicAuthProvider customBasicAuthProvider) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.rateLimitingFilter = rateLimitingFilter;
+        this.jwtAccessStrictAuthFilter = jwtAccessStrictAuthFilter;
+        this.jwtAccessSoftAuthFilter = jwtAccessSoftAuthFilter;
+        this.jwtRefreshAuthFilter = jwtRefreshAuthFilter;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customBasicAuthProvider = customBasicAuthProvider;
     }
@@ -56,20 +60,74 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(2)
-    public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain jwtRefreshFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/**")
+                .securityMatcher(
+                        "/api/auth/**",
+                        "api/security/devices/**"
+                )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/testing/**").permitAll() // TODO Test
+                        .requestMatchers("/api/auth/refresh-token").authenticated()
+                        .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("api/security/devices/**").authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtRefreshAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain jwtAccessSoftFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(
+                        "/api/blogs/*/posts",
+                        "/api/comments/*",
+                        "/api/posts/**")
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/refresh-token").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/comments/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
+    public SecurityFilterChain jwtAccessStrictFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(
+                        "/api/auth/**",
+                        "/api/posts/*/comments",
+                        "/api/posts/*/like-status",
+                        "/api/blogger/**")
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/refresh-token").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(rateLimitingFilter, DisableEncodeUrlFilter.class)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAccessStrictAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
                         httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
 

@@ -47,7 +47,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         log.info("RateLimitingFilter");
 
         // TODO make exclude rate limiting for specific routes
-        String userIdentifier = getUserIdentifier(request); // e.g., IP address
+        String userIdentifier = getUserIdentifier(request);
         Bucket bucket = buckets.computeIfAbsent(userIdentifier, key -> {
             Bandwidth limit = Bandwidth.classic(requestsLimit, Refill.greedy(requestsLimit, Duration.ofSeconds(requestsTTL)));
             return Bucket.builder().addLimit(limit).build();
