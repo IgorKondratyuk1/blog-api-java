@@ -8,6 +8,7 @@ import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
+import org.development.blogApi.exceptions.authExceprion.AuthException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.user.UserService;
@@ -41,9 +42,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            throw new AuthException("User not found");
         }
 
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
@@ -62,7 +62,6 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
     @PostMapping("/registration-email-resending")
     public ResponseEntity<Void> resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
@@ -76,8 +75,6 @@ public class AuthController {
                                                  HttpServletResponse response) {
         try {
             String ipAddress = request.getRemoteAddr();
-
-            // X-Forwarded-For header for proxies or load balancers
             String xfHeader = request.getHeader("X-Forwarded-For");
             if (xfHeader != null) {
                 ipAddress = xfHeader.split(",")[0];
@@ -98,13 +95,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response, Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        if (customUserDetails == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie refreshCookie = new Cookie(jwtService.JWT_REFRESH_COOKIE_NANE, "");
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(0);
@@ -114,11 +105,16 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
+    public ResponseEntity<?> refresh(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            throw new AuthException("User not found");
+        }
 
+        String refreshToken = this.jwtService.getJwtRefreshFromCookies(request); // make annotation
         if (refreshToken == null || refreshToken.isEmpty()) {
-            return ResponseEntity.badRequest().body("Refresh Token is empty!");
+            return new ResponseEntity("Refresh token is empty", HttpStatus.UNAUTHORIZED);
         }
 
         AuthTokensDto authTokensDto = this.authService.refresh(refreshToken);

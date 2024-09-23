@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.development.blogApi.exceptions.authExceprion.AuthException;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull FilterChain filterChain) {
 
         try {
             log.info("JwtAuthFilter");
@@ -55,34 +57,50 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
             final String usernameOrEmail;
+            final String userId;
+            final String deviceId;
+            final LocalDateTime lastActiveDate;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//                throw new AuthException("Token is not found");
                 filterChain.doFilter(request, response);
                 return;
             }
 
             jwt = authHeader.substring(7);
             usernameOrEmail = jwtService.extractLogin(jwt);
+            userId = jwtService.extractUserId(jwt);
+            deviceId = jwtService.extractDeviceId(jwt);
+            lastActiveDate = jwtService.extractLastActiveDate(jwt);
 
-
-            String userId = jwtService.extractUserId(jwt);
-            String deviceId = jwtService.extractDeviceId(jwt);
-            LocalDateTime lastActiveDate = jwtService.extractLastActiveDate(jwt);
-
-            if (usernameOrEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
-                CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
-
-                if(jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            customUserDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
+            if (usernameOrEmail == null || userId == null) {
+//                throw new AuthException("User is not found");
+                filterChain.doFilter(request, response);
+                return;
             }
+
+            if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                log.info("SecurityContextHolder is not empty:\n" + SecurityContextHolder.getContext().getAuthentication().getName());
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
+            CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
+
+            if(!jwtService.isTokenValid(jwt, userDetails)) {
+//                throw new AuthException("Token is not valid");
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    customUserDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
