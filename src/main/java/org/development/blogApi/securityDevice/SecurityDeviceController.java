@@ -25,7 +25,6 @@ public class SecurityDeviceController {
         this.jwtService = jwtService;
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @GetMapping
     public ResponseEntity<List<ViewSecurityDeviceDto>> findAllSecurityDevices(HttpServletRequest request) {  // TODO check what is the ResponseEntity and maybe delete from response
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
@@ -44,7 +43,6 @@ public class SecurityDeviceController {
         return new ResponseEntity<>(viewSecurityDeviceDto, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping
     public ResponseEntity<Void> deleteAllSecurityDevicesExceptCurrent(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
@@ -55,7 +53,6 @@ public class SecurityDeviceController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSecurityDeviceById(@PathVariable("id") UUID deviceId, HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
