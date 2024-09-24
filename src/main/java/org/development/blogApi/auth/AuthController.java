@@ -40,7 +40,6 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @GetMapping("/me")
     public ResponseEntity<ViewMeDto> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
@@ -94,7 +93,6 @@ public class AuthController {
         }
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Cookie refreshCookie = new Cookie(jwtService.JWT_REFRESH_COOKIE_NANE, ""); // TODO transfer to utils
@@ -106,7 +104,6 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponseDto> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
         AuthTokensDto authTokensDto = this.authService.generateNewTokensPair(customUserDetails);

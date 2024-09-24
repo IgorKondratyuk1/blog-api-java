@@ -43,21 +43,18 @@ public class SuperAdminBlogsController {
         this.postQueryRepository = postQueryRepository;
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @GetMapping
     public ResponseEntity<PaginationDto<ViewBlogDto>> findAll(CommonQueryParamsDto query) {
         PaginationDto<ViewBlogDto> result = blogQueryRepository.findAllBlogs(query, false);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PostMapping
     public ResponseEntity<ViewBlogDto> createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
         Blog blog = blogService.create(null, createBlogDto);
         return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateBlog(@PathVariable("id") String id,
                                            @RequestBody @Valid UpdateBlogDto updateBlogDto) {
@@ -65,7 +62,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> removeBlog(@PathVariable("id") String id) {
@@ -73,7 +69,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/{blogId}/posts")
     public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") String blogId,
                                                         @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto) {
@@ -81,7 +76,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{blogId}/posts")
     public ResponseEntity<PaginationDto<ViewPostDto>> findUserPosts(@PathVariable("blogId") String blogId,
                                                                     CommonQueryParamsDto query) {
@@ -89,7 +83,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable("blogId") String blogId,
                                            @PathVariable("postId") String postId,
@@ -98,7 +91,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<Void> removePost(@PathVariable("blogId") String blogId,
                                            @PathVariable("postId") String postId) {
@@ -106,7 +98,6 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{blogId}/bind-with-user/{userId}")
     public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") String blogId,
                                              @PathVariable("userId") String userId) {

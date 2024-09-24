@@ -36,7 +36,6 @@ public class SuperAdminUsersController {
 //        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 //    }
 
-    @RateLimiter(name = "rateLimiterApi")
     @PostMapping
     public ResponseEntity<ViewUserDto> create(@RequestBody @Valid RegistrationDto createUserDto) {
         UserEntity createdUser = userService.create(createUserDto, true);
@@ -44,14 +43,12 @@ public class SuperAdminUsersController {
         return new ResponseEntity<>(viewUserDto, HttpStatus.CREATED);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @GetMapping
     public ResponseEntity<PaginationDto<ViewUserDto>> findAll(QueryUserDto queryUserDto) {
         PaginationDto<ViewUserDto> result = userQueryRepository.findAllUsersWithCustomQueries(queryUserDto);
         return ResponseEntity.ok(result);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> remove(@PathVariable("userId") String userId) {
         userService.remove(UUID.fromString(userId));
