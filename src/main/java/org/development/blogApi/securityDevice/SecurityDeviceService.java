@@ -1,5 +1,6 @@
 package org.development.blogApi.securityDevice;
 
+import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceForbiddenException;
 import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
@@ -56,7 +57,7 @@ public class SecurityDeviceService {
                 .orElseThrow(() -> new SecurityDeviceNotFoundException());
 
         if (!userId.equals(deviceSession.getUserId().toString())) {
-            throw new RuntimeException("Cannot delete session of other user");
+            throw new SecurityDeviceForbiddenException("Cannot delete session of other user");
         }
 
         securityDeviceRepository.deleteById(UUID.fromString(deviceId));

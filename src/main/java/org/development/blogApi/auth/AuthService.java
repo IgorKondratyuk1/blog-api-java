@@ -142,4 +142,11 @@ public class AuthService {
 
         this.emailManager.sendPasswordRecoveryMessage(userEntity.getEmail(), userEntity.getPasswordRecovery().getRecoveryCode().toString());
     }
+
+    public void logout(String userId, String deviceId) {
+        if (userId.isBlank() || deviceId.isBlank()) {
+            throw new RuntimeException("Empty logout data. UserId: " + userId + " DeviceId: " + deviceId);
+        }
+        this.securityDeviceService.deleteDeviceSession(userId, deviceId);
+    }
 }
