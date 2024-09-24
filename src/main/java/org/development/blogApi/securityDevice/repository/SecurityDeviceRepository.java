@@ -17,6 +17,8 @@ public interface SecurityDeviceRepository extends JpaRepository<SecurityDevice, 
 
     void deleteAllByUserId(UUID userId);
 
+    void deleteByDeviceId(UUID deviceId);
+
     @Modifying
     @Query("DELETE FROM SecurityDevice sd WHERE sd.userId = :userId AND sd.deviceId != :currentSessionId")
     void deleteOtherSessionsExceptCurrent(UUID userId, UUID currentSessionId);

@@ -1,11 +1,17 @@
 package org.development.blogApi.securityDevice.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 
 import java.time.*;
 import java.util.UUID;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "security")
 public class SecurityDevice {
@@ -35,81 +41,6 @@ public class SecurityDevice {
 
     @Column(name = "last_active_date")
     private LocalDateTime lastActiveDate;
-
-    public SecurityDevice(UUID id, UUID deviceId, UUID userId, String ip, String title, boolean isValid, LocalDateTime createdAt, LocalDateTime lastActiveDate) {
-        this.id = id;
-        this.deviceId = deviceId;
-        this.userId = userId;
-        this.ip = ip;
-        this.title = title;
-        this.isValid = isValid;
-        this.createdAt = createdAt;
-        this.lastActiveDate = lastActiveDate;
-    }
-
-    public SecurityDevice() {
-    }
-
-    // Getters and Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(UUID deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public boolean isValid() {
-        return isValid;
-    }
-
-    public void setValid(boolean isValid) {
-        this.isValid = isValid;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getLastActiveDate() {
-        return lastActiveDate;
-    }
 
     public void setLastActiveDate(LocalDateTime lastActiveDate) {
         this.lastActiveDate = lastActiveDate;

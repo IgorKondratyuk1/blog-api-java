@@ -60,6 +60,6 @@ public class SecurityDeviceService {
             throw new SecurityDeviceForbiddenException("Cannot delete session of other user");
         }
 
-        securityDeviceRepository.deleteById(UUID.fromString(deviceId));
+        this.securityDeviceRepository.deleteByDeviceId(UUID.fromString(deviceId));
     }
 }

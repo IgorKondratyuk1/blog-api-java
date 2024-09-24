@@ -73,8 +73,6 @@ public class JwtService {
     }
 
     public String generateAccessToken(Map<String, Object> extractClaims, UserEntity userEntity) {
-        System.out.println("Access: " + ACCESS_TOKEN_VALIDITY_TIME_MS);
-        System.out.println("Refresh: " + REFRESH_TOKEN_VALIDITY_TIME_MS);
         return Jwts.builder()
                 .subject(userEntity.getLogin())
                 .claims(extractClaims)
