@@ -64,15 +64,16 @@ public class SecurityConfig {
     public SecurityFilterChain jwtRefreshFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(
-                        "/api/auth/**",
-                        "api/security/devices/**"
-                )
+                        "/api/auth/refresh-token",
+                        "/api/auth/logout",
+                        "/api/security/devices/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/refresh-token").authenticated()
-                        .requestMatchers("/api/auth/logout").authenticated()
-                        .requestMatchers("api/security/devices/**").authenticated()
+                        .requestMatchers(
+                                "/api/auth/refresh-token",
+                                "/api/auth/logout",
+                                "/api/security/devices/**").authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRefreshAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -98,9 +99,10 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/comments/*").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/posts").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/posts/*").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/posts",
+                                "/api/posts/*",
+                                "/api/posts/*/comments").authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -115,17 +117,13 @@ public class SecurityConfig {
     public SecurityFilterChain jwtAccessStrictFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(
-                        "/api/auth/**",
+                        "/api/auth/me",
                         "/api/posts/*/comments",
                         "/api/posts/*/like-status",
                         "/api/blogger/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/refresh-token").permitAll()
-                        .requestMatchers("/api/auth/logout").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAccessStrictAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->

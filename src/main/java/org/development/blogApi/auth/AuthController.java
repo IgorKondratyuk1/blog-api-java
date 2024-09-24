@@ -8,6 +8,7 @@ import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
+import org.development.blogApi.auth.dto.response.ViewMeDto;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.user.UserService;
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ViewMeDto> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 //        if (customUserDetails == null) {
 //            throw new AuthException("User not found");
 //        }

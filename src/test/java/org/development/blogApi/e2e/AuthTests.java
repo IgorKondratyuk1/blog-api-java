@@ -6,8 +6,10 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.Cookie;
 import org.development.blogApi.auth.dto.request.LoginDto;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
+import org.development.blogApi.auth.dto.response.ViewMeDto;
 import org.development.blogApi.e2e.helpers.TestHelpers;
 import org.development.blogApi.e2e.helpers.dto.TestTokensPairData;
 import org.development.blogApi.e2e.helpers.dto.TestUserData;
@@ -15,6 +17,7 @@ import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.exceptions.dto.APIFieldError;
 import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
+import org.development.blogApi.security.JwtService;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.development.blogApi.utils.CookieUtil;
@@ -42,6 +45,9 @@ class AuthTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private JwtService jwtService;
 
     @RegisterExtension
     private static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
@@ -77,7 +83,6 @@ class AuthTests {
         @DisplayName("Register User")
         @Order(1)
         void registerUser() throws MessagingException, IOException {
-            // Set up headers
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
 
@@ -113,7 +118,6 @@ class AuthTests {
         @DisplayName("User can not login without confirmation")
         @Order(2)
         void rejectLoginWithoutConfirmation() {
-            // Set up headers
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
 
@@ -135,7 +139,6 @@ class AuthTests {
         @DisplayName("Confirm user")
         @Order(3)
         void registerConfirmation() {
-            // Set up headers
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
 
@@ -228,7 +231,7 @@ class AuthTests {
                     passwordRecoveryUserData.getPassword(),
                     passwordRecoveryUserData.getEmail());
 
-            ViewUserDto response = TestHelpers.createUserBySa(restTemplate, createUserDto);
+            TestHelpers.createUserBySa(restTemplate, createUserDto);
         }
 
         @Test
@@ -312,6 +315,126 @@ class AuthTests {
 
             passwordRecoveryUserData.setAccessToken(tokensPairData.getAccessToken());
             passwordRecoveryUserData.setRefreshToken(tokensPairData.getRefreshToken());
+        }
+    }
+
+
+
+
+    @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class Logout {
+
+        private static TestUserData logoutUserData = new TestUserData("gotevi3@konetas.com", "username3", "1111111");
+
+        @Test
+        @DisplayName("Create User By SA")
+        @Order(1)
+        void create() throws JsonProcessingException {
+            RegistrationDto createUserDto = new RegistrationDto(
+                    logoutUserData.getUsername(),
+                    logoutUserData.getPassword(),
+                    logoutUserData.getEmail());
+
+            ViewUserDto viewUserDto = TestHelpers.createUserBySa(restTemplate, createUserDto);
+            logoutUserData.setId(UUID.fromString(viewUserDto.getId()));
+        }
+
+        @Test
+        @DisplayName("User can login after SA creation")
+        @Order(2)
+        void successLoginAfterSACreation() throws JsonProcessingException {
+            LoginDto loginDto = new LoginDto(logoutUserData.getUsername(), logoutUserData.getPassword());
+            TestTokensPairData tokensPairData = TestHelpers.login(restTemplate, loginDto);
+
+            logoutUserData.setAccessToken(tokensPairData.getAccessToken());
+            logoutUserData.setRefreshToken(tokensPairData.getRefreshToken());
+        }
+
+        @Test
+        @DisplayName("Refresh Token")
+        @Order(3)
+        void refreshToken() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            headers.add(HttpHeaders.COOKIE, jwtService.JWT_REFRESH_COOKIE_NANE + "=" + logoutUserData.getRefreshToken());
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            ResponseEntity<AuthResponseDto> response = restTemplate
+                    .exchange(
+                            "/api/auth/refresh-token",
+                            HttpMethod.POST,
+                            httpEntity,
+                            AuthResponseDto.class
+                    );
+
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+
+            String accessToken = response.getBody().getAccessToken();
+            String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")
+                    .orElseThrow(() -> new RuntimeException("No refresh token for test"));
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(accessToken).isNotNull();
+            assertThat(refreshToken).isNotNull();
+
+            logoutUserData.setRefreshToken(refreshToken);
+            logoutUserData.setAccessToken(accessToken);
+        }
+
+        @Test
+        @DisplayName("Me")
+        @Order(4)
+        void me() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            headers.set("Authorization", "Bearer " + logoutUserData.getAccessToken());
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            ResponseEntity<ViewMeDto> response = restTemplate
+                    .exchange(
+                            "/api/auth/me",
+                            HttpMethod.GET,
+                            httpEntity,
+                            ViewMeDto.class
+                    );
+
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody().getLogin()).isEqualTo(logoutUserData.getUsername());
+            assertThat(response.getBody().getEmail()).isEqualTo(logoutUserData.getEmail());
+            assertThat(response.getBody().getUserId()).isEqualTo(logoutUserData.getId().toString());
+        }
+
+        @Test
+        @DisplayName("Logout")
+        @Order(5)
+        void logout() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            headers.add(HttpHeaders.COOKIE, jwtService.JWT_REFRESH_COOKIE_NANE + "=" + logoutUserData.getRefreshToken());
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            ResponseEntity<Void> response = restTemplate
+                    .exchange(
+                            "/api/auth/logout",
+                            HttpMethod.POST,
+                            httpEntity,
+                            Void.class
+                    );
+
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+
+            String refreshToken = CookieUtil.getValueByKey(response.getHeaders().get("Set-Cookie"), "refreshToken")
+                    .orElseThrow(() -> new RuntimeException("No refresh token for test"));
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            assertThat(refreshToken).isBlank();
         }
     }
 }
