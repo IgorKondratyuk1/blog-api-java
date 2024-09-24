@@ -1,5 +1,6 @@
 package org.development.blogApi.core.comment;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import org.development.blogApi.core.comment.dto.request.UpdateCommentDto;
 import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
@@ -26,6 +27,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{id}")
     public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         if (customUserDetails == null) {
@@ -38,6 +40,7 @@ public class CommentController {
         return new ResponseEntity<>(viewPublicCommentDto, HttpStatus.OK);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateComment(
             @PathVariable("id") String id,
@@ -53,6 +56,7 @@ public class CommentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{id}/like-status")
     public ResponseEntity<?> updateCommentLikeStatus(
             @PathVariable("id") String id,
@@ -68,6 +72,7 @@ public class CommentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         System.out.println("customUserDetails: " + customUserDetails);

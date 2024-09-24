@@ -15,8 +15,9 @@ public class FiltersConfig {
     @Bean
     public FilterRegistrationBean<RateLimitingFilter> rateFilter(RateLimitingFilter rateLimitingFilter) {
         FilterRegistrationBean<RateLimitingFilter> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
-        registrationBean.setEnabled(true);
-        registrationBean.addUrlPatterns("/api/*");
+//        registrationBean.setEnabled(true);
+//        registrationBean.addUrlPatterns("/api/*");
+        registrationBean.setEnabled(false);
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registrationBean;
     }

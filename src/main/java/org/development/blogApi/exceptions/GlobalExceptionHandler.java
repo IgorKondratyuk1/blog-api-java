@@ -1,5 +1,6 @@
 package org.development.blogApi.exceptions;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.development.blogApi.exceptions.dto.APIFieldError;
@@ -61,9 +62,19 @@ public class GlobalExceptionHandler {
                 .body(apiErrorResult);
     }
 
+    // Request params type mismatch
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), "Wrong parameter or request body type, with name \"" + exception.getName() + "\"");
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    // Rate limiter
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<Object> requestNotPermittedException() {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.TOO_MANY_REQUESTS.value(), "Too many requests");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);

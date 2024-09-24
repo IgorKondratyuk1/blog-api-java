@@ -1,5 +1,6 @@
 package org.development.blogApi.auth;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,30 +40,35 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @GetMapping("/me")
     public ResponseEntity<ViewMeDto> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
         return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration")
     public ResponseEntity<Void> register(@RequestBody @Valid RegistrationDto registrationDto) {
         authService.register(registrationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration-confirmation")
     public ResponseEntity<Void> confirmRegistration(@RequestBody @Valid RegistrationConfirmationDto registrationConfirmationDto) {
         this.authService.confirmEmail(registrationConfirmationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration-email-resending")
     public ResponseEntity<Void> resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid LoginDto loginDto,
                                                  @RequestHeader(value = "User-Agent") String userAgent,
@@ -88,6 +94,7 @@ public class AuthController {
         }
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Cookie refreshCookie = new Cookie(jwtService.JWT_REFRESH_COOKIE_NANE, ""); // TODO transfer to utils
@@ -99,6 +106,7 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponseDto> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
         AuthTokensDto authTokensDto = this.authService.generateNewTokensPair(customUserDetails);
@@ -107,12 +115,14 @@ public class AuthController {
         return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/new-password")
     public ResponseEntity<Void> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RateLimiter(name = "rateLimiterApi")
     @PostMapping("/password-recovery")
     public ResponseEntity<Void> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);

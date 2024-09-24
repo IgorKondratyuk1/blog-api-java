@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -49,7 +47,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         // TODO make exclude rate limiting for specific routes
         String userIdentifier = getUserIdentifier(request);
         Bucket bucket = buckets.computeIfAbsent(userIdentifier, key -> {
-            Bandwidth limit = Bandwidth.classic(requestsLimit, Refill.greedy(requestsLimit, Duration.ofSeconds(requestsTTL)));
+            Refill refill = Refill.greedy(requestsLimit, Duration.ofSeconds(requestsTTL));
+            Bandwidth limit = Bandwidth.classic(requestsLimit, refill);
             return Bucket.builder().addLimit(limit).build();
         });
 
@@ -63,7 +62,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getUserIdentifier(HttpServletRequest request) {
-        // Identify the user by IP address or another identifier
-        return request.getRemoteAddr();
+        return request.getRemoteAddr(); // Identify the user by IP address or another identifier
     }
 }
