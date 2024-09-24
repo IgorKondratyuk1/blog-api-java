@@ -8,7 +8,7 @@ public class SecurityDeviceMapper {
         return new ViewSecurityDeviceDto(
                 securityDevice.getIp(),
                 securityDevice.getTitle(),
-                securityDevice.getLastActiveDate().toString(),
+                securityDevice.getLastActiveDate(),
                 securityDevice.getDeviceId().toString()
         );
     }

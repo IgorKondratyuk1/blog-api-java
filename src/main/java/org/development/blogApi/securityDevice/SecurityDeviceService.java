@@ -43,6 +43,7 @@ public class SecurityDeviceService {
         return securityDeviceRepository.findAllByUserId(UUID.fromString(userId));
     }
 
+    @Transactional
     public void deleteOtherDeviceSessions(String userId, String deviceId) {
         securityDeviceRepository.deleteOtherSessionsExceptCurrent(UUID.fromString(userId), UUID.fromString(deviceId));
     }
@@ -52,14 +53,14 @@ public class SecurityDeviceService {
     }
 
     @Transactional
-    public void deleteDeviceSession(String userId, String deviceId) {
-        SecurityDevice deviceSession = securityDeviceRepository.findByDeviceId(UUID.fromString(deviceId))
+    public void deleteDeviceSession(UUID userId, UUID deviceId) {
+        SecurityDevice deviceSession = securityDeviceRepository.findByDeviceId(deviceId)
                 .orElseThrow(() -> new SecurityDeviceNotFoundException());
 
-        if (!userId.equals(deviceSession.getUserId().toString())) {
+        if (!userId.equals(deviceSession.getUserId())) {
             throw new SecurityDeviceForbiddenException("Cannot delete session of other user");
         }
 
-        this.securityDeviceRepository.deleteByDeviceId(UUID.fromString(deviceId));
+        this.securityDeviceRepository.deleteByDeviceId(deviceId);
     }
 }

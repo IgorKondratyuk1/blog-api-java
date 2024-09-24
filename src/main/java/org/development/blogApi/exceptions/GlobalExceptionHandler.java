@@ -1,10 +1,10 @@
 package org.development.blogApi.exceptions;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.development.blogApi.exceptions.dto.APIFieldError;
 import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
+import org.hibernate.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.ArrayList;
@@ -51,22 +52,18 @@ public class GlobalExceptionHandler {
                 .body(apiErrorResult);
     }
 
-    // For expired Jwt token Error
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<Object> handleRuntimeException(ExpiredJwtException exception) {
-        log.error("GlobalExceptionHandler JWT");
-        exception.printStackTrace();
-
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Jwt token is expired");
+    // For not valid routes
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Object> noHandlerFoundException() {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), "Path not Found");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
     }
 
-    // For not valid routes
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Object> noHandlerFoundException() {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), "Path not Found");
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), "Wrong parameter or request body type, with name \"" + exception.getName() + "\"");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/security/devices")
@@ -26,10 +27,8 @@ public class SecurityDeviceController {
     @GetMapping
     public ResponseEntity<List<ViewSecurityDeviceDto>> findAllSecurityDevices(HttpServletRequest request) {  // TODO check what is the ResponseEntity and maybe delete from response
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
-        System.out.println(refreshToken);
         String userId = this.jwtService.extractUserId(refreshToken);
 
-        // Token Payload
         List<SecurityDevice> result = securityDeviceService.getAllDeviceSessions(userId);
 
         if (result == null || result.isEmpty()) {
@@ -49,18 +48,14 @@ public class SecurityDeviceController {
         String userId = this.jwtService.extractUserId(refreshToken);
         String deviceId = this.jwtService.extractDeviceId(refreshToken);
 
-        System.out.println(refreshToken);
-        System.out.println(userId);
-        System.out.println(deviceId);
-
         securityDeviceService.deleteOtherDeviceSessions(userId, deviceId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSecurityDeviceById(@PathVariable("id") String deviceId, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteSecurityDeviceById(@PathVariable("id") UUID deviceId, HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
-        String userId = this.jwtService.extractUserId(refreshToken);
+        UUID userId = UUID.fromString(this.jwtService.extractUserId(refreshToken));
 
         System.out.println("refreshToken: " + refreshToken + "\nuserId: " + userId + "\ndeviceId: " + deviceId);
 

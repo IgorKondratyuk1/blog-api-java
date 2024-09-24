@@ -95,7 +95,7 @@ public class AuthController {
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);
 
-        this.authService.logout(customUserDetails.getUserId(), customUserDetails.getDeviceId());
+        this.authService.logout(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(customUserDetails.getDeviceId()));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
