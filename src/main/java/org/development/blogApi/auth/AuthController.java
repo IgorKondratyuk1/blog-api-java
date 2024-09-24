@@ -41,10 +41,6 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ViewMeDto> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-//        if (customUserDetails == null) {
-//            throw new AuthException("User not found");
-//        }
-
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
         return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
     }
@@ -85,7 +81,6 @@ public class AuthController {
 
             AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
             jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
-
             return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,12 +100,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
-//        String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
-//        if (refreshToken == null || refreshToken.isEmpty()) {
-//            return new ResponseEntity("Refresh token is empty", HttpStatus.UNAUTHORIZED);
-//        }
-
+    public ResponseEntity<AuthResponseDto> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
         AuthTokensDto authTokensDto = this.authService.generateNewTokensPair(customUserDetails);
         AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
         jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
@@ -118,13 +108,13 @@ public class AuthController {
     }
 
     @PostMapping("/new-password")
-    public ResponseEntity<?> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
+    public ResponseEntity<Void> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<?> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
+    public ResponseEntity<Void> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -86,8 +86,6 @@ public class JwtRefreshAuthFilter extends OncePerRequestFilter {
             SecurityDevice securityDevice;
             try {
                 securityDevice = this.securityDeviceService.findDeviceSessionByDeviceId(deviceId);
-                System.out.println("securityDevice");
-                System.out.println(securityDevice);
             } catch (SecurityDeviceNotFoundException notFoundException) {
                 throw new AuthException(notFoundException.getMessage());
             }

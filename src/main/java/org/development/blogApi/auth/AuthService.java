@@ -14,6 +14,7 @@ import org.development.blogApi.security.JwtService;
 import org.development.blogApi.securityDevice.SecurityDeviceService;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
+import org.development.blogApi.securityDevice.repository.SecurityDeviceRepository;
 import org.development.blogApi.user.repository.RoleRepository;
 import org.development.blogApi.user.repository.UserRepository;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
@@ -27,6 +28,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -41,13 +44,19 @@ public class AuthService {
     private JwtService jwtService;
     private AuthenticationManager authenticationManager;
     private EmailManager emailManager;
-
     private SecurityDeviceService securityDeviceService;
+    private SecurityDeviceRepository securityDeviceRepository;
 
     @Autowired
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository,
-                          RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-                          JwtService jwtService, EmailManager emailManager, SecurityDeviceService securityDeviceService) {
+    public AuthService(AuthenticationManager authenticationManager,
+                       UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService,
+                       EmailManager emailManager,
+                       SecurityDeviceService securityDeviceService,
+                       SecurityDeviceRepository securityDeviceRepository
+    ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -55,6 +64,7 @@ public class AuthService {
         this.jwtService = jwtService;
         this.emailManager = emailManager;
         this.securityDeviceService = securityDeviceService;
+        this.securityDeviceRepository = securityDeviceRepository;
     }
 
     public void register(RegistrationDto createUserDto) {
@@ -114,12 +124,20 @@ public class AuthService {
     }
 
     public AuthTokensDto generateNewTokensPair(CustomUserDetails customUserDetails) {
-        if (customUserDetails.getUsername() == null || customUserDetails.getDeviceId() == null) {
+        if (customUserDetails.getUsername() == null ||
+            customUserDetails.getDeviceId() == null ||
+            customUserDetails.getLastActiveDate() == null
+        ) {
             throw new AuthException("User details not valid");
         }
 
+        // Check user and securityDevice data
         UserEntity userEntity = this.userRepository.findByLoginOrEmail(customUserDetails.getUsername()).orElseThrow(() -> new UserNotFoundException());
         SecurityDevice securityDevice = this.securityDeviceService.findDeviceSessionByDeviceId(customUserDetails.getDeviceId());
+
+        // Update lastActiveDate as unique value of device session
+        securityDevice.setLastActiveDate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+        this.securityDeviceRepository.save(securityDevice);
 
         Map<String, Object> claims = jwtService.createClaims(userEntity.getId(), securityDevice.getDeviceId(), securityDevice.getLastActiveDate());
         String newAccessToken = jwtService.generateAccessToken(claims, userEntity);

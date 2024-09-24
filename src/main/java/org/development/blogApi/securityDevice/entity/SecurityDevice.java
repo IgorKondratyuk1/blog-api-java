@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Data
@@ -54,7 +55,7 @@ public class SecurityDevice {
     }
 
     public static SecurityDevice createInstance(CreateSecurityDeviceDto createSecurityDeviceDto, int expiredDeviceSessionDays) {
-        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         LocalDateTime lastActiveDate = calculateLastActiveDate(createdAt, expiredDeviceSessionDays);
         return new SecurityDevice(
                 UUID.randomUUID(),
