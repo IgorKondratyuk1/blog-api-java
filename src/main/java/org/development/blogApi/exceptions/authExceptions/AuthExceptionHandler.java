@@ -1,7 +1,6 @@
-package org.development.blogApi.exceptions.authExceprion;
+package org.development.blogApi.exceptions.authExceptions;
 
 import org.development.blogApi.exceptions.dto.APIErrorResult;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

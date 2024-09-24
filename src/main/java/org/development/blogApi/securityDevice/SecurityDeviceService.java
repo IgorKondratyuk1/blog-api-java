@@ -1,5 +1,6 @@
 package org.development.blogApi.securityDevice;
 
+import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.development.blogApi.securityDevice.repository.SecurityDeviceRepository;
@@ -12,16 +13,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class SecurityDevicesService {
+public class SecurityDeviceService {
 
     @Value("${device-session.expiration-days}")
     private int expiredDeviceSession;
 
-    private final SecurityDeviceRepository securityDevicesRepository;
+    private final SecurityDeviceRepository securityDeviceRepository;
 
     @Autowired
-    public SecurityDevicesService(SecurityDeviceRepository securityDevicesRepository) {
-        this.securityDevicesRepository = securityDevicesRepository;
+    public SecurityDeviceService(SecurityDeviceRepository securityDeviceRepository) {
+        this.securityDeviceRepository = securityDeviceRepository;
     }
 
     public SecurityDevice createDeviceSession(CreateSecurityDeviceDto createSecurityDeviceDto) {
@@ -30,34 +31,34 @@ public class SecurityDevicesService {
                 expiredDeviceSession
         );
 
-        return securityDevicesRepository.save(newDeviceSession);
+        return securityDeviceRepository.save(newDeviceSession);
     }
 
     public SecurityDevice findDeviceSessionByDeviceId(String deviceId) {
-        return securityDevicesRepository.findByDeviceId(UUID.fromString(deviceId)).orElseThrow(() -> new RuntimeException("No security device founded"));
+        return securityDeviceRepository.findByDeviceId(UUID.fromString(deviceId)).orElseThrow(() -> new SecurityDeviceNotFoundException());
     }
 
     public List<SecurityDevice> getAllDeviceSessions(String userId) {
-        return securityDevicesRepository.findAllByUserId(UUID.fromString(userId));
+        return securityDeviceRepository.findAllByUserId(UUID.fromString(userId));
     }
 
     public void deleteOtherDeviceSessions(String userId, String deviceId) {
-        securityDevicesRepository.deleteOtherSessionsExceptCurrent(UUID.fromString(userId), UUID.fromString(deviceId));
+        securityDeviceRepository.deleteOtherSessionsExceptCurrent(UUID.fromString(userId), UUID.fromString(deviceId));
     }
 
     public void deleteAllUserSessions(String userId) {
-        securityDevicesRepository.deleteAllByUserId(UUID.fromString(userId));
+        securityDeviceRepository.deleteAllByUserId(UUID.fromString(userId));
     }
 
     @Transactional
     public void deleteDeviceSession(String userId, String deviceId) {
-        SecurityDevice deviceSession = securityDevicesRepository.findByDeviceId(UUID.fromString(deviceId))
-                .orElseThrow(() -> new RuntimeException("Session is not found"));
+        SecurityDevice deviceSession = securityDeviceRepository.findByDeviceId(UUID.fromString(deviceId))
+                .orElseThrow(() -> new SecurityDeviceNotFoundException());
 
         if (!userId.equals(deviceSession.getUserId().toString())) {
             throw new RuntimeException("Cannot delete session of other user");
         }
 
-        securityDevicesRepository.deleteById(UUID.fromString(deviceId));
+        securityDeviceRepository.deleteById(UUID.fromString(deviceId));
     }
 }

@@ -7,11 +7,11 @@ import org.development.blogApi.auth.dto.request.RegistrationConfirmationDto;
 import org.development.blogApi.auth.dto.request.RegistrationEmailResendDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.email.EmailManager;
-import org.development.blogApi.exceptions.authExceprion.AuthException;
+import org.development.blogApi.exceptions.authExceptions.AuthException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
-import org.development.blogApi.securityDevice.SecurityDevicesService;
+import org.development.blogApi.securityDevice.SecurityDeviceService;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.development.blogApi.user.repository.RoleRepository;
@@ -42,19 +42,19 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
     private EmailManager emailManager;
 
-    private SecurityDevicesService securityDevicesService;
+    private SecurityDeviceService securityDeviceService;
 
     @Autowired
     public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository,
                           RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-                          JwtService jwtService, EmailManager emailManager, SecurityDevicesService securityDevicesService) {
+                          JwtService jwtService, EmailManager emailManager, SecurityDeviceService securityDeviceService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.emailManager = emailManager;
-        this.securityDevicesService = securityDevicesService;
+        this.securityDeviceService = securityDeviceService;
     }
 
     public void register(RegistrationDto createUserDto) {
@@ -97,7 +97,7 @@ public class AuthService {
                 userEntity.getId().toString(),
                 extendedLoginDataDto.getIp(),
                 extendedLoginDataDto.getTitle());
-        SecurityDevice securityDevice = this.securityDevicesService.createDeviceSession(createSecurityDeviceDto);
+        SecurityDevice securityDevice = this.securityDeviceService.createDeviceSession(createSecurityDeviceDto);
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -119,7 +119,7 @@ public class AuthService {
         }
 
         UserEntity userEntity = this.userRepository.findByLoginOrEmail(customUserDetails.getUsername()).orElseThrow(() -> new UserNotFoundException());
-        SecurityDevice securityDevice = this.securityDevicesService.findDeviceSessionByDeviceId(customUserDetails.getDeviceId());
+        SecurityDevice securityDevice = this.securityDeviceService.findDeviceSessionByDeviceId(customUserDetails.getDeviceId());
 
         Map<String, Object> claims = jwtService.createClaims(userEntity.getId(), securityDevice.getDeviceId(), securityDevice.getLastActiveDate());
         String newAccessToken = jwtService.generateAccessToken(claims, userEntity);

@@ -319,8 +319,6 @@ class AuthTests {
     }
 
 
-
-
     @Nested
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class Logout {

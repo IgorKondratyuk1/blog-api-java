@@ -13,13 +13,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/security/devices")
-public class SecurityDevicesController {
+public class SecurityDeviceController {
 
-    private final SecurityDevicesService securityDevicesService;
+    private final SecurityDeviceService securityDeviceService;
     private final JwtService jwtService;
 
-    public SecurityDevicesController(SecurityDevicesService securityDevicesService, JwtService jwtService) {
-        this.securityDevicesService = securityDevicesService;
+    public SecurityDeviceController(SecurityDeviceService securityDeviceService, JwtService jwtService) {
+        this.securityDeviceService = securityDeviceService;
         this.jwtService = jwtService;
     }
 
@@ -30,7 +30,7 @@ public class SecurityDevicesController {
         String userId = this.jwtService.extractUserId(refreshToken);
 
         // Token Payload
-        List<SecurityDevice> result = securityDevicesService.getAllDeviceSessions(userId);
+        List<SecurityDevice> result = securityDeviceService.getAllDeviceSessions(userId);
 
         if (result == null || result.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -53,7 +53,7 @@ public class SecurityDevicesController {
         System.out.println(userId);
         System.out.println(deviceId);
 
-        securityDevicesService.deleteOtherDeviceSessions(userId, deviceId);
+        securityDeviceService.deleteOtherDeviceSessions(userId, deviceId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -64,7 +64,7 @@ public class SecurityDevicesController {
 
         System.out.println("refreshToken: " + refreshToken + "\nuserId: " + userId + "\ndeviceId: " + deviceId);
 
-        securityDevicesService.deleteDeviceSession(userId, deviceId);
+        securityDeviceService.deleteDeviceSession(userId, deviceId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

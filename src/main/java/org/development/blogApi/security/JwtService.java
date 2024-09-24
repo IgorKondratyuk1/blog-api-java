@@ -31,8 +31,8 @@ public class JwtService {
     private boolean cookiesSecure;
     private boolean cookiesHttpOnly;
     public String JWT_REFRESH_COOKIE_NANE = "refreshToken";
-    public Integer ACCESS_TOKEN_VALIDITY_TIME;
-    public Integer REFRESH_TOKEN_VALIDITY_TIME;
+    public Integer ACCESS_TOKEN_VALIDITY_TIME_MS;
+    public Integer REFRESH_TOKEN_VALIDITY_TIME_MS;
 
 
 
@@ -42,8 +42,8 @@ public class JwtService {
                       @Value("${token.cookies-secure}") Boolean cookiesSecure,
                       @Value("${token.cookies-httpOnly}") Boolean cookiesHttpOnly) {
         this.secretKey = secretKey;
-        this.ACCESS_TOKEN_VALIDITY_TIME = 1000 * accessTokenSeconds;
-        this.REFRESH_TOKEN_VALIDITY_TIME = 1000 * refreshTokenSeconds;
+        this.ACCESS_TOKEN_VALIDITY_TIME_MS = 1000 * accessTokenSeconds;
+        this.REFRESH_TOKEN_VALIDITY_TIME_MS = 1000 * refreshTokenSeconds;
         this.cookiesHttpOnly = cookiesHttpOnly;
         this.cookiesSecure = cookiesSecure;
         System.out.println(cookiesHttpOnly);
@@ -73,13 +73,13 @@ public class JwtService {
     }
 
     public String generateAccessToken(Map<String, Object> extractClaims, UserEntity userEntity) {
-        System.out.println("Access: " + ACCESS_TOKEN_VALIDITY_TIME);
-        System.out.println("Refresh: " + REFRESH_TOKEN_VALIDITY_TIME);
+        System.out.println("Access: " + ACCESS_TOKEN_VALIDITY_TIME_MS);
+        System.out.println("Refresh: " + REFRESH_TOKEN_VALIDITY_TIME_MS);
         return Jwts.builder()
                 .subject(userEntity.getLogin())
                 .claims(extractClaims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_TIME))
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_TIME_MS))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -93,7 +93,7 @@ public class JwtService {
                 .subject(userEntity.getLogin())
                 .claims(extractClaims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_TIME))
+                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_TIME_MS))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -158,7 +158,7 @@ public class JwtService {
         refreshTokenCookie.setHttpOnly(cookiesHttpOnly);
         refreshTokenCookie.setSecure(cookiesSecure);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_VALIDITY_TIME / 1000); // Convert milliseconds to seconds
+        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_VALIDITY_TIME_MS / 1000); // Convert milliseconds to seconds
         response.addCookie(refreshTokenCookie);
     }
 

@@ -4,13 +4,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.development.blogApi.exceptions.authExceprion.AuthException;
+import org.development.blogApi.exceptions.authExceptions.AuthException;
+import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
+import org.development.blogApi.securityDevice.SecurityDeviceService;
+import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,14 +29,17 @@ import java.time.LocalDateTime;
 public class JwtRefreshAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final SecurityDeviceService securityDeviceService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
     public JwtRefreshAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
                                 JwtService jwtService,
+                                SecurityDeviceService securityDeviceService,
                                 UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
+        this.securityDeviceService = securityDeviceService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
@@ -76,6 +80,19 @@ public class JwtRefreshAuthFilter extends OncePerRequestFilter {
 
             if (!jwtService.isTokenValid(refreshToken, userDetails)) {
                 throw new AuthException("Refresh token is not valid");
+            }
+
+            // Search security device due to device session management (connect with logout)
+            SecurityDevice securityDevice;
+            try {
+                securityDevice = this.securityDeviceService.findDeviceSessionByDeviceId(deviceId);
+            } catch (SecurityDeviceNotFoundException notFoundException) {
+                throw new AuthException(notFoundException.getMessage());
+            }
+
+            // Check that token is valid (lastActiveDate use like unique value)
+            if (!securityDevice.getLastActiveDate().isEqual(lastActiveDate)) {
+                throw new AuthException("Wrong activation date");
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

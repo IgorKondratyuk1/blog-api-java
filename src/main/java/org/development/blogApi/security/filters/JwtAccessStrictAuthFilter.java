@@ -4,9 +4,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.development.blogApi.exceptions.authExceprion.AuthException;
+import org.development.blogApi.exceptions.authExceptions.AuthException;
+import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
+import org.development.blogApi.securityDevice.SecurityDeviceService;
+import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
@@ -26,14 +29,17 @@ import java.time.LocalDateTime;
 public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final SecurityDeviceService securityDeviceService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
     public JwtAccessStrictAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
                                      JwtService jwtService,
+                                     SecurityDeviceService securityDeviceService,
                                      UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
+        this.securityDeviceService = securityDeviceService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
@@ -54,8 +60,6 @@ public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
             final LocalDateTime lastActiveDate;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//                filterChain.doFilter(request, response);
-//                return;
                 throw new AuthException("Token is not found");
             }
 
@@ -71,8 +75,6 @@ public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
             lastActiveDate = jwtService.extractLastActiveDate(jwt);
 
             if (usernameOrEmail == null || userId == null) {
-//                filterChain.doFilter(request, response);
-//                return;
                 throw new AuthException("Token data is not valid");
             }
 
@@ -86,16 +88,21 @@ public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
             CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
             if (!jwtService.isTokenValid(jwt, userDetails)) {
-//                filterChain.doFilter(request, response);
-//                return;
                 throw new AuthException("Token is not valid");
+            }
+
+            // Search security device due to device session management (connect with logout)
+            try {
+                this.securityDeviceService.findDeviceSessionByDeviceId(deviceId);
+            } catch (SecurityDeviceNotFoundException notFoundException) {
+                throw new AuthException(notFoundException.getMessage());
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     customUserDetails,
                     null,
-                    userDetails.getAuthorities()
-            );
+                    userDetails.getAuthorities());
+
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 

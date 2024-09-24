@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class JwtAccessSoftAuthFilter extends OncePerRequestFilter {
+public class JwtAccessSoftAuthFilter extends OncePerRequestFilter { // TODO create annotation that will receive user data from token if token received
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
