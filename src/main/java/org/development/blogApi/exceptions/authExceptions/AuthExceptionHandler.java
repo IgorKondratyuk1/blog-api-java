@@ -1,6 +1,7 @@
 package org.development.blogApi.exceptions.authExceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.springframework.core.Ordered;
@@ -17,11 +18,22 @@ public class AuthExceptionHandler {
 
     // For expired Jwt token Error
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<Object> handleRuntimeException(ExpiredJwtException exception) {
+    public ResponseEntity<Object> expiredJwtException(ExpiredJwtException exception) {
         log.error("GlobalExceptionHandler JWT");
         exception.printStackTrace();
 
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Jwt token is expired");
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    // For jwt signature does not match
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<Object> signatureException() {
+        log.error("AuthExceptionHandler SignatureException");
+
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Wrong jwt signature");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);

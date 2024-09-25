@@ -2,6 +2,7 @@ package org.development.blogApi.exceptions;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
+import org.development.blogApi.RateLimitExceededException;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.development.blogApi.exceptions.dto.APIFieldError;
 import org.development.blogApi.exceptions.dto.APIValidationErrorResult;
@@ -75,6 +76,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestNotPermitted.class)
     public ResponseEntity<Object> requestNotPermittedException() {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.TOO_MANY_REQUESTS.value(), "Too many requests");
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Object> requestNotPermittedException2(RateLimitExceededException e) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.TOO_MANY_REQUESTS.value(), e.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
