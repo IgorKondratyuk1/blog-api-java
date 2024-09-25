@@ -1,5 +1,6 @@
 package org.development.blogApi.config;
 
+import org.development.blogApi.RateLimitingFilterCustom;
 import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
 import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
@@ -19,6 +20,32 @@ public class FiltersConfig {
 //        registrationBean.addUrlPatterns("/api/*");
         registrationBean.setEnabled(false);
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<RateLimitingFilterCustom> rateFilter2(RateLimitingFilterCustom rateLimitingFilter) {
+        FilterRegistrationBean<RateLimitingFilterCustom> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
+        registrationBean.setEnabled(true);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registrationBean.addUrlPatterns(
+                "/api/auth/login",
+                "/api/auth/registration",
+                "/api/auth/registration-confirmation",
+                "/api/auth/registration-email-resending",
+                "/api/auth/new-password",
+                "/api/auth/password-recovery",
+
+                "/api/blogger/blogs",
+                "/api/blogger/blogs/*",
+
+                "/api/comments",
+                "/api/comments/*",
+
+                "/api/posts",
+                "/api/posts/*"
+        );
+
         return registrationBean;
     }
 

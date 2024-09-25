@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
-@Configuration
+//@Configuration
 public class RateLimiterConfiguration {
     @Value("${rate-limit.requestsLimit}")
     private int requests;

@@ -46,28 +46,28 @@ public class AuthController {
         return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration")
     public ResponseEntity<Void> register(@RequestBody @Valid RegistrationDto registrationDto) {
         authService.register(registrationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration-confirmation")
     public ResponseEntity<Void> confirmRegistration(@RequestBody @Valid RegistrationConfirmationDto registrationConfirmationDto) {
         this.authService.confirmEmail(registrationConfirmationDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/registration-email-resending")
     public ResponseEntity<Void> resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid LoginDto loginDto,
                                                  @RequestHeader(value = "User-Agent") String userAgent,
@@ -112,14 +112,14 @@ public class AuthController {
         return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/new-password")
     public ResponseEntity<Void> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/password-recovery")
     public ResponseEntity<Void> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);
