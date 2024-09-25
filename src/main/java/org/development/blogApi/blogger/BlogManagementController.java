@@ -58,7 +58,7 @@ public class BlogManagementController {
         this.commentQueryRepository = commentQueryRepository;
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping
     public ResponseEntity<?> findUserBlogs(
             CommonQueryParamsDto commonQueryParamsDto,
@@ -72,7 +72,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(blogs, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping
     public ResponseEntity<?> createBlog(
             @RequestBody @Valid CreateBlogDto createBlogDto,
@@ -87,7 +87,7 @@ public class BlogManagementController {
     }
 
     // TODO Make annotation that will be check AuthenticationPrincipal
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(
             @PathVariable String id,
@@ -102,7 +102,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> removeBlog(
             @PathVariable String id,
@@ -116,7 +116,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/{blogId}/posts")
     public ResponseEntity<?> createPostOfBlog(
             @PathVariable String blogId,
@@ -131,7 +131,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(PostMapper.toView(createdPost), HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{blogId}/posts")
     public ResponseEntity<?> findUserPosts(
             @PathVariable String blogId,
@@ -147,7 +147,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(postsOfBlogByUserId, HttpStatus.OK);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<?> updatePost(
             @PathVariable String blogId,
@@ -164,7 +164,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @DeleteMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<?> removePost(
             @PathVariable String blogId,
@@ -180,7 +180,7 @@ public class BlogManagementController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RateLimiter(name = "rateLimiterApi")
+    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/comments")
     public ResponseEntity<?> findCommentsOfUserBlog(
             CommonQueryParamsDto commonQueryParamsDto,
