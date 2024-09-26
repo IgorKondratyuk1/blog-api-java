@@ -1,6 +1,7 @@
 package org.development.blogApi.config;
 
 import org.development.blogApi.RateLimitingFilterCustom;
+import org.development.blogApi.RateLimitingFilterCustomExpress;
 import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
 import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
@@ -24,8 +25,8 @@ public class FiltersConfig {
     }
 
     @Bean
-    public FilterRegistrationBean<RateLimitingFilterCustom> rateFilter2(RateLimitingFilterCustom rateLimitingFilter) {
-        FilterRegistrationBean<RateLimitingFilterCustom> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
+    public FilterRegistrationBean<RateLimitingFilterCustomExpress> rateFilter2(RateLimitingFilterCustomExpress rateLimitingFilter) {
+        FilterRegistrationBean<RateLimitingFilterCustomExpress> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
         registrationBean.setEnabled(true);
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         registrationBean.addUrlPatterns(
