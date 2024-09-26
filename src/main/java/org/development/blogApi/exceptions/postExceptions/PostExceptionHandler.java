@@ -18,4 +18,20 @@ public class PostExceptionHandler {
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
     }
+
+    @ExceptionHandler(PostUpdateForbiddenException.class)
+    public ResponseEntity<Object> postUpdateForbiddenException(PostUpdateForbiddenException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    @ExceptionHandler(IncorrectPostDataException.class)
+    public ResponseEntity<Object> incorrectPostDataException(IncorrectPostDataException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
 }

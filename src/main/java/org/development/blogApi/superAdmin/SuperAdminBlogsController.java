@@ -52,7 +52,7 @@ public class SuperAdminBlogsController { // TODO write tests
     @PostMapping
     public ResponseEntity<ViewBlogDto> createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
         Blog blog = blogService.createByAdmin(createBlogDto);
-        return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.OK);
+        return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -73,7 +73,7 @@ public class SuperAdminBlogsController { // TODO write tests
     public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") UUID blogId,
                                                         @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto) {
         ViewPostDto viewPostDto = postService.createByAdmin(blogId, createPostOfBlogDto);
-        return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
+        return new ResponseEntity<>(viewPostDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{blogId}/posts")
@@ -89,7 +89,7 @@ public class SuperAdminBlogsController { // TODO write tests
                                            @PathVariable("postId") String postId,
                                            @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto) {
         postService.updateWithBlogIdByAdmin(postId, blogId, updatePostOfBlogDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{blogId}/posts/{postId}")

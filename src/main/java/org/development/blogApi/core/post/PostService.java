@@ -1,6 +1,5 @@
 package org.development.blogApi.core.post;
 
-import jakarta.transaction.Transactional;
 import org.development.blogApi.core.blog.repository.BlogRepository;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.like.LikeService;
@@ -13,6 +12,8 @@ import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.utils.PostMapper;
 import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
+import org.development.blogApi.exceptions.postExceptions.IncorrectPostDataException;
+import org.development.blogApi.exceptions.postExceptions.PostUpdateForbiddenException;
 import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
@@ -52,7 +53,7 @@ public class PostService {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Blog doesn't belong to the current user");
+            throw new IncorrectPostDataException("Blog doesn't belong to the current user");
         }
 
         Post post = Post.createInstance(user, blog, createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getContent(), createPostOfBlogDto.getTitle());
@@ -75,11 +76,11 @@ public class PostService {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new RuntimeException("Can not update with wrong blog id");
+            throw new IncorrectPostDataException("Can not update with wrong blog id");
         }
 
         if (!post.getUser().getId().toString().equals(userId)) {
-            throw new RuntimeException("Can not update post with wrong user id");
+            throw new IncorrectPostDataException("Can not update post with wrong user id");
         }
 
         post.updatePost(updatePostDto);
@@ -90,7 +91,7 @@ public class PostService {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new RuntimeException("Wrong blog id");
+            throw new IncorrectPostDataException("Wrong blog id");
         }
 
         post.updatePost(updatePostDto);
@@ -101,11 +102,11 @@ public class PostService {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new RuntimeException("Wrong blog id");
+            throw new IncorrectPostDataException("Wrong blog id");
         }
 
         if (!post.getUser().getId().toString().equals(userId)) {
-            throw new RuntimeException("Can not remove a post that is not owned");
+            throw new IncorrectPostDataException("Can not remove a post that is not owned");
         }
 
         postsRepository.deleteById(UUID.fromString(postId));
@@ -115,7 +116,7 @@ public class PostService {
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new RuntimeException("Wrong blog id");
+            throw new IncorrectPostDataException("Wrong blog id");
         }
 
         postsRepository.deleteById(UUID.fromString(postId));
