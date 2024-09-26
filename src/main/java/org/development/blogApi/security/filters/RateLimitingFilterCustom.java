@@ -1,4 +1,4 @@
-package org.development.blogApi;
+package org.development.blogApi.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,12 +14,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class RateLimitingFilterCustomExpress extends OncePerRequestFilter {
+public class RateLimitingFilterCustom extends OncePerRequestFilter {
 
     @Value("${rate-limit.requestsLimit}")
-    private int requestLimit;
+    private int requestsLimit;
+
     @Value("${rate-limit.requestsTTL}")
     private int requestsTTL;
+
+    @Value("${rate-limit.enable}")
+    private Boolean enableRateLimit;
 
     private final Map<String, RequestAttempt> attemptsMap = new ConcurrentHashMap<>();
 
@@ -27,11 +31,15 @@ public class RateLimitingFilterCustomExpress extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        if (!enableRateLimit) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         System.out.println("RateLimitingFilterCustomExpress");
 
         String ip = getClientIp(request);
         String url = request.getRequestURI();
-
         String key = ip + "-" + url;
 
         // Check if the rate limit is exceeded
@@ -63,7 +71,7 @@ public class RateLimitingFilterCustomExpress extends OncePerRequestFilter {
         }
 
         // Check if the max attempts have been reached
-        return attempt.count >= requestLimit;
+        return attempt.count >= requestsLimit;
     }
 
     private void setNewAttempt(String key) {
