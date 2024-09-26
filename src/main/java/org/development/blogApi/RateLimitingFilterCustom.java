@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Filter;
 
-@Component
+//@Component
 public class RateLimitingFilterCustom extends OncePerRequestFilter {
     private final RateLimiterRegistry rateLimiterRegistry;
     private final ConcurrentHashMap<String, RateLimiter> rateLimiterCache = new ConcurrentHashMap<>();

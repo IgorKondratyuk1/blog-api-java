@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @Slf4j
-@Component
+//@Component
 public class RateLimitingFilter extends OncePerRequestFilter {
 
     @Value("${rate-limit.requestsTTL}")
