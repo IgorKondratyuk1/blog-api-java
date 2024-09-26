@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.blogExceptions;
+package org.development.blogApi.exceptions.postExceptions;
 
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.springframework.core.Ordered;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class BlogExceptionHandler {
-    @ExceptionHandler(BlogNotFoundException.class)
-    public ResponseEntity<Object> blogNotFoundException(BlogNotFoundException exception) {
+public class PostExceptionHandler {
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<Object> postNotFoundException(PostNotFoundException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)

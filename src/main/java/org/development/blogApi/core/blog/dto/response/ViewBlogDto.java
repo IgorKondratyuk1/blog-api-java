@@ -1,5 +1,6 @@
 package org.development.blogApi.core.blog.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,5 +14,6 @@ public class ViewBlogDto {
     private String description;
     private String websiteUrl;
     private LocalDateTime createdAt;
+    @JsonProperty("isMembership")
     private boolean isMembership;
 }

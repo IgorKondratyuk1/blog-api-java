@@ -62,7 +62,7 @@ public class BlogService {
 
 
     public void remove(UUID userId, UUID blogId) {
-        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Cannot delete a blog that does not belong to the user");
@@ -72,12 +72,12 @@ public class BlogService {
     }
 
     public void removeByAdmin(UUID blogId) {
-        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
         this.blogsRepository.deleteById(blogId);
     }
 
     public void bindBlogWithUser(UUID userId, UUID blogId) {
-        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Wrong blogId"));
+        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (blog.getUser().getId() != null) {
             throw new RuntimeException("blog is already bounded");

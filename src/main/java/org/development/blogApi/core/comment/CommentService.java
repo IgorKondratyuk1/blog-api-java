@@ -9,6 +9,8 @@ import org.development.blogApi.core.like.enums.LikeLocation;
 import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.entity.Post;
+import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.repository.UserRepository;
 import org.development.blogApi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +44,10 @@ public class CommentService {
     }
 
     public Comment create(CreateCommentDto createCommentDto, String postId, String userId) {
-        Post post = postRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         // Check if user can create comment
-        UserEntity user = userRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new RuntimeException("User is not found"));
+        UserEntity user = userRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException());
 
         Comment comment = Comment.createInstance(
                 createCommentDto,

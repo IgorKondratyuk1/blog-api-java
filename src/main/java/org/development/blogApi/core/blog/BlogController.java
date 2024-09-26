@@ -8,6 +8,7 @@ import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogQueryRepository;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
+import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import java.util.UUID;
 public class BlogController {
     private final BlogQueryRepository blogQueryRepository;
     private final BlogService blogService;
-
     private final PostQueryRepository postQueryRepository;
 
     @Autowired
@@ -64,7 +64,7 @@ public class BlogController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
-        Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new BlogNotFoundException());
         if (blog == null) {
             return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);
         }

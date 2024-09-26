@@ -157,30 +157,6 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         return query.getSingleResult();
     }
 
-//    private String getFilters(CommonQueryParamsDto queryObj, boolean skipBannedComments, UUID userId) {
-//        StringBuilder filters = new StringBuilder("WHERE ");
-//        boolean hasPreviousFilter = false;
-//
-//        if (skipBannedComments) {
-//            filters.append("bt.isBanned = false");
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (userId != null) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("bt.user.id = ").append(userId);
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (!queryObj.getSearchNameTerm().isBlank()) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("bt.name LIKE '%").append(queryObj.getSearchNameTerm()).append("%'");
-//            hasPreviousFilter = true;
-//        }
-//
-//        return filters.append(";").toString();
-//    }
-
     private FilterResult getFilters(CommonQueryParamsDto queryObj, boolean skipBannedComments, String userId) {
         StringBuilder filters = new StringBuilder();
         Map<String, Object> params = new HashMap<>();

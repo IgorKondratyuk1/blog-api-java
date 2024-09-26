@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/sa/blogs")
-public class SuperAdminBlogsController {
+public class SuperAdminBlogsController { // TODO write tests
 
     private final BlogService blogService;
     private final PostService postService;

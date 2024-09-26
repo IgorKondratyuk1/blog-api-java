@@ -9,5 +9,4 @@ import java.util.UUID;
 
 @Repository
 public interface BlogQueryRepository extends JpaRepository<Blog, UUID>, BlogQueryRepositoryCustom {
-
 }

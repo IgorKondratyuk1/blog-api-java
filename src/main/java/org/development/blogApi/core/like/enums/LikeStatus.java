@@ -1,5 +1,7 @@
 package org.development.blogApi.core.like.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum LikeStatus {
     NONE("None"),
     LIKE("Like"),
@@ -11,6 +13,8 @@ public enum LikeStatus {
         this.value = value;
     }
 
+
+    @JsonValue
     public String getValue() {
         return value;
     }

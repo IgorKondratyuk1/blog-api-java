@@ -12,6 +12,8 @@ import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.utils.PostMapper;
+import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
+import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
@@ -42,11 +44,11 @@ public class PostService {
     }
 
     public Post findById(UUID postId) {
-        return postsRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        return postsRepository.findById(postId).orElseThrow(() -> new PostNotFoundException());
     }
 
     public Post create(UUID userId, UUID blogId, CreatePostOfBlogDto createPostOfBlogDto) {
-        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
@@ -58,19 +60,19 @@ public class PostService {
     }
 
     public ViewPostDto createByAdmin(UUID blogId, CreatePostOfBlogDto createPostOfBlogDto) {
-        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
         Post post = Post.createInstance(null, blog, createPostOfBlogDto.getShortDescription(), createPostOfBlogDto.getContent(), createPostOfBlogDto.getTitle());
         Post createdPost = postsRepository.save(post);
         return PostMapper.toView(createdPost);
     }
 
     public void updateLikeStatus(UUID id, String userId, String userLogin, LikeStatus status) {
-        Post post = postsRepository.findById(id).orElseThrow(() -> new RuntimeException("Blog not found"));
+        Post post = postsRepository.findById(id).orElseThrow(() -> new BlogNotFoundException());
         this.likeService.like(userId, userLogin, LikeLocation.POST, post.getId().toString(), status);
     }
 
     public void updateWithBlogId(String userId, String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
-        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
             throw new RuntimeException("Can not update with wrong blog id");
@@ -85,7 +87,7 @@ public class PostService {
     }
 
     public void updateWithBlogIdByAdmin(String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
-        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
             throw new RuntimeException("Wrong blog id");
@@ -96,7 +98,7 @@ public class PostService {
     }
 
     public void removeWithBlogId(String userId, String postId, String blogId) {
-        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
             throw new RuntimeException("Wrong blog id");
@@ -110,7 +112,7 @@ public class PostService {
     }
 
     public void removeWithBlogIdByAdmin(String postId, String blogId) {
-        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
             throw new RuntimeException("Wrong blog id");

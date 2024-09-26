@@ -37,6 +37,8 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
     @Override
     public Optional<ViewPostDto> findOnePost(String postId, String currentUserId) {
+        UUID userUuid = currentUserId == null ? null : UUID.fromString(currentUserId); // TODO refactor
+
         String jpql = "SELECT pt FROM Post pt " +
                 "LEFT JOIN pt.blog bt " +
                 "WHERE pt.id = :postId";
@@ -53,7 +55,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
         List<Like> lastLikes = likeRepository.getLastLikesInfo(postId, LikeLocation.POST, 3);
         LikesDislikesCountDto likesDislikesCount = likeRepository.getLikesAndDislikesCount(UUID.fromString(postId), LikeLocation.POST);
-        LikeStatus likeStatus = likeRepository.getUserLikeStatus(UUID.fromString(currentUserId), UUID.fromString(postId), LikeLocation.POST);
+        LikeStatus likeStatus = likeRepository.getUserLikeStatus(userUuid, UUID.fromString(postId), LikeLocation.POST);
 
         return Optional.of(PostMapper.toView(
                 post,
