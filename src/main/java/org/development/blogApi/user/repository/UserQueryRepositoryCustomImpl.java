@@ -76,6 +76,7 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
         return query.getSingleResult();
     }
 
+    // TODO rewrite like in posts query repo
     private String getUsersFilters(QueryUserDto queryObj) {
         StringBuilder sqlFilters = new StringBuilder();
         List<String> filters = new ArrayList<>();

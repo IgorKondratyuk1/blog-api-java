@@ -4,6 +4,7 @@ import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogRepository;
+import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
@@ -36,8 +37,13 @@ public class BlogService {
         return this.blogsRepository.save(blog);
     }
 
+    public Blog createByAdmin(CreateBlogDto createBlogDto) {
+        Blog blog = Blog.createInstance(null, createBlogDto);
+        return this.blogsRepository.save(blog);
+    }
+
     public void update(UUID userId, UUID blogId, UpdateBlogDto updateBlogDto) {
-        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new UserNotFoundException());
+        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
             throw new RuntimeException("Cannot update a blog that does not belong to the user");
@@ -46,6 +52,14 @@ public class BlogService {
         blog.updateBlog(updateBlogDto);
         this.blogsRepository.save(blog);
     }
+
+    public void updateByAdmin(UUID blogId, UpdateBlogDto updateBlogDto) {
+        Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
+
+        blog.updateBlog(updateBlogDto);
+        this.blogsRepository.save(blog);
+    }
+
 
     public void remove(UUID userId, UUID blogId) {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new RuntimeException("Blog not found"));

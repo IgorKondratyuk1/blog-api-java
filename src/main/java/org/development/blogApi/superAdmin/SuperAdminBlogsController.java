@@ -51,28 +51,28 @@ public class SuperAdminBlogsController {
 
     @PostMapping
     public ResponseEntity<ViewBlogDto> createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
-        Blog blog = blogService.create(null, createBlogDto);
+        Blog blog = blogService.createByAdmin(createBlogDto);
         return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBlog(@PathVariable("id") String id,
+    public ResponseEntity<Void> updateBlog(@PathVariable("id") UUID id,
                                            @RequestBody @Valid UpdateBlogDto updateBlogDto) {
-        blogService.update(null, UUID.fromString(id), updateBlogDto);
+        blogService.updateByAdmin(id, updateBlogDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> removeBlog(@PathVariable("id") String id) {
-        blogService.removeByAdmin(UUID.fromString(id));
+    public ResponseEntity<Void> removeBlog(@PathVariable("id") UUID id) {
+        blogService.removeByAdmin(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{blogId}/posts")
-    public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") String blogId,
+    public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") UUID blogId,
                                                         @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto) {
-        ViewPostDto viewPostDto = postService.createByAdmin(UUID.fromString(blogId), createPostOfBlogDto);
+        ViewPostDto viewPostDto = postService.createByAdmin(blogId, createPostOfBlogDto);
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
 
@@ -83,6 +83,7 @@ public class SuperAdminBlogsController {
         return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
     }
 
+    // TODO: Change to UUID (@PathVariable("blogId") String blogId)
     @PutMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable("blogId") String blogId,
                                            @PathVariable("postId") String postId,
@@ -99,9 +100,9 @@ public class SuperAdminBlogsController {
     }
 
     @PutMapping("/{blogId}/bind-with-user/{userId}")
-    public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") String blogId,
-                                             @PathVariable("userId") String userId) {
-        blogService.bindBlogWithUser(UUID.fromString(userId), UUID.fromString(blogId));
+    public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") UUID blogId,
+                                             @PathVariable("userId") UUID userId) {
+        blogService.bindBlogWithUser(userId, blogId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -16,9 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-
-
-
 public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom {
 
     @PersistenceContext
@@ -34,7 +31,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         // AND bt.isBanned = FALSE";
 
         TypedQuery<Blog> query = entityManager.createQuery(jpql, Blog.class);
-        query.setParameter("blogId", id);
+        query.setParameter("blogId", UUID.fromString(id));
         Blog blog = query.getSingleResult();
 
         if (blog == null) {
@@ -118,9 +115,9 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
 
-        FilterResult filterResult = getFilters(commonQueryParamsDto, false, UUID.fromString(userId));
+        FilterResult filterResult = getFilters(commonQueryParamsDto, false, userId);
 
-        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, false, UUID.fromString(userId));
+        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, false, userId);
         int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
@@ -150,7 +147,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         );
     }
 
-    private Long getTotalCountWithFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId) {
+    private Long getTotalCountWithFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, String userId) {
         FilterResult filterResult = getFilters(commonQueryParamsDto, skipBannedComments, userId);
         String jpql = "SELECT count(bt) FROM Blog bt " + filterResult.getQuery();
 
@@ -184,8 +181,8 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 //        return filters.append(";").toString();
 //    }
 
-    private FilterResult getFilters(CommonQueryParamsDto queryObj, boolean skipBannedComments, UUID userId) {
-        StringBuilder filters = new StringBuilder("WHERE ");
+    private FilterResult getFilters(CommonQueryParamsDto queryObj, boolean skipBannedComments, String userId) {
+        StringBuilder filters = new StringBuilder();
         Map<String, Object> params = new HashMap<>();
         boolean hasPreviousFilter = false;
 
@@ -197,7 +194,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         if (userId != null) {
             if (hasPreviousFilter) filters.append(" AND ");
             filters.append("bt.user.id = :userId");
-            params.put("userId", userId);
+            params.put("userId", UUID.fromString(userId));
             hasPreviousFilter = true;
         }
 
@@ -207,6 +204,8 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
             params.put("searchNameTerm", "%" + queryObj.getSearchNameTerm() + "%");
         }
 
-        return new FilterResult(filters.toString(), params);
+
+        String finalQuery = filters.isEmpty() ? "" : "WHERE " + filters.toString();
+        return new FilterResult(finalQuery, params);
     }
 }

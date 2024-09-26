@@ -187,7 +187,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 //    }
 
     private FilterResult getFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, List<UUID> blogIds, UUID postId) {
-        StringBuilder filters = new StringBuilder("WHERE ");
+        StringBuilder filters = new StringBuilder();
         Map<String, Object> params = new HashMap<>();
         boolean hasPreviousFilter = false;
 
@@ -228,7 +228,8 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
             params.put("postId", postId);
         }
 
-        return new FilterResult(filters.toString(), params);
+        String finalQuery = filters.isEmpty() ? "" : "WHERE " + filters.toString();
+        return new FilterResult(finalQuery, params);
     }
 
 }
