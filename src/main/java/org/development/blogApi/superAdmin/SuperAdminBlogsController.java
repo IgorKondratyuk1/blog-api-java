@@ -64,8 +64,8 @@ public class SuperAdminBlogsController { // TODO write tests
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> removeBlog(@PathVariable("id") UUID id) {
-        blogService.removeByAdmin(id);
+    public ResponseEntity<Void> removeBlog(@PathVariable("id") String id) {
+        blogService.removeByAdmin(UUID.fromString(id));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

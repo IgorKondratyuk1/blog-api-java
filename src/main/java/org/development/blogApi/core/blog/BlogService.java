@@ -71,9 +71,9 @@ public class BlogService {
         this.blogsRepository.deleteById(blogId);
     }
 
-    public void removeByAdmin(String blogId) {
-        this.blogsRepository.findById(UUID.fromString(blogId)).orElseThrow(() -> new BlogNotFoundException());
-        this.blogsRepository.deleteById(UUID.fromString(blogId));
+    public void removeByAdmin(UUID blogId) {
+        this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
+        this.blogsRepository.deleteById(blogId);
     }
 
     public void bindBlogWithUser(UUID userId, UUID blogId) {

@@ -1,6 +1,6 @@
 package org.development.blogApi.core.blog;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
@@ -10,7 +10,6 @@ import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
-import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +36,12 @@ public class BlogController {
         this.blogService = blogService;
     }
 
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping()
     public ResponseEntity<PaginationDto<ViewBlogDto>> findAllBlogs(CommonQueryParamsDto query) { // TODO check query params
         PaginationDto<ViewBlogDto> paginationDto = this.blogQueryRepository.findAllBlogs(query, false);
         return new ResponseEntity<>(paginationDto, HttpStatus.OK);
     }
 
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{id}")
     public ResponseEntity<?> findBlogById(@PathVariable String id) {
         Optional<ViewBlogDto> optionalViewBlogDto = this.blogQueryRepository.findOneBlog(id);
@@ -56,7 +53,6 @@ public class BlogController {
         return new ResponseEntity<>(optionalViewBlogDto.get(), HttpStatus.OK);
     }
 
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{id}/posts")
     public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query,
                                                 @AuthenticationPrincipal CustomUserDetails customUserDetails) {

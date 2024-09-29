@@ -49,7 +49,6 @@ public class PostController {
     }
 
 
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping
     public ResponseEntity<?> findAllPosts(
             CommonQueryParamsDto query,
@@ -63,8 +62,6 @@ public class PostController {
         return new ResponseEntity<>(paginationDto, HttpStatus.OK);
     }
 
-
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{id}")
     public ResponseEntity<?> findOnePost(
             @PathVariable String id,
@@ -97,7 +94,6 @@ public class PostController {
 //    }
 
     // TODO change all ResponseEntity<?> to another implementation
-    //@RateLimiter(name = "rateLimiterApi")
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> findCommentsOfPost(
             @PathVariable String id,
@@ -121,7 +117,6 @@ public class PostController {
         return new ResponseEntity<>(commentDtoPaginationDto, HttpStatus.OK);
     }
 
-    //@RateLimiter(name = "rateLimiterApi")
     @PostMapping("/{id}/comments")
     public ResponseEntity<?> createCommentsOfPost(
             @PathVariable String id,
@@ -141,7 +136,6 @@ public class PostController {
         return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.OK);
     }
 
-    //@RateLimiter(name = "rateLimiterApi")
     @PutMapping("/{id}/like-status")
     public ResponseEntity<?> updateLikeStatus(
             @PathVariable String id,
