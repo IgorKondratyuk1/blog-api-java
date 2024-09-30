@@ -7,10 +7,11 @@ import org.development.blogApi.core.blog.dto.response.ViewExtendedBlogDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BlogQueryRepositoryCustom {
     // Method to find a blog by its ID
-    Optional<ViewBlogDto> findOneBlog(String id);
+    Optional<ViewBlogDto> findOneBlog(UUID id);
 
     // Method to find all blogs with pagination and filtering
     PaginationDto<ViewBlogDto> findAllBlogs(CommonQueryParamsDto queryObj, boolean skipBannedBlogs);

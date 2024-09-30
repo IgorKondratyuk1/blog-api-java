@@ -97,12 +97,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/refresh-token").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/comments/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").permitAll() //.authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/comments/*").permitAll() //.authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/posts",
                                 "/api/posts/*",
-                                "/api/posts/*/comments").authenticated()
+                                "/api/posts/*/comments").permitAll() //.authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)

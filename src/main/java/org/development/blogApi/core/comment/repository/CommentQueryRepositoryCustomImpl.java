@@ -1,6 +1,7 @@
 package org.development.blogApi.core.comment.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
@@ -53,16 +54,18 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 
         TypedQuery<Comment> query = entityManager.createQuery(jpql, Comment.class);
         query.setParameter("commentId", commentId);
-        Comment result = query.getSingleResult();
+        Comment comment;
 
-        if (result == null) {
+        try {
+            comment = query.getSingleResult();
+        } catch (NoResultException e) {
             return Optional.empty();
         }
 
         LikeStatus likeStatus = likeRepository.getUserLikeStatus(currentUserId, commentId, LikeLocation.COMMENT);
         LikesDislikesCountDto likesDislikesCount = likeRepository.getLikesAndDislikesCount(commentId, LikeLocation.COMMENT);
 
-        return Optional.of(CommentMapper.toPublicViewFromDomain(result, likeStatus, likesDislikesCount.getLikesCount(), likesDislikesCount.getDislikesCount()));
+        return Optional.of(CommentMapper.toPublicViewFromDomain(comment, likeStatus, likesDislikesCount.getLikesCount(), likesDislikesCount.getDislikesCount()));
     }
 
     @Override

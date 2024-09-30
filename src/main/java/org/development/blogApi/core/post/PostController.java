@@ -1,23 +1,21 @@
 package org.development.blogApi.core.post;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
-import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
-import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
-import org.development.blogApi.core.comment.repository.CommentQueryRepository;
 import org.development.blogApi.core.comment.CommentService;
 import org.development.blogApi.core.comment.dto.request.CreateCommentDto;
+import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.comment.entity.Comment;
+import org.development.blogApi.core.comment.repository.CommentQueryRepository;
 import org.development.blogApi.core.comment.utils.CommentMapper;
 import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
-import org.development.blogApi.core.post.entity.Post;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
+import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
+import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,29 +48,24 @@ public class PostController {
 
 
     @GetMapping
-    public ResponseEntity<?> findAllPosts(
+    public ResponseEntity<PaginationDto<ViewPostDto>> findAllPosts(
             CommonQueryParamsDto query,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
 
-        if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-
-        PaginationDto<ViewPostDto> paginationDto = this.postsQueryRepository.findAllPosts(query, customUserDetails.getUserId());
+        PaginationDto<ViewPostDto> paginationDto = this.postsQueryRepository.findAllPosts(query, userId);
         return new ResponseEntity<>(paginationDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findOnePost(
+    public ResponseEntity<ViewPostDto> findPostById(
             @PathVariable String id,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
 
-        Optional<ViewPostDto> optionalViewPostDto = this.postsQueryRepository.findOnePost(id, customUserDetails.getUserId());
+        Optional<ViewPostDto> optionalViewPostDto = this.postsQueryRepository.findOnePost(id, userId);
         if (optionalViewPostDto.isEmpty()) {
-            return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
+            throw  new PostNotFoundException();
         }
 
         return new ResponseEntity<>(optionalViewPostDto.get(), HttpStatus.OK);
@@ -95,55 +88,45 @@ public class PostController {
 
     // TODO change all ResponseEntity<?> to another implementation
     @GetMapping("/{id}/comments")
-    public ResponseEntity<?> findCommentsOfPost(
+    public ResponseEntity<PaginationDto<ViewPublicCommentDto>> findCommentsOfPost(
             @PathVariable String id,
             @Valid CommonQueryParamsDto query,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
-        if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
 
-        Post post = postService.findById(UUID.fromString(id));
-        if (post == null) {
-            return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
-        }
-
+        postService.findById(UUID.fromString(id)); // Check that post exist
         PaginationDto<ViewPublicCommentDto> commentDtoPaginationDto = commentQueryRepository.findCommentsOfPost(
                 UUID.fromString(id),
                 query,
-                UUID.fromString(customUserDetails.getUserId())
+                UUID.fromString(userId)
         );
         return new ResponseEntity<>(commentDtoPaginationDto, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<?> createCommentsOfPost(
+    public ResponseEntity<ViewPublicCommentDto> createCommentsOfPost(
             @PathVariable String id,
             @RequestBody @Valid CreateCommentDto createCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
-        Post post = postService.findById(UUID.fromString(id));
-        if (post == null) {
-            return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
-        }
-
+        postService.findById(UUID.fromString(id)); // Check that post exist
         Comment comment = commentService.create(createCommentDto, id, customUserDetails.getUserId());
         return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/like-status")
-    public ResponseEntity<?> updateLikeStatus(
+    public ResponseEntity<Void> updateLikeStatus(
             @PathVariable String id,
             @RequestBody @Valid UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
         postService.updateLikeStatus(

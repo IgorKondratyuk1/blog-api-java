@@ -43,7 +43,7 @@ public class BlogController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findBlogById(@PathVariable String id) {
+    public ResponseEntity<?> findBlogById(@PathVariable UUID id) {
         Optional<ViewBlogDto> optionalViewBlogDto = this.blogQueryRepository.findOneBlog(id);
 
         if (optionalViewBlogDto.isEmpty()) {
@@ -56,16 +56,13 @@ public class BlogController {
     @GetMapping("/{id}/posts")
     public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query,
                                                 @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-
+        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
         Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new BlogNotFoundException());
         if (blog == null) {
             return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);
         }
 
-        PaginationDto<ViewPostDto> paginationDto = this.postQueryRepository.findPostsOfBlog(id, query, customUserDetails.getUserId());
+        PaginationDto<ViewPostDto> paginationDto = this.postQueryRepository.findPostsOfBlog(id, query, userId);
         return ResponseEntity.ok(paginationDto);
     }
 }

@@ -1,12 +1,14 @@
 package org.development.blogApi.core.post.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.common.utils.FilterResult;
 import org.development.blogApi.common.utils.PaginationHelper;
+import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.comment.dto.LikesDislikesCountDto;
 import org.development.blogApi.core.comment.entity.Comment;
 import org.development.blogApi.core.like.enums.LikeStatus;
@@ -47,9 +49,11 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
         query.setParameter("postId", UUID.fromString(postId));
-        Post post = query.getSingleResult();
+        Post post;
 
-        if (post == null) {
+        try {
+            post = query.getSingleResult();
+        } catch (NoResultException e) {
             return Optional.empty();
         }
 

@@ -1,4 +1,4 @@
-package org.development.blogApi.config;
+package org.development.blogApi.security.config;
 
 import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
 import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;

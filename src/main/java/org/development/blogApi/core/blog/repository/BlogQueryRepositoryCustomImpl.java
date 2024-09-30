@@ -1,6 +1,7 @@
 package org.development.blogApi.core.blog.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
@@ -21,20 +22,22 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public BlogQueryRepositoryCustomImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+//    public BlogQueryRepositoryCustomImpl(EntityManager entityManager) {
+//        this.entityManager = entityManager;
+//    }
 
     @Override
-    public Optional<ViewBlogDto> findOneBlog(String id) {
+    public Optional<ViewBlogDto> findOneBlog(UUID id) {
         String jpql = "SELECT bt FROM Blog bt WHERE bt.id = :blogId";
         // AND bt.isBanned = FALSE";
 
         TypedQuery<Blog> query = entityManager.createQuery(jpql, Blog.class);
-        query.setParameter("blogId", UUID.fromString(id));
-        Blog blog = query.getSingleResult();
+        query.setParameter("blogId", id);
+        Blog blog;
 
-        if (blog == null) {
+        try {
+            blog = query.getSingleResult();
+        } catch (NoResultException e) {
             return Optional.empty();
         }
 
