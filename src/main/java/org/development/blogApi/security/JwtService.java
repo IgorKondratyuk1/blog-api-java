@@ -46,8 +46,6 @@ public class JwtService {
         this.REFRESH_TOKEN_VALIDITY_TIME_MS = 1000 * refreshTokenSeconds;
         this.cookiesHttpOnly = cookiesHttpOnly;
         this.cookiesSecure = cookiesSecure;
-        System.out.println(cookiesHttpOnly);
-        System.out.println(cookiesSecure);
     }
 
 

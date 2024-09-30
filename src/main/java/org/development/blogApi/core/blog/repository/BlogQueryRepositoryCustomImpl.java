@@ -179,8 +179,8 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 
         if (!queryObj.getSearchNameTerm().isBlank()) {
             if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("bt.name LIKE :searchNameTerm");
-            params.put("searchNameTerm", "%" + queryObj.getSearchNameTerm() + "%");
+            filters.append("UPPER(bt.name) LIKE :searchNameTerm");
+            params.put("searchNameTerm", "%" + queryObj.getSearchNameTerm().toUpperCase() + "%");
         }
 
 

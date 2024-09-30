@@ -8,6 +8,7 @@ import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.common.utils.FilterResult;
 import org.development.blogApi.common.utils.PaginationHelper;
+import org.development.blogApi.common.utils.SortHelper;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.comment.dto.LikesDislikesCountDto;
 import org.development.blogApi.core.comment.entity.Comment;
@@ -73,6 +74,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
     @Override
     public PaginationDto<ViewPostDto> findAllPosts(CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, null, null);
 
@@ -86,7 +88,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
                 "LEFT JOIN pt.user u " +
                 "LEFT JOIN pt.blog bt " +
                 filterResult.getQuery() +
-                " ORDER BY pt." + commonQueryParamsDto.getSortBy() + " " + sortValue;
+                " ORDER BY pt." + sortBy  + " " + sortValue;
 
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
         filterResult.getParameters().forEach(query::setParameter);
@@ -112,6 +114,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
     @Override
     public PaginationDto<ViewPostDto> findPostsOfBlog(String blogId, CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, UUID.fromString(blogId), null);
 
@@ -124,7 +127,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
                 "LEFT JOIN pt.user u " +
                 "LEFT JOIN pt.blog bt " +
                 filterResult.getQuery() +
-                " ORDER BY pt." + commonQueryParamsDto.getSortBy() + " " + sortValue;
+                " ORDER BY pt." + sortBy  + " " + sortValue;
 
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
         filterResult.getParameters().forEach(query::setParameter);
@@ -150,6 +153,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
     @Override
     public PaginationDto<ViewPostDto> findPostsOfBlogByUserId(String blogId, CommonQueryParamsDto commonQueryParamsDto, String userId) {
         int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId), null);
 
@@ -163,7 +167,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
                 "LEFT JOIN pt.user u " +
                 "LEFT JOIN pt.blog bt " +
                 filterResult.getQuery() +
-                " ORDER BY pt." + commonQueryParamsDto.getSortBy() + " " + sortValue;
+                " ORDER BY pt." + sortBy  + " " + sortValue;
 
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
         filterResult.getParameters().forEach(query::setParameter);
@@ -265,8 +269,8 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         // Filter by search name term
         if (commonQueryParamsDto.getSearchNameTerm() != null && !commonQueryParamsDto.getSearchNameTerm().isBlank()) {
             if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("pt.name LIKE :searchNameTerm");
-            params.put("searchNameTerm", "%" + commonQueryParamsDto.getSearchNameTerm() + "%");
+            filters.append("UPPER(pt.name) LIKE :searchNameTerm");
+            params.put("searchNameTerm", "%" + commonQueryParamsDto.getSearchNameTerm().toUpperCase() + "%");
             hasPreviousFilter = true;
         }
 

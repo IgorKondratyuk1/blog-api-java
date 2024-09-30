@@ -99,24 +99,26 @@ public class PostService {
     }
 
     public void removeWithBlogId(String userId, String postId, String blogId) {
+        blogsRepository.findById(UUID.fromString(blogId)).orElseThrow(() -> new BlogNotFoundException());
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new IncorrectPostDataException("Wrong blog id");
+            throw new IncorrectPostDataException("Post no belong to blog with id" + blogId);
         }
 
         if (!post.getUser().getId().toString().equals(userId)) {
-            throw new IncorrectPostDataException("Can not remove a post that is not owned");
+            throw new IncorrectPostDataException("Can not remove post of other user");
         }
 
         postsRepository.deleteById(UUID.fromString(postId));
     }
 
     public void removeWithBlogIdByAdmin(String postId, String blogId) {
+        blogsRepository.findById(UUID.fromString(blogId)).orElseThrow(() -> new BlogNotFoundException());
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new IncorrectPostDataException("Wrong blog id");
+            throw new IncorrectPostDataException("Post no belong to blog with id" + blogId);
         }
 
         postsRepository.deleteById(UUID.fromString(postId));
