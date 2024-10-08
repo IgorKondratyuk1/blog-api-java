@@ -59,13 +59,19 @@ public class JwtAccessAuthFilter extends OncePerRequestFilter {
             final LocalDateTime lastActiveDate;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new AuthException("Token is not found");
+                log.info("Token is not found");
+                filterChain.doFilter(request, response);
+                return;
+//                throw new AuthException("Token is not found");
             }
 
             jwt = authHeader.substring(7);
 
             if (jwtService.isTokenExpired(jwt)) {
-                throw new AuthException("Token is expired");
+                log.info("Token is expired");
+                filterChain.doFilter(request, response);
+                return;
+//                throw new AuthException("Token is expired");
             }
 
             usernameOrEmail = jwtService.extractLogin(jwt);
@@ -74,7 +80,10 @@ public class JwtAccessAuthFilter extends OncePerRequestFilter {
             lastActiveDate = jwtService.extractLastActiveDate(jwt);
 
             if (usernameOrEmail == null || userId == null) {
-                throw new AuthException("Token data is not valid");
+                log.info("Token data is not valid");
+                filterChain.doFilter(request, response);
+                return;
+//                throw new AuthException("Token data is not valid");
             }
 
             if (SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -87,7 +96,10 @@ public class JwtAccessAuthFilter extends OncePerRequestFilter {
             CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
             if (!jwtService.isTokenValid(jwt, userDetails)) {
-                throw new AuthException("Token is not valid");
+                log.info("Token is not valid");
+                filterChain.doFilter(request, response);
+                return;
+//                throw new AuthException("Token is not valid");
             }
 
             // Search security device due to device session management (connect with logout)

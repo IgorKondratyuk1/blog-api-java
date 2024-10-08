@@ -34,7 +34,6 @@ import java.util.UUID;
 @RequestMapping("/api/blogger/blogs")
 public class BlogManagementController {
 
-    private final UserQueryRepository userQueryRepository;
     private final BlogService blogService;
     private final PostService postService;
     private final BlogQueryRepository blogQueryRepository;
@@ -47,10 +46,8 @@ public class BlogManagementController {
             PostService postService,
             BlogQueryRepository blogQueryRepository,
             PostQueryRepository postQueryRepository,
-            CommentQueryRepository commentQueryRepository,
-            UserQueryRepository userQueryRepository
+            CommentQueryRepository commentQueryRepository
     ){
-        this.userQueryRepository = userQueryRepository;
         this.blogService = blogService;
         this.postService = postService;
         this.blogQueryRepository = blogQueryRepository;

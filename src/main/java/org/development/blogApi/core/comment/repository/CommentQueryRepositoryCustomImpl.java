@@ -32,7 +32,6 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 
     @PersistenceContext
     private EntityManager entityManager;
-
     private LikeRepository likeRepository;
     private BlogRepository blogRepository;
     private PostRepository postRepository;

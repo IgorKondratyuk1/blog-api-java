@@ -28,7 +28,7 @@ public class CommentMapper {
                 comment.getId().toString(),
                 comment.getContent(),
                 new CommentatorInfoDto(comment.getUser().getId().toString(), comment.getUser().getLogin()),
-                comment.getCreatedAt().toString(),
+                comment.getCreatedAt(),
                 likeInfo);
     }
 
@@ -53,7 +53,7 @@ public class CommentMapper {
                 comment.getId().toString(),
                 comment.getContent(),
                 new CommentatorInfoDto(comment.getUser().getId().toString(), comment.getUser().getLogin()),
-                comment.getCreatedAt().toString(),
+                comment.getCreatedAt(),
                 viewPostInfoDto,
                 likeInfoDto
         );

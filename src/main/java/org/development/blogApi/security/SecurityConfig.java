@@ -118,11 +118,13 @@ public class SecurityConfig {
                         "/api/auth/me",
                         "/api/posts/*/comments",
                         "/api/posts/*/like-status",
-                        "/api/blogger/**")
+                        "/api/blogger/**",
+                        "/api/comments/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/comments/*").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAccessAuthFilter, UsernamePasswordAuthenticationFilter.class)

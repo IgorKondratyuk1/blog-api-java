@@ -31,11 +31,10 @@ public class CommentController {
     @GetUserFromJwt
     @GetMapping("/{id}")
     public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+        System.out.println(customUserDetails);
+        UUID userId = customUserDetails != null ? UUID.fromString(customUserDetails.getUserId()) : null;
 
-        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), UUID.fromString(customUserDetails.getUserId()))
+        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), userId)
                 .orElse(null);
 
         return new ResponseEntity<>(viewPublicCommentDto, HttpStatus.OK);
