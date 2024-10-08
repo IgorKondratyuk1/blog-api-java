@@ -1,9 +1,9 @@
 package org.development.blogApi.security.config;
 
 import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
-import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;
+import org.development.blogApi.security.filters.JwtAccessAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
-import org.development.blogApi.security.filters.RateLimitingFilterCustom;
+import org.development.blogApi.security.filters.RateLimitFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,8 @@ import org.springframework.core.Ordered;
 public class FiltersConfig {
 
     @Bean
-    public FilterRegistrationBean<RateLimitingFilterCustom> rateFilter(RateLimitingFilterCustom rateLimitingFilter) {
-        FilterRegistrationBean<RateLimitingFilterCustom> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
+    public FilterRegistrationBean<RateLimitFilter> rateFilter(RateLimitFilter rateLimitingFilter) {
+        FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
         registrationBean.setEnabled(true);
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         registrationBean.addUrlPatterns(
@@ -53,8 +53,8 @@ public class FiltersConfig {
     }
 
     @Bean
-    public FilterRegistrationBean<JwtAccessStrictAuthFilter> jwtAccessStrictFilter(JwtAccessStrictAuthFilter jwtAuthFilter) {
-        FilterRegistrationBean<JwtAccessStrictAuthFilter> registrationBean = new FilterRegistrationBean<>(jwtAuthFilter);
+    public FilterRegistrationBean<JwtAccessAuthFilter> jwtAccessStrictFilter(JwtAccessAuthFilter jwtAuthFilter) {
+        FilterRegistrationBean<JwtAccessAuthFilter> registrationBean = new FilterRegistrationBean<>(jwtAuthFilter);
         registrationBean.setEnabled(false);
         return registrationBean;
     }

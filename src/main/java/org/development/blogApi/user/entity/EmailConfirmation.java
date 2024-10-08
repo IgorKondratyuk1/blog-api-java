@@ -25,7 +25,7 @@ public class EmailConfirmation {
     @Column(name = "is_confirmed")
     private boolean isConfirmed;
 
-    // Constructor
+
     public EmailConfirmation(UUID confirmationCode, LocalDateTime expirationDate, boolean isConfirmed) {
         this.confirmationCode = confirmationCode;
         this.expirationDate = expirationDate;

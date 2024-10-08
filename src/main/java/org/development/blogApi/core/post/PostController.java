@@ -15,6 +15,7 @@ import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
+import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ public class PostController {
     }
 
 
+    @GetUserFromJwt
     @GetMapping
     public ResponseEntity<PaginationDto<ViewPostDto>> findAllPosts(
             CommonQueryParamsDto query,
@@ -57,6 +59,7 @@ public class PostController {
         return new ResponseEntity<>(paginationDto, HttpStatus.OK);
     }
 
+    @GetUserFromJwt
     @GetMapping("/{id}")
     public ResponseEntity<ViewPostDto> findPostById(
             @PathVariable String id,
@@ -71,22 +74,8 @@ public class PostController {
         return new ResponseEntity<>(optionalViewPostDto.get(), HttpStatus.OK);
     }
 
-    // TODO delete
-//    @PostMapping("/{id}/comments")
-//    public ResponseEntity<?> createCommentOfPost(
-//            @PathVariable String id,
-//            @Valid @RequestBody CreateCommentDto createCommentDto,
-//            @AuthenticationPrincipal CustomUserDetails customUserDetails
-//    ) {
-//        if (customUserDetails == null) {
-//            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-//        }
-//
-//        Comment comment = commentService.create(createCommentDto, id, customUserDetails.getUserId());
-//        return ResponseEntity.ok(CommentMapper.toPublicViewFromDomain(comment));
-//    }
-
     // TODO change all ResponseEntity<?> to another implementation
+    @GetUserFromJwt
     @GetMapping("/{id}/comments")
     public ResponseEntity<PaginationDto<ViewPublicCommentDto>> findCommentsOfPost(
             @PathVariable String id,
@@ -104,17 +93,13 @@ public class PostController {
         return new ResponseEntity<>(commentDtoPaginationDto, HttpStatus.OK);
     }
 
+
     @PostMapping("/{id}/comments")
     public ResponseEntity<ViewPublicCommentDto> createCommentsOfPost(
             @PathVariable String id,
             @RequestBody @Valid CreateCommentDto createCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
-        if (customUserDetails == null) {
-            throw new UserNotFoundException();
-        }
-
-        postService.findById(UUID.fromString(id)); // Check that post exist
         Comment comment = commentService.create(createCommentDto, id, customUserDetails.getUserId());
         return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.OK);
     }
@@ -125,10 +110,6 @@ public class PostController {
             @RequestBody @Valid UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
-        if (customUserDetails == null) {
-            throw new UserNotFoundException();
-        }
-
         postService.updateLikeStatus(
                 UUID.fromString(id),
                 customUserDetails.getUserId(),

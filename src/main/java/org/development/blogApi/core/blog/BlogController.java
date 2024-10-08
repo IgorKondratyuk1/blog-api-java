@@ -10,6 +10,7 @@ import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
+import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,7 @@ public class BlogController {
         return new ResponseEntity<>(optionalViewBlogDto.get(), HttpStatus.OK);
     }
 
+    @GetUserFromJwt
     @GetMapping("/{id}/posts")
     public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query,
                                                 @AuthenticationPrincipal CustomUserDetails customUserDetails) {

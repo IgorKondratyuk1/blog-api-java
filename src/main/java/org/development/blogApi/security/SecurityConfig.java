@@ -2,7 +2,7 @@ package org.development.blogApi.security;
 
 import org.development.blogApi.security.exceptionHandlers.CustomAuthenticationEntryPoint;
 import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
-import org.development.blogApi.security.filters.JwtAccessStrictAuthFilter;
+import org.development.blogApi.security.filters.JwtAccessAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,18 +26,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableAsync
 public class SecurityConfig {
     private final CustomBasicAuthProvider customBasicAuthProvider;
-    private final JwtAccessStrictAuthFilter jwtAccessStrictAuthFilter;
+    private final JwtAccessAuthFilter jwtAccessAuthFilter;
     private final JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter;
     private final JwtRefreshAuthFilter jwtRefreshAuthFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Autowired
-    public SecurityConfig(JwtAccessStrictAuthFilter jwtAccessStrictAuthFilter,
+    public SecurityConfig(JwtAccessAuthFilter jwtAccessAuthFilter,
                           JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter,
                           JwtRefreshAuthFilter jwtRefreshAuthFilter,
                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
                           CustomBasicAuthProvider customBasicAuthProvider) {
-        this.jwtAccessStrictAuthFilter = jwtAccessStrictAuthFilter;
+        this.jwtAccessAuthFilter = jwtAccessAuthFilter;
         this.jwtAccessSoftAuthFilter = jwtAccessSoftAuthFilter;
         this.jwtRefreshAuthFilter = jwtRefreshAuthFilter;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
@@ -60,7 +60,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain jwtRefreshFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(
@@ -83,34 +83,32 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain jwtAccessSoftFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher(
-                        "/api/blogs/*/posts",
-                        "/api/comments/*",
-                        "/api/posts/**")
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/refresh-token").permitAll()
-                        .requestMatchers("/api/auth/logout").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").permitAll() //.authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/comments/*").permitAll() //.authenticated()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/posts",
-                                "/api/posts/*",
-                                "/api/posts/*/comments").permitAll() //.authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
-
-        return http.build();
-    }
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain jwtAccessSoftFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .securityMatcher(
+//                        "/api/blogs/*/posts",
+//                        "/api/comments/*",
+//                        "/api/posts",
+//                        "/api/posts/*",
+//                        "/api/posts/*/comments")
+//                .csrf(csrf -> csrf.disable())
+//                .cors(cors -> cors.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/comments/*").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll()
+//                )
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
+//                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
+//
+//        return http.build();
+//    }
 
     @Bean
     @Order(3)
@@ -123,9 +121,11 @@ public class SecurityConfig {
                         "/api/blogger/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAccessStrictAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAccessAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
                         httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
 

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class RateLimitingFilterCustom extends OncePerRequestFilter {
+public class RateLimitFilter extends OncePerRequestFilter {
 
     @Value("${rate-limit.requestsLimit}")
     private int requestsLimit;
@@ -36,7 +36,7 @@ public class RateLimitingFilterCustom extends OncePerRequestFilter {
             return;
         }
 
-        System.out.println("RateLimitingFilterCustomExpress");
+        System.out.println("Rate Limiting Filter Custom");
 
         String ip = getClientIp(request);
         String url = request.getRequestURI();

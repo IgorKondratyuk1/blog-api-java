@@ -7,6 +7,7 @@ import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
 import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
 import org.development.blogApi.security.CustomUserDetails;
+import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @GetUserFromJwt
     @GetMapping("/{id}")
     public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         if (customUserDetails == null) {

@@ -9,7 +9,6 @@ import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDevic
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.securityDevice.SecurityDeviceService;
-import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
@@ -26,7 +25,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
+public class JwtAccessAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final SecurityDeviceService securityDeviceService;
@@ -34,10 +33,10 @@ public class JwtAccessStrictAuthFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
-    public JwtAccessStrictAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
-                                     JwtService jwtService,
-                                     SecurityDeviceService securityDeviceService,
-                                     UserDetailsService userDetailsService) {
+    public JwtAccessAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
+                               JwtService jwtService,
+                               SecurityDeviceService securityDeviceService,
+                               UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.securityDeviceService = securityDeviceService;
         this.userDetailsService = userDetailsService;
