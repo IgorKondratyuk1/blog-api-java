@@ -101,7 +101,7 @@ public class PostController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         Comment comment = commentService.create(createCommentDto, id, customUserDetails.getUserId());
-        return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.OK);
+        return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/like-status")

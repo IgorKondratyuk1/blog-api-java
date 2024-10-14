@@ -9,6 +9,8 @@ import org.development.blogApi.core.like.enums.LikeLocation;
 import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.core.post.repository.PostRepository;
 import org.development.blogApi.core.post.entity.Post;
+import org.development.blogApi.exceptions.commentExceptions.CommentNotFoundException;
+import org.development.blogApi.exceptions.commentExceptions.CommentUpdateForbiddenException;
 import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
 import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
 import org.development.blogApi.user.repository.UserRepository;
@@ -44,18 +46,10 @@ public class CommentService {
     }
 
     public Comment create(CreateCommentDto createCommentDto, String postId, String userId) {
-        Post post = postRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
-
-        // Check if user can create comment
-        UserEntity user = userRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException());
-
-        Comment comment = Comment.createInstance(
-                createCommentDto,
-                user,
-                post
-        );
-
-        return commentRepository.save(comment);
+        Post commentedPost = postRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
+        UserEntity commentCreator = userRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException());
+        Comment newComment = Comment.createInstance(createCommentDto, commentCreator, commentedPost);
+        return commentRepository.save(newComment);
     }
 
     public Optional<Comment> findOne(String id) {
@@ -63,10 +57,9 @@ public class CommentService {
     }
 
     public void updateComment(String id, String userId, UpdateCommentDto updateCommentDto) {
-        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new CommentNotFoundException());
         if (!comment.getUser().getId().toString().equals(userId)) {
-            throw new RuntimeException("User can not update not his comment");
+            throw new CommentUpdateForbiddenException("User can not update not his comment");
         }
 
         comment.setContent(updateCommentDto.getContent());
@@ -74,16 +67,14 @@ public class CommentService {
     }
 
     public void updateLikeStatus(String id, String userId, String userLogin, LikeStatus status) {
-        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new CommentNotFoundException());
         likeService.like(userId, userLogin, LikeLocation.COMMENT, comment.getId().toString(), status);
     }
 
     public void remove(String id, String userId) {
-        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Comment comment = commentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new CommentNotFoundException());
         if (!comment.getUser().getId().toString().equals(userId)) {
-            throw new RuntimeException("Comment can not be deleted by another user");
+            throw new CommentUpdateForbiddenException("Comment can not be deleted by another user");
         }
 
         commentRepository.deleteById(UUID.fromString(id));

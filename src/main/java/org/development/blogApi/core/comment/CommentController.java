@@ -1,6 +1,5 @@
 package org.development.blogApi.core.comment;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import org.development.blogApi.core.comment.dto.request.UpdateCommentDto;
 import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
@@ -31,11 +30,12 @@ public class CommentController {
     @GetUserFromJwt
     @GetMapping("/{id}")
     public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        System.out.println(customUserDetails);
         UUID userId = customUserDetails != null ? UUID.fromString(customUserDetails.getUserId()) : null;
+        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), userId).orElse(null);
 
-        ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), userId)
-                .orElse(null);
+        if (viewPublicCommentDto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         return new ResponseEntity<>(viewPublicCommentDto, HttpStatus.OK);
     }
@@ -46,7 +46,6 @@ public class CommentController {
             @RequestBody @Valid UpdateCommentDto updateCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -61,7 +60,6 @@ public class CommentController {
             @RequestBody @Valid UpdateLikeDto updateLikeDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -72,7 +70,6 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        System.out.println("customUserDetails: " + customUserDetails);
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
