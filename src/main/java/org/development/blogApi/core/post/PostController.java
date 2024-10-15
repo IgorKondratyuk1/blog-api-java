@@ -20,6 +20,7 @@ import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +54,13 @@ public class PostController {
     @GetUserFromJwt
     @GetMapping
     public ResponseEntity<PaginationDto<ViewPostDto>> findAllPosts(CommonQueryParamsDto query) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
+        // TODO refactor
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            userId = customUserDetails.getUserId();
+        }
 
         PaginationDto<ViewPostDto> paginationDto = this.postsQueryRepository.findAllPosts(query, userId); // TODO refactor all QueryRepositories to one type of params
         return new ResponseEntity<>(paginationDto, HttpStatus.OK);
@@ -64,8 +70,13 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<ViewPostDto> findPostById(@PathVariable String id) {
         // TODO why not work: @AuthenticationPrincipal CustomUserDetails customUserDetails
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
+        // TODO refactor
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            userId = customUserDetails.getUserId();
+        }
 
         Optional<ViewPostDto> optionalViewPostDto = this.postsQueryRepository.findOnePost(id, userId);
         if (optionalViewPostDto.isEmpty()) {
@@ -80,8 +91,12 @@ public class PostController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<PaginationDto<ViewPublicCommentDto>> findCommentsOfPost(@PathVariable String id, CommonQueryParamsDto query)
     {
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UUID userId = customUserDetails != null ? UUID.fromString(customUserDetails.getUserId()) : null;
+        UUID userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            userId = UUID.fromString(customUserDetails.getUserId());
+        }
 
         postService.findById(UUID.fromString(id)); // Check that post exist
         PaginationDto<ViewPublicCommentDto> commentDtoPaginationDto = commentQueryRepository.findCommentsOfPost(

@@ -14,6 +14,7 @@ import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,8 +59,13 @@ public class BlogController {
     @GetUserFromJwt
     @GetMapping("/{id}/posts")
     public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
+        // TODO refactor
+        String userId = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            userId = customUserDetails.getUserId();
+        }
 
         Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new BlogNotFoundException());
         if (blog == null) {
