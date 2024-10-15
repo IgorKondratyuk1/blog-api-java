@@ -10,6 +10,7 @@ import org.development.blogApi.core.comment.entity.Comment;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
 import org.development.blogApi.core.comment.utils.CommentMapper;
 import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
+import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
 import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
@@ -79,7 +80,7 @@ public class PostController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<PaginationDto<ViewPublicCommentDto>> findCommentsOfPost(
             @PathVariable String id,
-            @Valid CommonQueryParamsDto query,
+            CommonQueryParamsDto query,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
@@ -114,7 +115,7 @@ public class PostController {
                 UUID.fromString(id),
                 customUserDetails.getUserId(),
                 customUserDetails.getUsername(),
-                updateLikeDto.getLikeStatus()
+                LikeStatus.fromValue(updateLikeDto.getLikeStatus())
         );
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

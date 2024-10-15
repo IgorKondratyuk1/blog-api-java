@@ -1,6 +1,7 @@
 package org.development.blogApi.exceptions.authExceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.exceptions.dto.APIErrorResult;
@@ -29,7 +30,8 @@ public class AuthExceptionHandler {
     }
 
     // For jwt signature does not match
-    @ExceptionHandler(SignatureException.class)
+    // For wrong jwt
+    @ExceptionHandler({ SignatureException.class, MalformedJwtException.class })
     public ResponseEntity<Object> signatureException() {
         log.error("AuthExceptionHandler SignatureException");
 

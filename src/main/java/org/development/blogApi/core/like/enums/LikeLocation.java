@@ -1,6 +1,6 @@
 package org.development.blogApi.core.like.enums;
 
-public enum LikeLocation {
+public enum LikeLocation implements ValueEnum<String> {
     COMMENT("Comment"),
     POST("Post");
 
@@ -10,6 +10,7 @@ public enum LikeLocation {
         this.value = value;
     }
 
+    @Override
     public String getValue() {
         return value;
     }

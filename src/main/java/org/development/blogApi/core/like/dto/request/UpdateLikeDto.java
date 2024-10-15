@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.development.blogApi.common.validation.enumCheck.EnumCheck;
 import org.development.blogApi.core.like.enums.LikeStatus;
 
 @Data
@@ -12,6 +13,7 @@ import org.development.blogApi.core.like.enums.LikeStatus;
 @NoArgsConstructor
 public class UpdateLikeDto {
     @NotNull(message = "Like status cannot be null")
-    @Pattern(regexp = "None|Like|Dislike", message = "Invalid like status") //TODO create own validator
-    private LikeStatus likeStatus;
+//    @Pattern(regexp = "None|Like|Dislike", message = "Invalid like status") //TODO create own validator
+    @EnumCheck(enumClass = LikeStatus.class, message = "Invalid like status")
+    private String likeStatus;
 }

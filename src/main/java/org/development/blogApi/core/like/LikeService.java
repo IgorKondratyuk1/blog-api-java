@@ -23,13 +23,16 @@ public class LikeService {
         this.likeRepository = likeRepository;
     }
 
+    @Transactional
     public void like(String userId, String userLogin, LikeLocation locationName, String locationId, LikeStatus status) {
         switch (status) {
             case LIKE:
             case DISLIKE:
                 this.createOrUpdateLike(userId, userLogin, locationName, locationId, status);
+                break;
             case NONE:
                 this.removeLike(userId, locationName, locationId);
+                break;
             default:
                 throw new RuntimeException("Wrong like status: " + status);
         }
@@ -72,6 +75,7 @@ public class LikeService {
         this.likeRepository.save(existingLikeEntity);
     }
 
+    @Transactional
     public void removeLike(String userId, LikeLocation locationName, String locationId) {
         switch (locationName) {
             case POST:

@@ -5,6 +5,7 @@ import org.development.blogApi.core.comment.dto.request.UpdateCommentDto;
 import org.development.blogApi.core.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.core.comment.repository.CommentQueryRepository;
 import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
+import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ public class CommentController {
     public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         UUID userId = customUserDetails != null ? UUID.fromString(customUserDetails.getUserId()) : null;
         ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), userId).orElse(null);
-
         if (viewPublicCommentDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -63,8 +63,8 @@ public class CommentController {
         if (customUserDetails == null) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
-
-        commentService.updateLikeStatus(id, customUserDetails.getUserId(), customUserDetails.getUsername(), updateLikeDto.getLikeStatus());
+        System.out.println("C " + updateLikeDto.getLikeStatus());
+        commentService.updateLikeStatus(id, customUserDetails.getUserId(), customUserDetails.getUsername(), LikeStatus.fromValue(updateLikeDto.getLikeStatus()));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

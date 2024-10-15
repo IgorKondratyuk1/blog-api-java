@@ -215,11 +215,11 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
             hasPreviousFilter = true;
         }
 
-        // Filter by search name term
+        // Filter by search content term
         if (commonQueryParamsDto.getSearchNameTerm() != null && !commonQueryParamsDto.getSearchNameTerm().isBlank()) {
             if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("ct.name LIKE :searchNameTerm");
-            params.put("searchNameTerm", "%" + commonQueryParamsDto.getSearchNameTerm() + "%");
+            filters.append("UPPER(ct.content) LIKE :searchNameTerm");
+            params.put("searchNameTerm", "%" + commonQueryParamsDto.getSearchNameTerm().toUpperCase() + "%");
             hasPreviousFilter = true;
         }
 
