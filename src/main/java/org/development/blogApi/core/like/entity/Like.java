@@ -3,6 +3,8 @@ package org.development.blogApi.core.like.entity;
 import jakarta.persistence.*;
 import org.development.blogApi.core.like.enums.LikeLocation;
 import org.development.blogApi.core.like.enums.LikeStatus;
+import org.development.blogApi.user.entity.UserEntity;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,8 +16,10 @@ public abstract class Like {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "user_id")
-    private UUID userId;
+
+    @OneToOne()
+    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
+    private UserEntity user;
 
 //    @Column(name = "user_login")
 //    private String userLogin;
@@ -37,7 +41,6 @@ public abstract class Like {
     public Like(
             UUID id,
             UUID userId,
-            String userLogin,
 //            String locationId,
 //            LikeLocation locationName,
 //            boolean isBanned,
@@ -45,7 +48,8 @@ public abstract class Like {
             LocalDateTime createdAt
     ) {
         this.id = id;
-        this.userId = userId;
+        this.user = new UserEntity();
+        user.setId(userId);
 //        this.userLogin = userLogin;
 //        this.locationId = locationId;
 //        this.locationName = locationName;
@@ -90,11 +94,19 @@ public abstract class Like {
     }
 
     public UUID getUserId() {
-        return userId;
+        return user.getId();
     }
 
     public void setUserId(UUID userId) {
-        this.userId = userId;
+        this.user.setId(userId);
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
 //    public String getUserLogin() {

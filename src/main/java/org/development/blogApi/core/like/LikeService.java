@@ -52,10 +52,10 @@ public class LikeService {
         Like newLike;
         switch (locationName) {
             case POST:
-                newLike = PostLike.createInstance(UUID.fromString(userId), userLogin, UUID.fromString(locationId), status);
+                newLike = PostLike.createInstance(UUID.fromString(userId), UUID.fromString(locationId), status);
                 break;
             case COMMENT:
-                newLike = CommentLike.createInstance(UUID.fromString(userId), userLogin, UUID.fromString(locationId), status);
+                newLike = CommentLike.createInstance(UUID.fromString(userId), UUID.fromString(locationId), status);
                 break;
             default:
                 throw new RuntimeException("No location founded");

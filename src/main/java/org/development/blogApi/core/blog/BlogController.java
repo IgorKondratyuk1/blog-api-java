@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,9 +57,10 @@ public class BlogController {
 
     @GetUserFromJwt
     @GetMapping("/{id}/posts")
-    public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query,
-                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<?> findAllPostsOfBlog(@PathVariable String id, QueryUserDto query) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = customUserDetails != null ? customUserDetails.getUserId() : null;
+
         Blog blog = this.blogService.findById(UUID.fromString(id)).orElseThrow(() -> new BlogNotFoundException());
         if (blog == null) {
             return new ResponseEntity<>("Blog not found", HttpStatus.NOT_FOUND);

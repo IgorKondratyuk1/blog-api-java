@@ -20,8 +20,7 @@ public class PostMapper {
         return new LikeDetails(
                 likeEntity.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
                 likeEntity.getUserId().toString(),
-                "" // TODO change to correct value
-//                likeEntity.getUserLogin()
+                likeEntity.getUser().getLogin()
         );
     }
 

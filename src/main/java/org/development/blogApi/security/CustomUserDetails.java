@@ -1,12 +1,14 @@
 package org.development.blogApi.security;
 
+import lombok.*;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class CustomUserDetails extends User {
-
     private String userId;
     private String deviceId;
     private LocalDateTime lastActiveDate;
@@ -15,30 +17,6 @@ public class CustomUserDetails extends User {
         super(user.getUsername(), user.getPassword(), user.isEnabled(), user.isAccountNonExpired(), user.isAccountNonExpired(), user.isAccountNonLocked(), user.getAuthorities());
         this.userId = userId;
         this.deviceId = deviceId;
-        this.lastActiveDate = lastActiveDate;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    public LocalDateTime getLastActiveDate() {
-        return lastActiveDate;
-    }
-
-    public void setLastActiveDate(LocalDateTime lastActiveDate) {
         this.lastActiveDate = lastActiveDate;
     }
 

@@ -47,11 +47,10 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
                 "WHERE pt.id = :postId";
 //                " AND pt.isBanned = FALSE";
 
-
         TypedQuery<Post> query = entityManager.createQuery(jpql, Post.class);
         query.setParameter("postId", UUID.fromString(postId));
-        Post post;
 
+        Post post;
         try {
             post = query.getSingleResult();
         } catch (NoResultException e) {

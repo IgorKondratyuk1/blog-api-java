@@ -18,8 +18,8 @@ public class PostLike extends Like {
     @JoinColumn(name = "post_id", updatable = false)
     private Post post;
 
-    public PostLike(UUID id, UUID userId, String userLogin, LikeStatus status, LocalDateTime createdAt, UUID locationId) {
-        super(id, userId, userLogin, status, createdAt);
+    public PostLike(UUID id, UUID userId, LikeStatus status, LocalDateTime createdAt, UUID locationId) {
+        super(id, userId, status, createdAt);
         this.post = new Post();
         this.post.setId(locationId);
     }
@@ -29,14 +29,12 @@ public class PostLike extends Like {
 
     public static PostLike createInstance(
             UUID userId,
-            String userLogin,
             UUID locationId,
             LikeStatus status
     ) {
         return new PostLike(
                 UUID.randomUUID(),
                 userId,
-                userLogin,
                 status,
                 LocalDateTime.now(),
                 locationId

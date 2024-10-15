@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,8 +31,10 @@ public class CommentController {
 
     @GetUserFromJwt
     @GetMapping("/{id}")
-    public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<?> findUserCommentById(@PathVariable("id") String id) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UUID userId = customUserDetails != null ? UUID.fromString(customUserDetails.getUserId()) : null;
+
         ViewPublicCommentDto viewPublicCommentDto = this.commentQueryRepository.findCommentByIdAndUserId(UUID.fromString(id), userId).orElse(null);
         if (viewPublicCommentDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

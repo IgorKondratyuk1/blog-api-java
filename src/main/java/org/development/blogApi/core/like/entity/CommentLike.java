@@ -19,8 +19,8 @@ public class CommentLike extends Like {
     @JoinColumn(name = "comment_id", updatable = false)
     private Comment comment;
 
-    public CommentLike(UUID id, UUID userId, String userLogin, LikeStatus status, LocalDateTime createdAt, UUID commentId) {
-        super(id, userId, userLogin, status, createdAt);
+    public CommentLike(UUID id, UUID userId, LikeStatus status, LocalDateTime createdAt, UUID commentId) {
+        super(id, userId, status, createdAt);
 //        this.commentId = commentId;
         this.comment = new Comment();
         this.comment.setId(commentId);
@@ -30,14 +30,12 @@ public class CommentLike extends Like {
 
     public static Like createInstance(
             UUID userId,
-            String userLogin,
             UUID locationId,
             LikeStatus status
     ) {
         return new CommentLike(
                 UUID.randomUUID(),
                 userId,
-                userLogin,
                 status,
                 LocalDateTime.now(),
                 locationId

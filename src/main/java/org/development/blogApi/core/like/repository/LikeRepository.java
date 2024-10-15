@@ -56,18 +56,18 @@ public interface LikeRepository extends JpaRepository<Like, UUID>, LikeQueryRepo
         return new LikesDislikesCountDto(likesCount, dislikesCount);
     }
 
-    @Query("SELECT u FROM CommentLike u WHERE u.userId = :userId AND u.comment.id = :commentId")
+    @Query("SELECT u FROM CommentLike u WHERE u.user.id = :userId AND u.comment.id = :commentId")
     Optional<Like> getCommentUserLike(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
 
-    @Query("SELECT u FROM PostLike u WHERE u.userId = :userId AND u.post.id = :postId")
+    @Query("SELECT u FROM PostLike u WHERE u.user.id = :userId AND u.post.id = :postId")
     Optional<Like> getPostUserLike(@Param("userId") UUID userId, @Param("postId") UUID postId);
 
     @Modifying
-    @Query("DELETE FROM PostLike u WHERE u.userId = :userId AND u.post.id = :locationId")
+    @Query("DELETE FROM PostLike u WHERE u.user.id = :userId AND u.post.id = :locationId")
     int deletePostLikeByUserIdAndLocationId(UUID userId, UUID locationId);
 
     @Modifying
-    @Query("DELETE FROM CommentLike u WHERE u.userId = :userId AND u.comment.id = :locationId")
+    @Query("DELETE FROM CommentLike u WHERE u.user.id = :userId AND u.comment.id = :locationId")
     int deleteCommentLikeByUserIdAndLocationId(UUID userId, UUID locationId);
 
     @Modifying

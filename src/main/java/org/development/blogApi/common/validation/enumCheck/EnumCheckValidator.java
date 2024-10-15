@@ -27,11 +27,6 @@ public class EnumCheckValidator implements ConstraintValidator<EnumCheck, String
             return false;
         }
 
-        Arrays.stream(enumClass.getEnumConstants()).forEach(e -> {
-            System.out.println(((ValueEnum<?>) e).getValue());
-        });
-
-
         return Arrays.stream(enumClass.getEnumConstants())
                 .anyMatch(e -> ((ValueEnum<?>) e).getValue().equals(value));
     }
