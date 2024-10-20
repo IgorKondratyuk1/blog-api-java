@@ -8,10 +8,15 @@ import java.util.UUID;
 @Table(name = "password_recovery")
 public class PasswordRecovery {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    @Column(name = "id")
+//    private UUID id;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
+    @OneToOne()
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Column(name = "recoveryCode")
     private UUID recoveryCode;

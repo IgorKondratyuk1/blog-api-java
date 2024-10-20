@@ -11,10 +11,15 @@ import java.util.UUID;
 @Table(name = "email_confirmation")
 public class EmailConfirmation {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    @Column(name = "id")
+//    private UUID id;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
+    @OneToOne()
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Column(name = "confirmation_code")
     private UUID confirmationCode;

@@ -29,14 +29,14 @@ public class UserEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // TODO change fk to EmailConfirmation
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "email_confirmation_id", referencedColumnName = "id")
+//     // TODO change fk to EmailConfirmation
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private EmailConfirmation emailConfirmation;
-
-    // TODO change fk to PasswordRecovery
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "password_recovery_id", referencedColumnName = "id")
+//
+//    // TODO change fk to PasswordRecovery
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
     private PasswordRecovery passwordRecovery;
 
     //    private SaUserBanInfo banInfo;
