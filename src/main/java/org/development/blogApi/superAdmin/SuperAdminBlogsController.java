@@ -26,7 +26,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/sa/blogs")
 public class SuperAdminBlogsController { // TODO write tests
-
     private final BlogService blogService;
     private final PostService postService;
     private final BlogQueryRepository blogQueryRepository;
@@ -44,66 +43,61 @@ public class SuperAdminBlogsController { // TODO write tests
     }
 
     @GetMapping
-    public ResponseEntity<PaginationDto<ViewBlogDto>> findAll(CommonQueryParamsDto query) {
-        PaginationDto<ViewBlogDto> result = blogQueryRepository.findAllBlogs(query, false);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public PaginationDto<ViewBlogDto> findAll(CommonQueryParamsDto query) {
+        return blogQueryRepository.findAllBlogs(query, false);
     }
 
     @PostMapping
-    public ResponseEntity<ViewBlogDto> createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ViewBlogDto createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
         Blog blog = blogService.createByAdmin(createBlogDto);
-        return new ResponseEntity(BlogMapper.toView(blog), HttpStatus.CREATED);
+        return BlogMapper.toView(blog);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBlog(@PathVariable("id") UUID id,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateBlog(@PathVariable("id") UUID id,
                                            @RequestBody @Valid UpdateBlogDto updateBlogDto) {
         blogService.updateByAdmin(id, updateBlogDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> removeBlog(@PathVariable("id") String id) {
+    public void removeBlog(@PathVariable("id") String id) {
         blogService.removeByAdmin(UUID.fromString(id));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{blogId}/posts")
-    public ResponseEntity<ViewPostDto> createPostOfBlog(@PathVariable("blogId") UUID blogId,
+    @ResponseStatus(HttpStatus.CREATED)
+    public ViewPostDto createPostOfBlog(@PathVariable("blogId") UUID blogId,
                                                         @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto) {
-        ViewPostDto viewPostDto = postService.createByAdmin(blogId, createPostOfBlogDto);
-        return new ResponseEntity<>(viewPostDto, HttpStatus.CREATED);
+        return postService.createByAdmin(blogId, createPostOfBlogDto);
     }
 
     @GetMapping("/{blogId}/posts")
-    public ResponseEntity<PaginationDto<ViewPostDto>> findUserPosts(@PathVariable("blogId") String blogId,
-                                                                    CommonQueryParamsDto query) {
-        PaginationDto<ViewPostDto> viewPostDto = postQueryRepository.findPostsOfBlog(blogId, query, null);
-        return new ResponseEntity<>(viewPostDto, HttpStatus.OK);
+    public PaginationDto<ViewPostDto> findUserPosts(@PathVariable("blogId") String blogId, CommonQueryParamsDto query) {
+        return postQueryRepository.findPostsOfBlog(blogId, query, null);
     }
 
     // TODO: Change to UUID (@PathVariable("blogId") String blogId)
     @PutMapping("/{blogId}/posts/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable("blogId") String blogId,
-                                           @PathVariable("postId") String postId,
-                                           @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePost(@PathVariable("blogId") String blogId,
+                           @PathVariable("postId") String postId,
+                           @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto) {
         postService.updateWithBlogIdByAdmin(postId, blogId, updatePostOfBlogDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{blogId}/posts/{postId}")
-    public ResponseEntity<Void> removePost(@PathVariable("blogId") String blogId,
-                                           @PathVariable("postId") String postId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removePost(@PathVariable("blogId") String blogId, @PathVariable("postId") String postId) {
         postService.removeWithBlogIdByAdmin(postId, blogId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{blogId}/bind-with-user/{userId}")
-    public ResponseEntity<Void> bindWithUser(@PathVariable("blogId") UUID blogId,
-                                             @PathVariable("userId") UUID userId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void bindWithUser(@PathVariable("blogId") UUID blogId, @PathVariable("userId") UUID userId) {
         blogService.bindBlogWithUser(userId, blogId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 //    @PutMapping("/{blogId}/ban")

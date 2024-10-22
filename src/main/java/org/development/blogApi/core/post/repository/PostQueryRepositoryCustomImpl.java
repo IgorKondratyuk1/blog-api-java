@@ -6,12 +6,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
-import org.development.blogApi.common.utils.FilterResult;
-import org.development.blogApi.common.utils.PaginationHelper;
-import org.development.blogApi.common.utils.SortHelper;
-import org.development.blogApi.core.blog.entity.Blog;
+import org.development.blogApi.common.dto.FilterResult;
+import org.development.blogApi.common.utils.PaginationUtil;
+import org.development.blogApi.common.utils.SortUtil;
 import org.development.blogApi.core.comment.dto.LikesDislikesCountDto;
-import org.development.blogApi.core.comment.entity.Comment;
 import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.core.like.repository.LikeRepository;
 import org.development.blogApi.core.like.entity.Like;
@@ -72,14 +70,14 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
     @Override
     public PaginationDto<ViewPostDto> findAllPosts(CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
-        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, null, null);
 
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, null, null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT pt " +
@@ -112,13 +110,13 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
     @Override
     public PaginationDto<ViewPostDto> findPostsOfBlog(String blogId, CommonQueryParamsDto commonQueryParamsDto, String currentUserId) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
-        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, UUID.fromString(blogId), null);
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, UUID.fromString(blogId), null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT pt " +
@@ -151,14 +149,14 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
 
     @Override
     public PaginationDto<ViewPostDto> findPostsOfBlogByUserId(String blogId, CommonQueryParamsDto commonQueryParamsDto, String userId) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
-        String sortBy = SortHelper.getSortBy(commonQueryParamsDto.getSortBy());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId), null);
 
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId), null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT pt " +

@@ -7,8 +7,8 @@ import org.development.blogApi.auth.dto.request.RegistrationConfirmationDto;
 import org.development.blogApi.auth.dto.request.RegistrationEmailResendDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.email.EmailManager;
-import org.development.blogApi.exceptions.authExceptions.AuthException;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.auth.exceptions.AuthException;
+import org.development.blogApi.user.exceptions.UserNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.securityDevice.SecurityDeviceService;
@@ -156,8 +156,8 @@ public class AuthService {
     public void sendRecoveryCode(PasswordRecoveryDto passwordRecoveryDto) {
         UserEntity userEntity = this.userRepository.findByLoginOrEmail(passwordRecoveryDto.getEmail()).orElseThrow(() -> new RuntimeException("User with email " + passwordRecoveryDto.getEmail() + " not found"));
         userEntity.createNewPasswordRecoveryCode();
+        System.out.println(userEntity);
         this.userRepository.save(userEntity);
-
         this.emailManager.sendPasswordRecoveryMessage(userEntity.getEmail(), userEntity.getPasswordRecovery().getRecoveryCode().toString());
     }
 

@@ -4,8 +4,8 @@ import org.development.blogApi.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.blog.repository.BlogRepository;
-import org.development.blogApi.exceptions.blogExceptions.BlogNotFoundException;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.core.blog.exceptions.BlogNotFoundException;
+import org.development.blogApi.user.exceptions.UserNotFoundException;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @Service
 public class BlogService {
-
     private final BlogRepository blogsRepository;
 
     private final UserRepository userRepository;

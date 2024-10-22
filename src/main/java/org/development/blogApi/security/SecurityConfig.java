@@ -1,7 +1,6 @@
 package org.development.blogApi.security;
 
 import org.development.blogApi.security.exceptionHandlers.CustomAuthenticationEntryPoint;
-import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
 import org.development.blogApi.security.filters.JwtAccessAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +26,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomBasicAuthProvider customBasicAuthProvider;
     private final JwtAccessAuthFilter jwtAccessAuthFilter;
-    private final JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter;
     private final JwtRefreshAuthFilter jwtRefreshAuthFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Autowired
     public SecurityConfig(JwtAccessAuthFilter jwtAccessAuthFilter,
-                          JwtAccessSoftAuthFilter jwtAccessSoftAuthFilter,
                           JwtRefreshAuthFilter jwtRefreshAuthFilter,
                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
                           CustomBasicAuthProvider customBasicAuthProvider) {
         this.jwtAccessAuthFilter = jwtAccessAuthFilter;
-        this.jwtAccessSoftAuthFilter = jwtAccessSoftAuthFilter;
         this.jwtRefreshAuthFilter = jwtRefreshAuthFilter;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customBasicAuthProvider = customBasicAuthProvider;
@@ -82,33 +78,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-//    @Bean
-//    @Order(2)
-//    public SecurityFilterChain jwtAccessSoftFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatcher(
-//                        "/api/blogs/*/posts",
-//                        "/api/comments/*",
-//                        "/api/posts",
-//                        "/api/posts/*",
-//                        "/api/posts/*/comments")
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> cors.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.GET, "/api/blogs/*/posts").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/comments/*").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/posts", "/api/posts/*").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/posts/*/comments").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll()
-//                )
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .addFilterBefore(jwtAccessSoftAuthFilter, UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-//                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint));
-//
-//        return http.build();
-//    }
 
     @Bean
     @Order(3)

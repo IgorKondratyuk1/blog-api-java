@@ -1,6 +1,6 @@
 package org.development.blogApi.security;
 
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.user.exceptions.UserNotFoundException;
 import org.development.blogApi.user.repository.UserRepository;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;
@@ -10,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

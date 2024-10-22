@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.PaginationDto;
-import org.development.blogApi.common.utils.PaginationHelper;
+import org.development.blogApi.common.utils.PaginationUtil;
 import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.development.blogApi.auth.dto.response.ViewUserDto;
 import org.development.blogApi.user.entity.UserEntity;
@@ -40,8 +40,8 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
         }
 
         Long totalCount = getTotalCountWithFilters(queryUserParams);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, queryUserParams.getPageSize());
-        int skipValue = PaginationHelper.getSkipValue(queryUserParams.getPageNumber(), queryUserParams.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, queryUserParams.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(queryUserParams.getPageNumber(), queryUserParams.getPageSize());
 
         query.setFirstResult(skipValue);
         query.setMaxResults(queryUserParams.getPageSize());

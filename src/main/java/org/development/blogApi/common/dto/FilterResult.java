@@ -1,4 +1,4 @@
-package org.development.blogApi.common.utils;
+package org.development.blogApi.common.dto;
 
 import java.util.Map;
 

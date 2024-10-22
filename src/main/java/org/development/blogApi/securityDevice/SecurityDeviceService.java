@@ -1,7 +1,7 @@
 package org.development.blogApi.securityDevice;
 
-import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceForbiddenException;
-import org.development.blogApi.exceptions.securityDeviceExceptions.SecurityDeviceNotFoundException;
+import org.development.blogApi.securityDevice.exceptions.SecurityDeviceForbiddenException;
+import org.development.blogApi.securityDevice.exceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.securityDevice.dto.CreateSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.development.blogApi.securityDevice.repository.SecurityDeviceRepository;

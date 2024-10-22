@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.authExceptions;
+package org.development.blogApi.auth.exceptions;
 
 public class AuthException extends RuntimeException {
     public AuthException(String message) {

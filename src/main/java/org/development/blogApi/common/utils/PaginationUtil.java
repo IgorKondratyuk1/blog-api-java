@@ -1,6 +1,6 @@
 package org.development.blogApi.common.utils;
 
-public class PaginationHelper {
+public class PaginationUtil {
 
     public static int getSkipValue(int pageNumber, int pageSize) {
         return (pageNumber - 1) * pageSize;

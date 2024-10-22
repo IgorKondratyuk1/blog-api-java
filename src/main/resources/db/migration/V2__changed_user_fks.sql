@@ -22,40 +22,40 @@ ALTER TABLE "user" DROP COLUMN "password_recovery_id";
 -- drop fk constraint and column
 DO $$
     DECLARE
-v_constraint_name TEXT;
-BEGIN
-SELECT con.constraint_name
-INTO v_constraint_name
-FROM information_schema.table_constraints con
-         JOIN information_schema.key_column_usage kcu
-              ON con.constraint_name = kcu.constraint_name
-WHERE con.constraint_type = 'PRIMARY KEY'
-  AND kcu.table_name = 'email_confirmation'
-  AND kcu.column_name = 'email_confirmation_pkey';
-IF v_constraint_name IS NOT NULL THEN
-            EXECUTE format('ALTER TABLE email_confirmation DROP CONSTRAINT %I', v_constraint_name);
-ELSE
-            RAISE NOTICE 'No pk constraint found for email_confirmation.email_confirmation_pkey';
-END IF;
+    v_constraint_name TEXT;
+    BEGIN
+    SELECT con.constraint_name
+    INTO v_constraint_name
+    FROM information_schema.table_constraints con
+             JOIN information_schema.key_column_usage kcu
+                  ON con.constraint_name = kcu.constraint_name
+    WHERE con.constraint_type = 'PRIMARY KEY'
+      AND kcu.table_name = 'email_confirmation'
+      AND kcu.column_name = 'id';
+    IF v_constraint_name IS NOT NULL THEN
+                EXECUTE format('ALTER TABLE email_confirmation DROP CONSTRAINT %I', v_constraint_name);
+    ELSE
+                RAISE NOTICE 'No pk constraint found for email_confirmation.email_confirmation_pkey';
+    END IF;
 END $$;
 
 DO $$
     DECLARE
-v_constraint_name TEXT;
-BEGIN
-SELECT con.constraint_name
-INTO v_constraint_name
-FROM information_schema.table_constraints con
-         JOIN information_schema.key_column_usage kcu
-              ON con.constraint_name = kcu.constraint_name
-WHERE con.constraint_type = 'PRIMARY KEY'
-  AND kcu.table_name = 'password_recovery'
-  AND kcu.column_name = 'password_recovery_pkey';
-IF v_constraint_name IS NOT NULL THEN
-                EXECUTE format('ALTER TABLE password_recovery DROP CONSTRAINT %I', v_constraint_name);
-ELSE
-                RAISE NOTICE 'No pk constraint found for password_recovery.password_recovery_pkey';
-END IF;
+    v_constraint_name TEXT;
+    BEGIN
+    SELECT con.constraint_name
+    INTO v_constraint_name
+    FROM information_schema.table_constraints con
+             JOIN information_schema.key_column_usage kcu
+                  ON con.constraint_name = kcu.constraint_name
+    WHERE con.constraint_type = 'PRIMARY KEY'
+      AND kcu.table_name = 'password_recovery'
+      AND kcu.column_name = 'id';
+    IF v_constraint_name IS NOT NULL THEN
+                    EXECUTE format('ALTER TABLE password_recovery DROP CONSTRAINT %I', v_constraint_name);
+    ELSE
+                    RAISE NOTICE 'No pk constraint found for password_recovery.password_recovery_pkey';
+    END IF;
 END $$;
 
 

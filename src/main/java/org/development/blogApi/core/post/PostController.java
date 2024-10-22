@@ -13,25 +13,21 @@ import org.development.blogApi.core.like.dto.request.UpdateLikeDto;
 import org.development.blogApi.core.like.enums.LikeStatus;
 import org.development.blogApi.core.post.dto.response.ViewPostDto;
 import org.development.blogApi.core.post.repository.PostQueryRepository;
-import org.development.blogApi.exceptions.postExceptions.PostNotFoundException;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.core.post.exceptions.PostNotFoundException;
 import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.security.annotation.GetUserFromJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/posts")
 public class PostController {
-
     private final PostQueryRepository postsQueryRepository;
     private final PostService postService;
     private final CommentQueryRepository commentQueryRepository;
@@ -53,7 +49,7 @@ public class PostController {
 
     @GetUserFromJwt
     @GetMapping
-    public ResponseEntity<PaginationDto<ViewPostDto>> findAllPosts(CommonQueryParamsDto query) {
+    public PaginationDto<ViewPostDto> findAllPosts(CommonQueryParamsDto query) {
         // TODO refactor
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,15 +58,14 @@ public class PostController {
             userId = customUserDetails.getUserId();
         }
 
-        PaginationDto<ViewPostDto> paginationDto = this.postsQueryRepository.findAllPosts(query, userId); // TODO refactor all QueryRepositories to one type of params
-        return new ResponseEntity<>(paginationDto, HttpStatus.OK);
+        // TODO refactor all QueryRepositories to one type of params
+        return this.postsQueryRepository.findAllPosts(query, userId);
     }
 
     @GetUserFromJwt
     @GetMapping("/{id}")
-    public ResponseEntity<ViewPostDto> findPostById(@PathVariable String id) {
-        // TODO why not work: @AuthenticationPrincipal CustomUserDetails customUserDetails
-        // TODO refactor
+    public ViewPostDto findPostById(@PathVariable String id) {
+        // TODO refactor AND why not work: @AuthenticationPrincipal CustomUserDetails customUserDetails
         String userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
@@ -78,19 +73,12 @@ public class PostController {
             userId = customUserDetails.getUserId();
         }
 
-        Optional<ViewPostDto> optionalViewPostDto = this.postsQueryRepository.findOnePost(id, userId);
-        if (optionalViewPostDto.isEmpty()) {
-            throw  new PostNotFoundException();
-        }
-
-        return new ResponseEntity<>(optionalViewPostDto.get(), HttpStatus.OK);
+        return this.postsQueryRepository.findOnePost(id, userId).orElseThrow(() -> new PostNotFoundException());
     }
 
-    // TODO change all ResponseEntity<?> to another implementation
     @GetUserFromJwt
     @GetMapping("/{id}/comments")
-    public ResponseEntity<PaginationDto<ViewPublicCommentDto>> findCommentsOfPost(@PathVariable String id, CommonQueryParamsDto query)
-    {
+    public PaginationDto<ViewPublicCommentDto> findCommentsOfPost(@PathVariable String id, CommonQueryParamsDto query) {
         UUID userId = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && authentication.getName() != "anonymousUser") {
@@ -99,30 +87,29 @@ public class PostController {
         }
 
         postService.findById(UUID.fromString(id)); // Check that post exist
-        PaginationDto<ViewPublicCommentDto> commentDtoPaginationDto = commentQueryRepository.findCommentsOfPost(
+        return commentQueryRepository.findCommentsOfPost(
                 UUID.fromString(id),
                 query,
                 userId
         );
-        return new ResponseEntity<>(commentDtoPaginationDto, HttpStatus.OK);
     }
 
-
     @PostMapping("/{id}/comments")
-    public ResponseEntity<ViewPublicCommentDto> createCommentsOfPost(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ViewPublicCommentDto createCommentsOfPost(
             @PathVariable String id,
             @RequestBody @Valid CreateCommentDto createCommentDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         Comment comment = commentService.create(createCommentDto, id, customUserDetails.getUserId());
-        return new ResponseEntity<>(CommentMapper.toPublicViewFromDomain(comment), HttpStatus.CREATED);
+        return CommentMapper.toPublicViewFromDomain(comment);
     }
 
     @PutMapping("/{id}/like-status")
-    public ResponseEntity<Void> updateLikeStatus(
-            @PathVariable String id,
-            @RequestBody @Valid UpdateLikeDto updateLikeDto,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateLikeStatus(@PathVariable String id,
+                                 @RequestBody @Valid UpdateLikeDto updateLikeDto,
+                                 @AuthenticationPrincipal CustomUserDetails customUserDetails)
     {
         postService.updateLikeStatus(
                 UUID.fromString(id),
@@ -130,8 +117,6 @@ public class PostController {
                 customUserDetails.getUsername(),
                 LikeStatus.fromValue(updateLikeDto.getLikeStatus())
         );
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
 

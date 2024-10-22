@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.postExceptions;
+package org.development.blogApi.core.post.exceptions;
 
 public class PostNotFoundException extends RuntimeException {
     public PostNotFoundException() {

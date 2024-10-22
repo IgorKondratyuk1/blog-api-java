@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.postExceptions;
+package org.development.blogApi.core.post.exceptions;
 
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.springframework.core.Ordered;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class PostExceptionHandler {
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<Object> postNotFoundException(PostNotFoundException exception) {
+    public ResponseEntity<APIErrorResult> postNotFoundException(PostNotFoundException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
@@ -20,7 +20,7 @@ public class PostExceptionHandler {
     }
 
     @ExceptionHandler(PostUpdateForbiddenException.class)
-    public ResponseEntity<Object> postUpdateForbiddenException(PostUpdateForbiddenException exception) {
+    public ResponseEntity<APIErrorResult> postUpdateForbiddenException(PostUpdateForbiddenException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
@@ -28,7 +28,7 @@ public class PostExceptionHandler {
     }
 
     @ExceptionHandler(IncorrectPostDataException.class)
-    public ResponseEntity<Object> incorrectPostDataException(IncorrectPostDataException exception) {
+    public ResponseEntity<APIErrorResult> incorrectPostDataException(IncorrectPostDataException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)

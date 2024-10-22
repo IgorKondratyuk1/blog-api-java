@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     // For field validation Error
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleRuntimeException(MethodArgumentNotValidException exception) {
+    public ResponseEntity<APIValidationErrorResult> handleRuntimeException(MethodArgumentNotValidException exception) {
         log.info("GlobalExceptionHandler MethodArgumentNotValidException");
 
         List<APIFieldError> errors = new ArrayList<>();
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
     // For not valid routes
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Object> noHandlerFoundException() {
+    public ResponseEntity<APIErrorResult> noHandlerFoundException() {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), "Path not Found");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
     // Request params type mismatch
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Object> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+    public ResponseEntity<APIErrorResult> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), "Wrong parameter or request body type, with name \"" + exception.getName() + "\"");
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
+    public ResponseEntity<APIErrorResult> handleRuntimeException(RuntimeException exception) {
         log.error("GlobalExceptionHandler Exception");
         exception.printStackTrace();
 

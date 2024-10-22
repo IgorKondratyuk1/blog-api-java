@@ -1,4 +1,4 @@
-package org.development.blogApi.helper;
+package org.development.blogApi.common.envHelpers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

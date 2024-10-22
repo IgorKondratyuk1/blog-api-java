@@ -30,28 +30,28 @@ public class SuperAdminUsersController {
         this.userQueryRepository = userQueryRepository;
     }
 
-//    @PutMapping("/{userId}/ban")
-//    public ResponseEntity<Void> banUser(@PathVariable("userId") String userId, @RequestBody BanUserDto banUserDto) {
-//        commandBus.execute(new BanUserBySaCommand(userId, banUserDto));
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
 
     @PostMapping
-    public ResponseEntity<ViewUserDto> create(@RequestBody @Valid RegistrationDto createUserDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ViewUserDto create(@RequestBody @Valid RegistrationDto createUserDto) {
         UserEntity createdUser = userService.create(createUserDto, true);
-        ViewUserDto viewUserDto = UserMapper.toView(createdUser);
-        return new ResponseEntity<>(viewUserDto, HttpStatus.CREATED);
+        return UserMapper.toView(createdUser);
     }
 
     @GetMapping
-    public ResponseEntity<PaginationDto<ViewUserDto>> findAll(QueryUserDto queryUserDto) {
-        PaginationDto<ViewUserDto> result = userQueryRepository.findAllUsersWithCustomQueries(queryUserDto);
-        return ResponseEntity.ok(result);
+    public PaginationDto<ViewUserDto> findAll(QueryUserDto queryUserDto) {
+        return userQueryRepository.findAllUsersWithCustomQueries(queryUserDto);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> remove(@PathVariable("userId") String userId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remove(@PathVariable("userId") String userId) {
         userService.remove(UUID.fromString(userId));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    //    @PutMapping("/{userId}/ban")
+    //    public ResponseEntity<Void> banUser(@PathVariable("userId") String userId, @RequestBody BanUserDto banUserDto) {
+    //        commandBus.execute(new BanUserBySaCommand(userId, banUserDto));
+    //        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    //    }
 }

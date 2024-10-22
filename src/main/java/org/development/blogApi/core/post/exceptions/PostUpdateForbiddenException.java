@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.postExceptions;
+package org.development.blogApi.core.post.exceptions;
 
 import jakarta.validation.constraints.NotNull;
 

@@ -13,9 +13,10 @@ public class PasswordRecovery {
 //    @Column(name = "id")
 //    private UUID id;
 
+
     @Id
-    @OneToOne()
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
     @Column(name = "recoveryCode")
@@ -59,6 +60,14 @@ public class PasswordRecovery {
 
     public void setUsed(boolean used) {
         isUsed = used;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     // Static factory method

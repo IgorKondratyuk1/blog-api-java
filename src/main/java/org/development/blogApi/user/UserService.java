@@ -1,7 +1,7 @@
 package org.development.blogApi.user;
 
 import jakarta.transaction.Transactional;
-import org.development.blogApi.exceptions.userExceptions.UserNotFoundException;
+import org.development.blogApi.user.exceptions.UserNotFoundException;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.user.entity.RoleEntity;
 import org.development.blogApi.user.entity.UserEntity;

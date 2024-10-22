@@ -2,16 +2,9 @@ package org.development.blogApi.common.validation.enumCheck;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.development.blogApi.common.utils.UuidHelper;
 import org.development.blogApi.core.like.enums.ValueEnum;
-import org.development.blogApi.user.entity.UserEntity;
-import org.development.blogApi.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
 
 public class EnumCheckValidator implements ConstraintValidator<EnumCheck, String> {
     private Class<? extends Enum<?>> enumClass;

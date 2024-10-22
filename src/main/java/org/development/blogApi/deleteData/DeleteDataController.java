@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
@@ -22,9 +23,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/testing")
 public class DeleteDataController {
-
-    @PersistenceContext
-    private EntityManager entityManager;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -44,21 +42,15 @@ public class DeleteDataController {
         this.userRepository = userRepository;
     }
 
-    @Transactional
     @DeleteMapping("/all-data")
-    public ResponseEntity<Void> deleteAllData() {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    public void deleteAllData() {
         likeRepository.deleteAllCommentLikes();
         likeRepository.deleteAllPostLikes();
         commentRepository.deleteAll();
         postRepository.deleteAll();
         blogRepository.deleteAll();
         userRepository.deleteAll();
-
-
-//        String jpql = "DELETE FROM UserEntity.roles";
-//        TypedQuery<Blog> query = entityManager.createQuery(jpql, Blog.class);
-//        System.out.println(query.executeUpdate());
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -6,8 +6,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
-import org.development.blogApi.common.utils.FilterResult;
-import org.development.blogApi.common.utils.PaginationHelper;
+import org.development.blogApi.common.dto.FilterResult;
+import org.development.blogApi.common.utils.PaginationUtil;
 import org.development.blogApi.core.blog.dto.response.ViewBlogDto;
 import org.development.blogApi.core.blog.dto.response.ViewExtendedBlogDto;
 import org.development.blogApi.core.blog.entity.Blog;
@@ -46,13 +46,13 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 
     @Override
     public PaginationDto<ViewBlogDto> findAllBlogs(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedBlogs) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, skipBannedBlogs, null);
 
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, skipBannedBlogs, null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT bt FROM Blog bt " + filterResult.getQuery() +
@@ -81,12 +81,12 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 
     @Override
     public PaginationDto<ViewExtendedBlogDto> findBlogsWithExtendedInfo(CommonQueryParamsDto commonQueryParamsDto) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         FilterResult filterResult = getFilters(commonQueryParamsDto, false, null);
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, false, null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT bt FROM Blog bt " + filterResult.getQuery() +
@@ -115,13 +115,13 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 
     @Override
     public PaginationDto<ViewBlogDto> findBlogsByCreatedUserId(String userId, CommonQueryParamsDto commonQueryParamsDto) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
 
         FilterResult filterResult = getFilters(commonQueryParamsDto, false, userId);
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, false, userId);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         // Fetch posts with filters and pagination
         String jpql = "SELECT bt FROM Blog bt " + filterResult.getQuery() +

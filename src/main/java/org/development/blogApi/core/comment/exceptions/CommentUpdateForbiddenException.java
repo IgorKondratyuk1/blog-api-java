@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.commentExceptions;
+package org.development.blogApi.core.comment.exceptions;
 
 import jakarta.validation.constraints.NotNull;
 

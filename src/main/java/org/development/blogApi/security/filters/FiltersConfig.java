@@ -1,6 +1,5 @@
-package org.development.blogApi.security.config;
+package org.development.blogApi.security.filters;
 
-import org.development.blogApi.security.filters.JwtAccessSoftAuthFilter;
 import org.development.blogApi.security.filters.JwtAccessAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
 import org.development.blogApi.security.filters.RateLimitFilter;
@@ -34,14 +33,6 @@ public class FiltersConfig {
                 "/api/posts",
                 "/api/posts/*"
         );
-
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean<JwtAccessSoftAuthFilter> jwtAccessSoftFilter(JwtAccessSoftAuthFilter jwtAuthFilter) {
-        FilterRegistrationBean<JwtAccessSoftAuthFilter> registrationBean = new FilterRegistrationBean<>(jwtAuthFilter);
-        registrationBean.setEnabled(false);
         return registrationBean;
     }
 

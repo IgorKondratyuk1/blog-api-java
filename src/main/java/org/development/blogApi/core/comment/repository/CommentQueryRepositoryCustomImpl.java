@@ -6,8 +6,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
-import org.development.blogApi.common.utils.FilterResult;
-import org.development.blogApi.common.utils.PaginationHelper;
+import org.development.blogApi.common.dto.FilterResult;
+import org.development.blogApi.common.utils.PaginationUtil;
 import org.development.blogApi.core.blog.repository.BlogRepository;
 import org.development.blogApi.core.blog.entity.Blog;
 import org.development.blogApi.core.comment.dto.LikesDislikesCountDto;
@@ -69,11 +69,11 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 
     @Override
     public PaginationDto<ViewPublicCommentDto> findCommentsOfPost(UUID postId, CommonQueryParamsDto commonQueryParamsDto, UUID currentUserId) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, null, postId);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, null, postId);
         String jpql = "SELECT ct " +
@@ -106,7 +106,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 
     @Override
     public PaginationDto<ViewBloggerCommentDto> findCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto commonQueryParamsDto) {
-        int skipValue = PaginationHelper.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
 
         List<Blog> userBlogs = blogRepository.findByUserId(userId);
@@ -134,7 +134,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
         }).collect(Collectors.toList());
 
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, userId, blogIds, null);
-        int pagesCount = PaginationHelper.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         return new PaginationDto<>(pagesCount, commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize(), totalCount, commentsViewModels);
     }

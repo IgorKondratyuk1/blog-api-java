@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.authExceptions;
+package org.development.blogApi.auth.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthExceptionHandler {
 
-    // For expired Jwt token Error
+    // For expired jwt token
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<Object> expiredJwtException(ExpiredJwtException exception) {
+    public ResponseEntity<APIErrorResult> expiredJwtException(ExpiredJwtException exception) {
         log.error("GlobalExceptionHandler JWT");
         exception.printStackTrace();
 
@@ -29,10 +29,9 @@ public class AuthExceptionHandler {
                 .body(apiErrorResult);
     }
 
-    // For jwt signature does not match
-    // For wrong jwt
+    // For wrong jwt and when jwt signature does not match
     @ExceptionHandler({ SignatureException.class, MalformedJwtException.class })
-    public ResponseEntity<Object> signatureException() {
+    public ResponseEntity<APIErrorResult> signatureException() {
         log.error("AuthExceptionHandler SignatureException");
 
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Wrong jwt signature");
@@ -42,7 +41,7 @@ public class AuthExceptionHandler {
     }
 
     @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Object> authException(AuthException exception) {
+    public ResponseEntity<APIErrorResult> authException(AuthException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)

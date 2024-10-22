@@ -1,6 +1,7 @@
 package org.development.blogApi.user.entity;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "\"user\"")
+@ToString
 public class UserEntity {
 
     @Id
@@ -29,14 +31,12 @@ public class UserEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-//     // TODO change fk to EmailConfirmation
+    // TODO change fk to EmailConfirmation
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     private EmailConfirmation emailConfirmation;
-//
-//    // TODO change fk to PasswordRecovery
+
+    // TODO change fk to PasswordRecovery
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     private PasswordRecovery passwordRecovery;
 
     //    private SaUserBanInfo banInfo;
@@ -123,7 +123,9 @@ public class UserEntity {
     // Method to create a new password recovery code
     public void createNewPasswordRecoveryCode() {
         UUID recoveryCode = UUID.randomUUID();
-        this.passwordRecovery = new PasswordRecovery(recoveryCode, PasswordRecovery.generateNewExpirationDate(), false);
+        PasswordRecovery passwordRecovery = new PasswordRecovery(recoveryCode, PasswordRecovery.generateNewExpirationDate(), false);
+        passwordRecovery.setUser(this);
+        this.passwordRecovery = passwordRecovery;
     }
 
     // Method to set a new password
@@ -156,10 +158,11 @@ public class UserEntity {
 
     // For SA user creation
     public static UserEntity createInstance(RegistrationDto createUserDto, String passwordHash, List<RoleEntity> roles, boolean isConfirmed) {
+        UUID userId = UUID.randomUUID();
         EmailConfirmation emailConfirmation = EmailConfirmation.createInstance(isConfirmed);
 
         UserEntity user = new UserEntity(
-                UUID.randomUUID(),
+                userId,
                 createUserDto.getLogin(),
                 createUserDto.getEmail(),
                 passwordHash,
@@ -168,6 +171,7 @@ public class UserEntity {
                 null,
                 roles
         );
+        emailConfirmation.setUser(user);
         //        SaUserBanInfo banInfo = new SaUserBanInfo(false, null, null);
 
         return user;

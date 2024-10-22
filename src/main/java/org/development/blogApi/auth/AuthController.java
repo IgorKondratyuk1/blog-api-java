@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.auth.dto.ExtendedLoginDataDto;
 import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
@@ -24,11 +25,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     private final AuthService authService;
     private final JwtService jwtService;
     private final UserService userService;
@@ -41,27 +41,27 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ViewMeDto> me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ViewMeDto me(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         UserEntity user = this.userService.findById(UUID.fromString(customUserDetails.getUserId()));
-        return new ResponseEntity<>(UserMapper.toViewMe(user),HttpStatus.OK);
+        return UserMapper.toViewMe(user);
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegistrationDto registrationDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void register(@RequestBody @Valid RegistrationDto registrationDto) {
         authService.register(registrationDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/registration-confirmation")
-    public ResponseEntity<Void> confirmRegistration(@RequestBody @Valid RegistrationConfirmationDto registrationConfirmationDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void confirmRegistration(@RequestBody @Valid RegistrationConfirmationDto registrationConfirmationDto) {
         this.authService.confirmEmail(registrationConfirmationDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/registration-email-resending")
-    public ResponseEntity<Void> resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resendConfirmationCode(@RequestBody @Valid RegistrationEmailResendDto registrationEmailResendDto) {
         this.authService.resendConfirmCode(registrationEmailResendDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/login")
@@ -84,39 +84,40 @@ public class AuthController {
             jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
             return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletResponse response, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Cookie refreshCookie = new Cookie(jwtService.JWT_REFRESH_COOKIE_NANE, ""); // TODO transfer to utils
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);
 
         this.authService.logout(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(customUserDetails.getDeviceId()));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponseDto> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
+    public AuthResponseDto refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
         AuthTokensDto authTokensDto = this.authService.generateNewTokensPair(customUserDetails);
         AuthResponseDto authResponseDto = new AuthResponseDto(authTokensDto.getAccessToken());
         jwtService.setRefreshTokenInCookie(response, authTokensDto.getRefreshToken());
-        return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
+        return authResponseDto;
     }
 
     @PostMapping("/new-password")
-    public ResponseEntity<Void> newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void newPassword(@RequestBody @Valid NewPasswordDto newPasswordDto) {
         this.authService.confirmNewPassword(newPasswordDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<Void> passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void passwordRecovery(@RequestBody @Valid PasswordRecoveryDto passwordRecoveryDto) {
         this.authService.sendRecoveryCode(passwordRecoveryDto);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

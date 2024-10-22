@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.securityDeviceExceptions;
+package org.development.blogApi.securityDevice.exceptions;
 
 public class SecurityDeviceForbiddenException extends RuntimeException {
     public SecurityDeviceForbiddenException(String message) {

@@ -1,4 +1,4 @@
-package org.development.blogApi.exceptions.commentExceptions;
+package org.development.blogApi.core.comment.exceptions;
 
 import org.development.blogApi.exceptions.dto.APIErrorResult;
 import org.springframework.core.Ordered;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CommentExceptionHandler {
     @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<Object> commentNotFoundException(CommentNotFoundException exception) {
+    public ResponseEntity<APIErrorResult> commentNotFoundException(CommentNotFoundException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.NOT_FOUND.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
@@ -20,7 +20,7 @@ public class CommentExceptionHandler {
     }
 
     @ExceptionHandler(CommentUpdateForbiddenException.class)
-    public ResponseEntity<Object> commentUpdateForbiddenException(CommentUpdateForbiddenException exception) {
+    public ResponseEntity<APIErrorResult> commentUpdateForbiddenException(CommentUpdateForbiddenException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)

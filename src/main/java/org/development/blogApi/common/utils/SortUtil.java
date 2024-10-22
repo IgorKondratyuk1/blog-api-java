@@ -1,6 +1,6 @@
 package org.development.blogApi.common.utils;
 
-public class SortHelper {
+public class SortUtil {
     public static String getSortBy(String value) {
         switch (value) {
             case "blogName":
