@@ -2,10 +2,8 @@ package org.development.blogApi.auth.dto.request;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.ToString;
-import org.development.blogApi.common.dto.CommonQueryParamsDto;
+import org.development.blogApi.infrastructure.common.dto.CommonQueryParamsDto;
 
 @Data
 public class QueryUserDto extends CommonQueryParamsDto {

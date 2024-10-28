@@ -1,6 +1,6 @@
 package org.development.blogApi.securityDevice.exceptions;
 
-import org.development.blogApi.exceptions.dto.APIErrorResult;
+import org.development.blogApi.infrastructure.common.exceptions.dto.APIErrorResult;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

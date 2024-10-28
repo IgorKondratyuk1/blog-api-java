@@ -1,7 +1,7 @@
 package org.development.blogApi.user.entity;
 
 import jakarta.persistence.*;
-import org.development.blogApi.common.envHelpers.ApplicationEnvHelper;
+import org.development.blogApi.infrastructure.common.envHelpers.ApplicationEnvHelper;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

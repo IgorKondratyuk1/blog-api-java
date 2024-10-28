@@ -1,6 +1,7 @@
 package org.development.blogApi.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.ToString;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "\"user\"")
-@ToString
+@Data
 public class UserEntity {
 
     @Id
@@ -96,7 +97,6 @@ public class UserEntity {
     }
 
     // Method to set ban status
-    // TODO
 //    public void setIsBanned(boolean isBanned, String banReason) {
 //        if (banReason == null || banReason.isEmpty()) {
 //            throw new IllegalArgumentException("Cannot ban user without a ban reason");
@@ -112,13 +112,6 @@ public class UserEntity {
 //        }
 //    }
 
-    // Method to set a new email confirmation code
-//    public void setEmailConfirmationCode(UUID code) {
-//        if (this.emailConfirmation.isConfirmed()) {
-//            throw new IllegalStateException("Cannot set a new confirmation code if the code was confirmed");
-//        }
-//        this.emailConfirmation.setConfirmationCode(code);
-//    }
 
     // Method to create a new password recovery code
     public void createNewPasswordRecoveryCode() {
@@ -175,70 +168,5 @@ public class UserEntity {
         //        SaUserBanInfo banInfo = new SaUserBanInfo(false, null, null);
 
         return user;
-    }
-
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public EmailConfirmation getEmailConfirmation() {
-        return emailConfirmation;
-    }
-
-    public void setEmailConfirmation(EmailConfirmation emailConfirmation) {
-        this.emailConfirmation = emailConfirmation;
-    }
-
-    public PasswordRecovery getPasswordRecovery() {
-        return passwordRecovery;
-    }
-
-    public void setPasswordRecovery(PasswordRecovery passwordRecovery) {
-        this.passwordRecovery = passwordRecovery;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public List<RoleEntity> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<RoleEntity> roles) {
-        this.roles = roles;
     }
 }

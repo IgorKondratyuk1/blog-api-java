@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.development.blogApi.common.validation.loginOrEmailNotUsed.LoginOrEmailNotUsed;
+import org.development.blogApi.infrastructure.common.validation.loginOrEmailNotUsed.LoginOrEmailNotUsed;
 import org.hibernate.validator.constraints.Length;
 
 @Data

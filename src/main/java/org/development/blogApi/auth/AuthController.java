@@ -1,6 +1,5 @@
 package org.development.blogApi.auth;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,8 +10,8 @@ import org.development.blogApi.auth.dto.request.*;
 import org.development.blogApi.auth.dto.response.AuthResponseDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
 import org.development.blogApi.auth.dto.response.ViewMeDto;
-import org.development.blogApi.security.CustomUserDetails;
-import org.development.blogApi.security.JwtService;
+import org.development.blogApi.infrastructure.security.CustomUserDetails;
+import org.development.blogApi.infrastructure.security.JwtService;
 import org.development.blogApi.user.UserService;
 import org.development.blogApi.auth.dto.request.RegistrationDto;
 import org.development.blogApi.user.entity.UserEntity;

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class SecurityDeviceService {
 
     @Value("${device-session.expiration-days}")
@@ -43,7 +44,6 @@ public class SecurityDeviceService {
         return securityDeviceRepository.findAllByUserId(UUID.fromString(userId));
     }
 
-    @Transactional
     public void deleteOtherDeviceSessions(String userId, String deviceId) {
         securityDeviceRepository.deleteOtherSessionsExceptCurrent(UUID.fromString(userId), UUID.fromString(deviceId));
     }
@@ -52,7 +52,6 @@ public class SecurityDeviceService {
         securityDeviceRepository.deleteAllByUserId(UUID.fromString(userId));
     }
 
-    @Transactional
     public void deleteDeviceSession(UUID userId, UUID deviceId) {
         SecurityDevice deviceSession = securityDeviceRepository.findByDeviceId(deviceId)
                 .orElseThrow(() -> new SecurityDeviceNotFoundException());
