@@ -23,7 +23,7 @@ public class SecurityDeviceController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<ViewSecurityDeviceDto> findAllSecurityDevices(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         String userId = this.jwtService.extractUserId(refreshToken);
@@ -37,7 +37,7 @@ public class SecurityDeviceController {
                 .toList();
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllSecurityDevicesExceptCurrent(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);

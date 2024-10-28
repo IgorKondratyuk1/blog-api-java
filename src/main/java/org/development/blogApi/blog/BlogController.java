@@ -37,7 +37,7 @@ public class BlogController {
         this.blogService = blogService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public PaginationDto<ViewBlogDto> findAllBlogs(CommonQueryParamsDto query) { // TODO check query params
         return this.blogQueryRepository.findAllBlogs(query, false);
     }

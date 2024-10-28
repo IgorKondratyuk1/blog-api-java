@@ -40,12 +40,12 @@ public class SuperAdminBlogsController { // TODO write tests
         this.postQueryRepository = postQueryRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public PaginationDto<ViewBlogDto> findAll(CommonQueryParamsDto query) {
         return blogQueryRepository.findAllBlogs(query, false);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public ViewBlogDto createBlog(@RequestBody @Valid CreateBlogDto createBlogDto) {
         Blog blog = blogService.createByAdmin(createBlogDto);

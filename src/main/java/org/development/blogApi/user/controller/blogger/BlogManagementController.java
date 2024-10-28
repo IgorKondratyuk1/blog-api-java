@@ -43,8 +43,7 @@ public class BlogManagementController {
             PostService postService,
             BlogQueryRepository blogQueryRepository,
             PostQueryRepository postQueryRepository,
-            CommentQueryRepository commentQueryRepository
-    ) {
+            CommentQueryRepository commentQueryRepository) {
         this.blogService = blogService;
         this.postService = postService;
         this.blogQueryRepository = blogQueryRepository;
@@ -52,17 +51,15 @@ public class BlogManagementController {
         this.commentQueryRepository = commentQueryRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public PaginationDto<ViewBlogDto> findUserBlogs(CommonQueryParamsDto commonQueryParamsDto,
-                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return blogQueryRepository.findBlogsByCreatedUserId(customUserDetails.getUserId(), commonQueryParamsDto);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ViewBlogDto createBlog(@RequestBody @Valid CreateBlogDto createBlogDto,
-                                  @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                  @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Blog blog = blogService.create(UUID.fromString(customUserDetails.getUserId()), createBlogDto);
         return BlogMapper.toView(blog);
     }
@@ -70,8 +67,7 @@ public class BlogManagementController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBlog(@PathVariable String id,
                                         @RequestBody @Valid UpdateBlogDto updateBlogDto,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         blogService.update(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(id), updateBlogDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -85,8 +81,7 @@ public class BlogManagementController {
     @PostMapping("/{blogId}/posts")
     public ResponseEntity<?> createPostOfBlog(@PathVariable String blogId,
                                               @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto,
-                                              @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Post createdPost = postService.create(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(blogId), createPostOfBlogDto);
         return new ResponseEntity<>(PostMapper.toView(createdPost), HttpStatus.OK);
     }
@@ -94,8 +89,7 @@ public class BlogManagementController {
     @GetMapping("/{blogId}/posts")
     public ResponseEntity<?> findUserPosts(@PathVariable String blogId,
                                            CommonQueryParamsDto commonQueryParamsDto,
-                                           @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         PaginationDto<ViewPostDto> postsOfBlogByUserId = postQueryRepository.findPostsOfBlogByUserId(blogId, commonQueryParamsDto, customUserDetails.getUserId());
         return new ResponseEntity<>(postsOfBlogByUserId, HttpStatus.OK);
     }
@@ -104,8 +98,7 @@ public class BlogManagementController {
     public ResponseEntity<?> updatePost(@PathVariable String blogId,
                                         @PathVariable String postId,
                                         @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         postService.updateWithBlogId(customUserDetails.getUserId(), postId, blogId, updatePostOfBlogDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -113,16 +106,14 @@ public class BlogManagementController {
     @DeleteMapping("/{blogId}/posts/{postId}")
     public ResponseEntity<?> removePost(@PathVariable String blogId,
                                         @PathVariable String postId,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         postService.removeWithBlogId(customUserDetails.getUserId(), postId, blogId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/comments")
     public ResponseEntity<?> findCommentsOfUserBlog(CommonQueryParamsDto commonQueryParamsDto,
-                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         PaginationDto<ViewBloggerCommentDto> allCommentsOfUserBlogs = commentQueryRepository.findCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto);
         return new ResponseEntity<>(allCommentsOfUserBlogs, HttpStatus.OK);
     }

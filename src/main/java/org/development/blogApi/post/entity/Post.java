@@ -19,7 +19,6 @@ public class Post {
     @Column(name = "id")
     private UUID id;
 
-
     @ManyToOne()
     @JoinColumn(name = "user_id", updatable = false)
     private UserEntity user;

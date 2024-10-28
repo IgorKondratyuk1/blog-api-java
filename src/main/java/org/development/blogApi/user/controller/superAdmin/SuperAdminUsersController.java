@@ -29,14 +29,14 @@ public class SuperAdminUsersController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public ViewUserDto create(@RequestBody @Valid RegistrationDto createUserDto) {
         UserEntity createdUser = userService.create(createUserDto, true);
         return UserMapper.toView(createdUser);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public PaginationDto<ViewUserDto> findAll(QueryUserDto queryUserDto) {
         return userQueryRepository.findAllUsersWithCustomQueries(queryUserDto);
     }

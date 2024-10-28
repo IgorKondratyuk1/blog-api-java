@@ -48,7 +48,7 @@ public class PostController {
 
 
     @GetUserFromJwt
-    @GetMapping("/")
+    @GetMapping("")
     public PaginationDto<ViewPostDto> findAllPosts(CommonQueryParamsDto query) {
         // TODO refactor
         String userId = null;

@@ -1,5 +1,7 @@
 package org.development.blogApi.like.enums;
 
+import org.development.blogApi.infrastructure.common.enums.ValueEnum;
+
 public enum LikeLocation implements ValueEnum<String> {
     COMMENT("Comment"),
     POST("Post");

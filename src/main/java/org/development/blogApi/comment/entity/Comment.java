@@ -1,6 +1,7 @@
 package org.development.blogApi.comment.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.development.blogApi.comment.dto.request.CreateCommentDto;
 import org.development.blogApi.post.entity.Post;
 import org.development.blogApi.user.entity.UserEntity;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 
+@Data
 @Entity
 @Table(name = "\"comment\"")
 public class Comment {
@@ -57,68 +59,4 @@ public class Comment {
                 post
         );
     }
-
-    // Getters and setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-//    public Blog getBlog() {
-//        return blog;
-//    }
-//
-//    public void setBlog(Blog blog) {
-//        this.blog = blog;
-//    }
-
-//    public CommentatorInfo getCommentatorInfo() {
-//        return commentatorInfo;
-//    }
-//
-//    public void setCommentatorInfo(CommentatorInfo commentatorInfo) {
-//        this.commentatorInfo = commentatorInfo;
-//    }
-//
-//    public boolean isBanned() {
-//        return isBanned;
-//    }
-//
-//    public void setBanned(boolean banned) {
-//        isBanned = banned;
-//    }
 }

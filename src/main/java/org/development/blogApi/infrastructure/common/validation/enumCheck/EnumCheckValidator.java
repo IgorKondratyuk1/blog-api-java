@@ -2,7 +2,7 @@ package org.development.blogApi.infrastructure.common.validation.enumCheck;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.development.blogApi.like.enums.ValueEnum;
+import org.development.blogApi.infrastructure.common.enums.ValueEnum;
 
 import java.util.Arrays;
 

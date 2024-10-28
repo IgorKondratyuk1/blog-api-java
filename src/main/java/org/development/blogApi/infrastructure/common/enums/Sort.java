@@ -1,16 +1,15 @@
-package org.development.blogApi.like.enums;
+package org.development.blogApi.infrastructure.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.development.blogApi.infrastructure.common.enums.ValueEnum;
 
-public enum LikeStatus implements ValueEnum<String> {
-    NONE("None"),
-    LIKE("Like"),
-    DISLIKE("Dislike");
+
+public enum Sort implements ValueEnum<String> {
+    ASC("asc"),
+    DESC("desc");
 
     private final String value;
 
-    LikeStatus(String value) {
+    Sort(String value) {
         this.value = value;
     }
 
@@ -20,8 +19,8 @@ public enum LikeStatus implements ValueEnum<String> {
         return value;
     }
 
-    public static LikeStatus fromValue(String value) {
-        for (LikeStatus status : LikeStatus.values()) {
+    public static org.development.blogApi.like.enums.LikeStatus fromValue(String value) {
+        for (org.development.blogApi.like.enums.LikeStatus status : org.development.blogApi.like.enums.LikeStatus.values()) {
             if (status.getValue().equalsIgnoreCase(value)) {
                 return status;
             }

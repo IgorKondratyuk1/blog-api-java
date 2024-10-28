@@ -4,6 +4,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import oracle.jdbc.proxy.annotation.Pre;
 import org.development.blogApi.blog.repository.BlogRepository;
 import org.development.blogApi.comment.dto.LikesDislikesCountDto;
 import org.development.blogApi.comment.dto.response.ViewBloggerCommentDto;
@@ -21,12 +26,13 @@ import org.development.blogApi.like.enums.LikeStatus;
 import org.development.blogApi.post.repository.PostRepository;
 import org.development.blogApi.post.entity.Post;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-// +
+
 @Repository
 public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryCustom {
 
@@ -43,27 +49,26 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
         this.postRepository = postRepository;
     }
 
+
     @Override
     public Optional<ViewPublicCommentDto> findCommentByIdAndUserId(UUID commentId, UUID currentUserId) {
-        String jpql = "SELECT ct FROM Comment ct " +
-                "LEFT JOIN ct.user u " +
-                "LEFT JOIN ct.post pt " +
-                "WHERE ct.id = :commentId ";
-                // + "AND ct.isBanned = false";
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
 
-        TypedQuery<Comment> query = entityManager.createQuery(jpql, Comment.class);
-        query.setParameter("commentId", commentId);
+        Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
+        Predicate idPredicate = criteriaBuilder.equal(commentRoot.get("id"), commentId);
+        criteriaQuery.where(idPredicate);
+        TypedQuery<Comment> query = entityManager.createQuery(criteriaQuery);
+
         Comment comment;
-
         try {
             comment = query.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
 
         LikeStatus likeStatus = likeRepository.getUserLikeStatus(currentUserId, commentId, LikeLocation.COMMENT);
         LikesDislikesCountDto likesDislikesCount = likeRepository.getLikesAndDislikesCount(commentId, LikeLocation.COMMENT);
-
         return Optional.of(CommentMapper.toPublicViewFromDomain(comment, likeStatus, likesDislikesCount.getLikesCount(), likesDislikesCount.getDislikesCount()));
     }
 
@@ -71,21 +76,23 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
     public PaginationDto<ViewPublicCommentDto> findCommentsOfPost(UUID postId, CommonQueryParamsDto commonQueryParamsDto, UUID currentUserId) {
         int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
-
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, null, postId);
         int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
-        FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, null, postId);
-        String jpql = "SELECT ct " +
-                "FROM Comment ct " +
-                "LEFT JOIN ct.user u " +
-                "LEFT JOIN ct.post pt " +
-                "LEFT JOIN pt.blog bt " +
-                filterResult.getQuery() +
-                " ORDER BY ct." + commonQueryParamsDto.getSortBy() + " " + sortValue;
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
 
-        TypedQuery<Comment> query = entityManager.createQuery(jpql, Comment.class);
-        filterResult.getParameters().forEach(query::setParameter);
+        Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
+        Predicate filterPredicate = getFilters(commentRoot, commonQueryParamsDto, true, null, null, postId);
+        criteriaQuery.where(filterPredicate);
+
+        if (sortValue.equals("ASC")) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(commentRoot.get(commonQueryParamsDto.getSortBy())));
+        } else {
+            criteriaQuery.orderBy(criteriaBuilder.desc(commentRoot.get(commonQueryParamsDto.getSortBy())));
+        }
+
+        TypedQuery<Comment> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(skipValue);
         query.setMaxResults(commonQueryParamsDto.getPageSize());
 
@@ -106,22 +113,28 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
 
     @Override
     public PaginationDto<ViewBloggerCommentDto> findCommentsOfUserBlogs(UUID userId, CommonQueryParamsDto commonQueryParamsDto) {
-        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
-        String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
-
         List<Blog> userBlogs = blogRepository.findByUserId(userId);
         List<UUID> blogIds = userBlogs.stream().map(Blog::getId).collect(Collectors.toList());
 
-        FilterResult filterResult = getFilters(commonQueryParamsDto, true, null, blogIds, null);
-        String jpql = "SELECT ct FROM Comment ct " +
-                "LEFT JOIN ct.user u " +
-                "LEFT JOIN ct.post pt " +
-                "LEFT JOIN pt.blog bt " +
-                filterResult.getQuery() +
-                " ORDER BY ct." + commonQueryParamsDto.getSortBy() + " " + sortValue;
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
+        String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
+        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, userId, blogIds, null);
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
-        TypedQuery<Comment> query = entityManager.createQuery(jpql, Comment.class);
-        filterResult.getParameters().forEach(query::setParameter);
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
+
+        Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
+        Predicate filterPredicate = getFilters(commentRoot, commonQueryParamsDto, true, null, blogIds, null);
+        criteriaQuery.where(filterPredicate);
+
+        if (sortValue.equals("ASC")) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(commentRoot.get(commonQueryParamsDto.getSortBy())));
+        } else {
+            criteriaQuery.orderBy(criteriaBuilder.desc(commentRoot.get(commonQueryParamsDto.getSortBy())));
+        }
+
+        TypedQuery<Comment> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(skipValue);
         query.setMaxResults(commonQueryParamsDto.getPageSize());
 
@@ -133,105 +146,54 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
             return CommentMapper.toBloggerView(comment, post.orElse(null), likeStatus, likesDislikesCount.getLikesCount(), likesDislikesCount.getDislikesCount());
         }).collect(Collectors.toList());
 
-        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, userId, blogIds, null);
-        int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
-
         return new PaginationDto<>(pagesCount, commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize(), totalCount, commentsViewModels);
     }
 
     private Long getTotalCountWithFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, List<UUID> blogIds, UUID postId) {
-        FilterResult filterResult = getFilters(commonQueryParamsDto, skipBannedComments, userId, blogIds, postId);
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
-        String jpql = "SELECT count(ct) FROM Comment ct " +
-                "LEFT JOIN ct.user u " +
-                "LEFT JOIN ct.post pt " +
-                "LEFT JOIN pt.blog bt " +
-                filterResult.getQuery();
+        Root<Comment> commentRoot = criteriaQuery.from(Comment.class);
+        Predicate filterPredicate = getFilters(commentRoot, commonQueryParamsDto, skipBannedComments, userId, blogIds, postId);
 
-        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
-        filterResult.getParameters().forEach(query::setParameter);
+        criteriaQuery.where(filterPredicate);
+        criteriaQuery.select(criteriaBuilder.count(commentRoot));
+        
+        TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
         return query.getSingleResult();
     }
 
-//    private String getFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, List<UUID> blogIds, UUID postId) {
-//        StringBuilder filters = new StringBuilder("WHERE ");
-//        boolean hasPreviousFilter = false;
-//
-//        if (skipBannedComments) {
-//            filters.append("ct.isBanned = false");
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (userId != null) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("ct.user.id = ").append(userId);
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (blogIds != null && !blogIds.isEmpty()) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("bt.id IN (").append(blogIds.stream().map(String::valueOf).collect(Collectors.joining(","))).append(")");
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (commonQueryParamsDto.getSearchNameTerm() != null) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("ct.name LIKE '%").append(commonQueryParamsDto.getSearchNameTerm()).append("%'");
-//            hasPreviousFilter = true;
-//        }
-//
-//        if (postId != null) {
-//            if (hasPreviousFilter) filters.append(" AND ");
-//            filters.append("pt.id = ").append(postId);
-//        }
-//
-//        return filters.toString();
-//    }
-
-    private FilterResult getFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, List<UUID> blogIds, UUID postId) {
-        StringBuilder filters = new StringBuilder();
-        Map<String, Object> params = new HashMap<>();
-        boolean hasPreviousFilter = false;
+    private Predicate getFilters(Root<Comment> commentRoot, CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, List<UUID> blogIds, UUID postId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        List<Predicate> andPredicates = new ArrayList<>();
 
         // Filter for banned comments
-        if (skipBannedComments) {
+//        if (skipBannedComments) {
 //            filters.append("ct.isBanned = false");
-//            hasPreviousFilter = true;
-        }
+//        }
 
         // Filter by userId
         if (userId != null) {
-            if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("ct.user.id = :userId");
-            params.put("userId", userId);
-            hasPreviousFilter = true;
+            andPredicates.add(criteriaBuilder.equal(commentRoot.get("user").get("id"), userId));
         }
 
         // Filter by blogIds (using IN clause)
         if (blogIds != null && !blogIds.isEmpty()) {
-            if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("bt.id IN :blogIds");
-            params.put("blogIds", blogIds);
-            hasPreviousFilter = true;
+            andPredicates.add(commentRoot.get("post").get("blog").get("id").in(blogIds));
         }
 
         // Filter by search content term
         if (commonQueryParamsDto.getSearchNameTerm() != null && !commonQueryParamsDto.getSearchNameTerm().isBlank()) {
-            if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("UPPER(ct.content) LIKE :searchNameTerm");
-            params.put("searchNameTerm", "%" + commonQueryParamsDto.getSearchNameTerm().toUpperCase() + "%");
-            hasPreviousFilter = true;
+            andPredicates.add(criteriaBuilder.like(
+                    criteriaBuilder.upper(commentRoot.get("content")),
+                    "%" + commonQueryParamsDto.getSearchNameTerm().toUpperCase() + "%"));
         }
 
         // Filter by postId
         if (postId != null) {
-            if (hasPreviousFilter) filters.append(" AND ");
-            filters.append("pt.id = :postId");
-            params.put("postId", postId);
+            andPredicates.add(commentRoot.get("post").get("id").in(postId));
         }
 
-        String finalQuery = filters.isEmpty() ? "" : "WHERE " + filters.toString();
-        return new FilterResult(finalQuery, params);
+        return criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
     }
-
 }
