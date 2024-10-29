@@ -2,9 +2,18 @@ package org.development.blogApi.like.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.development.blogApi.comment.entity.Comment;
+import org.development.blogApi.like.entity.CommentLike;
 import org.development.blogApi.like.entity.Like;
+import org.development.blogApi.like.entity.PostLike;
 import org.development.blogApi.like.enums.LikeLocation;
 import org.development.blogApi.like.enums.LikeStatus;
+import org.development.blogApi.user.entity.UserEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,28 +39,35 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
 
     @Override
     public List<Like> getLastCommentLikesInfo(String locationId, int limitCount) {
-        String jpql = "SELECT cl FROM CommentLike cl " +
-                        "WHERE cl.status = :status AND cl.comment.id = :locationId " +
-                        "ORDER BY cl.createdAt DESC";
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CommentLike> criteriaQuery = criteriaBuilder.createQuery(CommentLike.class);
+        Root<CommentLike> commentLikeRoot = criteriaQuery.from(CommentLike.class);
 
-        return entityManager.createQuery(jpql, Like.class)
-                .setParameter("status", LikeStatus.LIKE)
-                .setParameter("locationId", UUID.fromString(locationId))
-                .setMaxResults(limitCount)
-                .getResultList();
+        Predicate statusPredicate = criteriaBuilder.equal(commentLikeRoot.get("id"), LikeStatus.LIKE);
+        Predicate commentIdPredicate = criteriaBuilder.equal(commentLikeRoot.get("comment").get("id"), LikeStatus.LIKE);
+        criteriaQuery.where(statusPredicate, commentIdPredicate);
+        criteriaQuery.orderBy(criteriaBuilder.desc(commentLikeRoot.get("createdAt")));
+
+        TypedQuery<CommentLike> query = entityManager.createQuery(criteriaQuery);
+        query.setMaxResults(limitCount);
+
+        return List.copyOf(query.getResultList());
     }
 
     @Override
     public List<Like> getLastPostLikesInfo(String locationId, int limitCount) {
-        String selectLastPostLikes =
-                "SELECT pl FROM PostLike pl " +
-                        "WHERE pl.status = :status AND pl.post.id = :locationId " +
-                        "ORDER BY pl.createdAt DESC";
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostLike> criteriaQuery = criteriaBuilder.createQuery(PostLike.class);
+        Root<PostLike> postLikeRoot = criteriaQuery.from(PostLike.class);
 
-        return entityManager.createQuery(selectLastPostLikes, Like.class)
-                .setParameter("status", LikeStatus.LIKE)
-                .setParameter("locationId", UUID.fromString(locationId))
-                .setMaxResults(limitCount)
-                .getResultList();
+        Predicate statusPredicate = criteriaBuilder.equal(postLikeRoot.get("id"), LikeStatus.LIKE);
+        Predicate commentIdPredicate = criteriaBuilder.equal(postLikeRoot.get("post").get("id"), LikeStatus.LIKE);
+        criteriaQuery.where(statusPredicate, commentIdPredicate);
+        criteriaQuery.orderBy(criteriaBuilder.desc(postLikeRoot.get("createdAt")));
+
+        TypedQuery<PostLike> query = entityManager.createQuery(criteriaQuery);
+        query.setMaxResults(limitCount);
+
+        return List.copyOf(query.getResultList());
     }
 }

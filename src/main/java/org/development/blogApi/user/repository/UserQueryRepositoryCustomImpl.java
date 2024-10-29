@@ -3,6 +3,11 @@ package org.development.blogApi.user.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.development.blogApi.comment.entity.Comment;
 import org.development.blogApi.infrastructure.common.dto.PaginationDto;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
 import org.development.blogApi.auth.dto.request.QueryUserDto;
@@ -23,34 +28,30 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 
     @Override
     public PaginationDto<ViewUserDto> findAllUsersWithCustomQueries(QueryUserDto queryUserParams) {
-        System.out.println(queryUserParams);
-        String filters = getUsersFilters(queryUserParams);
-        String jpql = "SELECT u FROM UserEntity u LEFT JOIN FETCH u.emailConfirmation ec " +
-                "LEFT JOIN FETCH u.passwordRecovery pr "
-                //+ " LEFT JOIN FETCH u.saUserBan sb "
-                + filters +
-                " ORDER BY u." + queryUserParams.getSortBy() + " " + queryUserParams.getSortDirection().toUpperCase();
-
-        TypedQuery<UserEntity> query = entityManager.createQuery(jpql, UserEntity.class);
-        if (queryUserParams.getSearchLoginTerm() != null && !queryUserParams.getSearchLoginTerm().isEmpty()) {
-            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm().toUpperCase() + "%");
-        }
-        if (queryUserParams.getSearchEmailTerm() != null && !queryUserParams.getSearchEmailTerm().isEmpty()) {
-            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm().toUpperCase() + "%");
-        }
-
+        String sortValue = queryUserParams.getSortDirection().toUpperCase();
         Long totalCount = getTotalCountWithFilters(queryUserParams);
         int pagesCount = PaginationUtil.getPagesCount(totalCount, queryUserParams.getPageSize());
         int skipValue = PaginationUtil.getSkipValue(queryUserParams.getPageNumber(), queryUserParams.getPageSize());
 
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserEntity> criteriaQuery = criteriaBuilder.createQuery(UserEntity.class);
+
+        Root<UserEntity> userRoot = criteriaQuery.from(UserEntity.class);
+        Predicate filterPredicate = getUsersFilters(userRoot, queryUserParams);
+
+        criteriaQuery.where(filterPredicate);
+        if (sortValue.equals("ASC")) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(userRoot.get(queryUserParams.getSortBy())));
+        } else {
+            criteriaQuery.orderBy(criteriaBuilder.desc(userRoot.get(queryUserParams.getSortBy())));
+        }
+
+        TypedQuery<UserEntity> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(skipValue);
         query.setMaxResults(queryUserParams.getPageSize());
 
         List<UserEntity> userEntities = query.getResultList();
-        System.out.println(userEntities.size());
         List<ViewUserDto> viewUserDto = userEntities.stream().map((user) -> UserMapper.toView(user)).collect(Collectors.toList());
-        System.out.println(viewUserDto);
-
 
         return new PaginationDto<ViewUserDto>(
                 pagesCount,
@@ -62,24 +63,23 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
     }
 
     private Long getTotalCountWithFilters(QueryUserDto queryUserParams) {
-        String filters = getUsersFilters(queryUserParams);
-        String jpql = "SELECT COUNT(u) FROM UserEntity u " + filters;
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
-        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
-        if (queryUserParams.getSearchLoginTerm() != null && !queryUserParams.getSearchLoginTerm().isEmpty()) {
-            query.setParameter("searchLoginTerm", "%" + queryUserParams.getSearchLoginTerm().toUpperCase() + "%");
-        }
-        if (queryUserParams.getSearchEmailTerm() != null && !queryUserParams.getSearchEmailTerm().isEmpty()) {
-            query.setParameter("searchEmailTerm", "%" + queryUserParams.getSearchEmailTerm().toUpperCase() + "%");
-        }
+        Root<UserEntity> userRoot = criteriaQuery.from(UserEntity.class);
+        Predicate filterPredicate = getUsersFilters(userRoot, queryUserParams);
 
+        criteriaQuery.where(filterPredicate);
+        criteriaQuery.select(criteriaBuilder.count(userRoot));
+
+        TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
         return query.getSingleResult();
     }
 
-    // TODO rewrite like in posts query repo
-    private String getUsersFilters(QueryUserDto queryObj) {
-        StringBuilder sqlFilters = new StringBuilder();
-        List<String> filters = new ArrayList<>();
+    private Predicate getUsersFilters(Root<UserEntity> userRoot, QueryUserDto queryObj) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        List<Predicate> andPredicates = new ArrayList<>();
+        List<Predicate> orPredicates = new ArrayList<>();
 
 //        if ("banned".equals(queryObj.getBanStatus())) {
 //            filters.add("u.saUserBan IS NOT NULL");
@@ -87,24 +87,24 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 //            filters.add("u.saUserBan IS NULL");
 //        }
 
-        List<String> searchFilters = new ArrayList<>();
         if (queryObj.getSearchLoginTerm() != null && !queryObj.getSearchLoginTerm().isEmpty()) {
-            searchFilters.add("UPPER(u.login) LIKE :searchLoginTerm");
+            orPredicates.add(criteriaBuilder.like(
+                    criteriaBuilder.upper(userRoot.get("login")),
+                    "%" + queryObj.getSearchLoginTerm().toUpperCase() + "%"));
         }
 
         if (queryObj.getSearchEmailTerm() != null && !queryObj.getSearchEmailTerm().isEmpty()) {
-            searchFilters.add("UPPER(u.email) LIKE :searchEmailTerm");
+            orPredicates.add(criteriaBuilder.like(
+                    criteriaBuilder.upper(userRoot.get("email")),
+                    "%" + queryObj.getSearchEmailTerm().toUpperCase() + "%"));
         }
 
-        if (searchFilters.size() > 0) {
-            filters.add(String.join(" OR ", searchFilters));
-        }
+        Predicate orPredicate = orPredicates.isEmpty()  ? criteriaBuilder.conjunction()
+                                                        : criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
 
-        if (!filters.isEmpty()) {
-            sqlFilters.append(" WHERE ").append(String.join(" AND ", filters));
-        }
+        Predicate andPredicate = andPredicates.isEmpty()    ? criteriaBuilder.conjunction()
+                                                            : criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
 
-        return sqlFilters.toString();
+        return criteriaBuilder.and(andPredicate, orPredicate);
     }
-
 }

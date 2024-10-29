@@ -116,10 +116,10 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
         List<Blog> userBlogs = blogRepository.findByUserId(userId);
         List<UUID> blogIds = userBlogs.stream().map(Blog::getId).collect(Collectors.toList());
 
-        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
         Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, userId, blogIds, null);
         int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
+        int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
@@ -194,6 +194,8 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
             andPredicates.add(commentRoot.get("post").get("id").in(postId));
         }
 
-        return criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
+        Predicate resultPredicate = andPredicates.isEmpty() ? criteriaBuilder.conjunction()
+                                                            : criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
+        return resultPredicate;
     }
 }
