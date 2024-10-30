@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -27,7 +28,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
     public UserEntity create(RegistrationDto createUserDto, boolean isConfirmed) {
         RoleEntity roles = roleRepository.findRoleEntityByName("USER").orElseThrow(() -> new RuntimeException("Role not found"));
         UserEntity user = UserEntity.createInstance(createUserDto, passwordEncoder.encode(createUserDto.getPassword()), Collections.singletonList(roles), isConfirmed);

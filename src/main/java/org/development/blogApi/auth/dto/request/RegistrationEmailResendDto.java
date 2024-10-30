@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.development.blogApi.common.validation.isEmailNotConfirmed.IsEmailNotConfirmed;
+import org.development.blogApi.infrastructure.common.validation.isEmailNotConfirmed.IsEmailNotConfirmed;
 import org.hibernate.validator.constraints.Length;
 
 @Data

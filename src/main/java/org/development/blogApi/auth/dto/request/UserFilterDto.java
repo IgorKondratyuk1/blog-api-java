@@ -1,7 +1,7 @@
 package org.development.blogApi.auth.dto.request;
 
 import jakarta.validation.constraints.Size;
-import org.development.blogApi.common.dto.FilterDto;
+import org.development.blogApi.infrastructure.common.dto.FilterDto;
 
 public class UserFilterDto extends FilterDto {
     @Size(max = 100, message = "Search login term can be up to 100 characters")

@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LoginDto {
+public class LoginDto { // TODO make DTOs without setters
     @NotEmpty(message = "loginOrEmail must not be empty")
     private String loginOrEmail;
 

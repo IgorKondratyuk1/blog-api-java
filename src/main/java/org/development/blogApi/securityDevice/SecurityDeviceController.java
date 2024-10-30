@@ -1,13 +1,11 @@
 package org.development.blogApi.securityDevice;
 
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.development.blogApi.security.JwtService;
+import org.development.blogApi.infrastructure.security.JwtService;
 import org.development.blogApi.securityDevice.dto.ViewSecurityDeviceDto;
 import org.development.blogApi.securityDevice.entity.SecurityDevice;
 import org.development.blogApi.securityDevice.utils.SecurityDeviceMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ public class SecurityDeviceController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping
+    @GetMapping("")
     public List<ViewSecurityDeviceDto> findAllSecurityDevices(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);
         String userId = this.jwtService.extractUserId(refreshToken);
@@ -39,7 +37,7 @@ public class SecurityDeviceController {
                 .toList();
     }
 
-    @DeleteMapping
+    @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllSecurityDevicesExceptCurrent(HttpServletRequest request) {
         String refreshToken = this.jwtService.getJwtRefreshFromCookies(request);

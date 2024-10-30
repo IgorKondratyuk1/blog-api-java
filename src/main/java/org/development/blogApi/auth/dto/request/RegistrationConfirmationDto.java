@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.development.blogApi.common.validation.codeNotUsed.CodeNotUsed;
+import org.development.blogApi.infrastructure.common.validation.codeNotUsed.CodeNotUsed;
 
 @Data
 @AllArgsConstructor
