@@ -186,7 +186,7 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
 //        }
 
         if (userId != null) {
-            andPredicates.add(criteriaBuilder.equal(blogRoot.get("user").get("id"), userId));
+            andPredicates.add(criteriaBuilder.equal(blogRoot.get("user").get("id"), UUID.fromString(userId)));
         }
 
         if (!queryObj.getSearchNameTerm().isBlank()) {

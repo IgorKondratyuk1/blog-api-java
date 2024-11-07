@@ -43,7 +43,7 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
         CriteriaQuery<CommentLike> criteriaQuery = criteriaBuilder.createQuery(CommentLike.class);
         Root<CommentLike> commentLikeRoot = criteriaQuery.from(CommentLike.class);
 
-        Predicate statusPredicate = criteriaBuilder.equal(commentLikeRoot.get("id"), LikeStatus.LIKE);
+        Predicate statusPredicate = criteriaBuilder.equal(commentLikeRoot.get("id"), UUID.fromString(locationId));
         Predicate commentIdPredicate = criteriaBuilder.equal(commentLikeRoot.get("comment").get("id"), LikeStatus.LIKE);
         criteriaQuery.where(statusPredicate, commentIdPredicate);
         criteriaQuery.orderBy(criteriaBuilder.desc(commentLikeRoot.get("createdAt")));
@@ -60,7 +60,7 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
         CriteriaQuery<PostLike> criteriaQuery = criteriaBuilder.createQuery(PostLike.class);
         Root<PostLike> postLikeRoot = criteriaQuery.from(PostLike.class);
 
-        Predicate statusPredicate = criteriaBuilder.equal(postLikeRoot.get("id"), LikeStatus.LIKE);
+        Predicate statusPredicate = criteriaBuilder.equal(postLikeRoot.get("id"), UUID.fromString(locationId));
         Predicate commentIdPredicate = criteriaBuilder.equal(postLikeRoot.get("post").get("id"), LikeStatus.LIKE);
         criteriaQuery.where(statusPredicate, commentIdPredicate);
         criteriaQuery.orderBy(criteriaBuilder.desc(postLikeRoot.get("createdAt")));
