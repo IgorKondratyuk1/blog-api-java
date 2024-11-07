@@ -9,18 +9,18 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.development.blogApi.blog.dto.response.ViewBlogDto;
+import org.development.blogApi.blog.dto.response.ViewExtendedBlogDto;
 import org.development.blogApi.blog.entity.Blog;
 import org.development.blogApi.blog.utils.BlogMapper;
-import org.development.blogApi.comment.entity.Comment;
 import org.development.blogApi.infrastructure.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.infrastructure.common.dto.PaginationDto;
-import org.development.blogApi.infrastructure.common.dto.FilterResult;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
-import org.development.blogApi.blog.dto.response.ViewExtendedBlogDto;
 import org.development.blogApi.infrastructure.common.utils.SortUtil;
-import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
