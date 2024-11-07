@@ -12,6 +12,7 @@ import org.development.blogApi.infrastructure.common.dto.PaginationDto;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
 import org.development.blogApi.auth.dto.request.QueryUserDto;
 import org.development.blogApi.auth.dto.response.ViewUserDto;
+import org.development.blogApi.infrastructure.common.utils.SortUtil;
 import org.development.blogApi.user.entity.UserEntity;
 import org.development.blogApi.user.utils.UserMapper;
 import org.springframework.stereotype.Repository;
@@ -41,9 +42,9 @@ public class UserQueryRepositoryCustomImpl implements UserQueryRepositoryCustom 
 
         criteriaQuery.where(filterPredicate);
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(userRoot.get(queryUserParams.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(userRoot,queryUserParams.getSortBy())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(userRoot.get(queryUserParams.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(userRoot,queryUserParams.getSortBy())));
         }
 
         TypedQuery<UserEntity> query = entityManager.createQuery(criteriaQuery);

@@ -78,20 +78,20 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
-        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, null, null);
+        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, null);
         int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Post> criteriaQuery = criteriaBuilder.createQuery(Post.class);
 
         Root<Post> postRoot = criteriaQuery.from(Post.class);
-        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, null, null, null); // TODO do not put NULL values
+        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, null, null); // TODO do not put NULL values
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(postRoot.get(sortBy)));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(postRoot, sortBy)));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(postRoot.get(sortBy)));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(postRoot, sortBy)));
         }
 
         TypedQuery<Post> query = entityManager.createQuery(criteriaQuery);
@@ -117,20 +117,20 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
-        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, UUID.fromString(blogId), null);
+        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, null, UUID.fromString(blogId));
         int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Post> criteriaQuery = criteriaBuilder.createQuery(Post.class);
 
         Root<Post> postRoot = criteriaQuery.from(Post.class);
-        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, null, UUID.fromString(blogId), null); // TODO do not put NULL values
+        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, null, UUID.fromString(blogId)); // TODO do not put NULL values
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(postRoot.get(sortBy)));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(postRoot, sortBy)));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(postRoot.get(sortBy)));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(postRoot, sortBy)));
         }
 
         TypedQuery<Post> query = entityManager.createQuery(criteriaQuery);
@@ -156,14 +156,14 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         int skipValue = PaginationUtil.getSkipValue(commonQueryParamsDto.getPageNumber(), commonQueryParamsDto.getPageSize());
         String sortBy = SortUtil.getSortBy(commonQueryParamsDto.getSortBy());
         String sortValue = commonQueryParamsDto.getSortDirection().toUpperCase();
-        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId), null);
+        Long totalCount = getTotalCountWithFilters(commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId));
         int pagesCount = PaginationUtil.getPagesCount(totalCount, commonQueryParamsDto.getPageSize());
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Post> criteriaQuery = criteriaBuilder.createQuery(Post.class);
 
         Root<Post> postRoot = criteriaQuery.from(Post.class);
-        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId), null); // TODO do not put NULL values
+        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, true, UUID.fromString(userId), UUID.fromString(blogId)); // TODO do not put NULL values
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
@@ -190,12 +190,12 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         );
     }
 
-    private Long getTotalCountWithFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, UUID blogId, UUID postId) {
+    private Long getTotalCountWithFilters(CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedPosts, UUID userId, UUID blogId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<Post> postRoot = criteriaQuery.from(Post.class);
-        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, skipBannedComments, userId, blogId, postId);
+        Predicate filterPredicate = getFilters(postRoot, commonQueryParamsDto, skipBannedPosts, userId, blogId);
         criteriaQuery.where(filterPredicate);
         criteriaQuery.select(criteriaBuilder.count(postRoot));
 
@@ -203,7 +203,7 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
         return query.getSingleResult();
     }
 
-    private Predicate getFilters(Root<Post> postRoot, CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, UUID blogId, UUID postId) {
+    private Predicate getFilters(Root<Post> postRoot, CommonQueryParamsDto commonQueryParamsDto, boolean skipBannedComments, UUID userId, UUID blogId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         List<Predicate> andPredicates = new ArrayList<>();
 
@@ -228,11 +228,6 @@ public class PostQueryRepositoryCustomImpl implements PostQueryRepositoryCustom{
             andPredicates.add(criteriaBuilder.like(
                     criteriaBuilder.upper(postRoot.get("name")),
                     "%" + commonQueryParamsDto.getSearchNameTerm().toUpperCase() + "%"));
-        }
-
-        // Filter by postId
-        if (postId != null) {
-            andPredicates.add(postRoot.get("id").in(postId));
         }
 
         Predicate resultPredicate = andPredicates.isEmpty() ? criteriaBuilder.conjunction()
