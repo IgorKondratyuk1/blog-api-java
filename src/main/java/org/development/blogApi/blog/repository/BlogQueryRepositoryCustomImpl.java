@@ -17,6 +17,7 @@ import org.development.blogApi.infrastructure.common.dto.PaginationDto;
 import org.development.blogApi.infrastructure.common.dto.FilterResult;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
 import org.development.blogApi.blog.dto.response.ViewExtendedBlogDto;
+import org.development.blogApi.infrastructure.common.utils.SortUtil;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.*;
@@ -63,9 +64,9 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         }
 
         TypedQuery<Blog> query = entityManager.createQuery(criteriaQuery);
@@ -101,9 +102,9 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         }
 
         TypedQuery<Blog> query = entityManager.createQuery(criteriaQuery);
@@ -139,9 +140,9 @@ public class BlogQueryRepositoryCustomImpl implements BlogQueryRepositoryCustom 
         criteriaQuery.where(filterPredicate);
 
         if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(blogRoot.get(commonQueryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(blogRoot,commonQueryParamsDto.getSortBy())));
         }
 
         TypedQuery<Blog> query = entityManager.createQuery(criteriaQuery);
