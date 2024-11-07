@@ -6,7 +6,7 @@ import org.development.blogApi.auth.dto.request.PasswordRecoveryDto;
 import org.development.blogApi.auth.dto.request.RegistrationConfirmationDto;
 import org.development.blogApi.auth.dto.request.RegistrationEmailResendDto;
 import org.development.blogApi.auth.dto.response.AuthTokensDto;
-import org.development.blogApi.email.EmailManager;
+import org.development.blogApi.infrastructure.email.EmailManager;
 import org.development.blogApi.auth.exceptions.AuthException;
 import org.development.blogApi.user.exceptions.UserNotFoundException;
 import org.development.blogApi.infrastructure.security.CustomUserDetails;

@@ -7,7 +7,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.development.blogApi.comment.entity.Comment;
 import org.development.blogApi.infrastructure.common.dto.PaginationDto;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
 import org.development.blogApi.auth.dto.request.QueryUserDto;

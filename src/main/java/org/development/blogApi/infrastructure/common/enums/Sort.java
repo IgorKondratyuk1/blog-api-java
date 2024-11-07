@@ -1,6 +1,7 @@
 package org.development.blogApi.infrastructure.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.development.blogApi.blogPlatform.core.like.enums.LikeStatus;
 
 
 public enum Sort implements ValueEnum<String> {
@@ -19,8 +20,8 @@ public enum Sort implements ValueEnum<String> {
         return value;
     }
 
-    public static org.development.blogApi.like.enums.LikeStatus fromValue(String value) {
-        for (org.development.blogApi.like.enums.LikeStatus status : org.development.blogApi.like.enums.LikeStatus.values()) {
+    public static LikeStatus fromValue(String value) {
+        for (LikeStatus status : LikeStatus.values()) {
             if (status.getValue().equalsIgnoreCase(value)) {
                 return status;
             }

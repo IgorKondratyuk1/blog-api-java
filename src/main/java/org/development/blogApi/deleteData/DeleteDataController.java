@@ -1,9 +1,9 @@
 package org.development.blogApi.deleteData;
 
-import org.development.blogApi.blog.repository.BlogRepository;
-import org.development.blogApi.comment.repository.CommentRepository;
-import org.development.blogApi.like.repository.LikeRepository;
-import org.development.blogApi.post.repository.PostRepository;
+import org.development.blogApi.blogPlatform.core.blog.repository.BlogRepository;
+import org.development.blogApi.blogPlatform.core.comment.repository.CommentRepository;
+import org.development.blogApi.blogPlatform.core.like.repository.LikeRepository;
+import org.development.blogApi.blogPlatform.core.post.repository.PostRepository;
 import org.development.blogApi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
