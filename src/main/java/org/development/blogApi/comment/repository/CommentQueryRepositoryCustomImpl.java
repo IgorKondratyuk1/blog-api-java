@@ -8,28 +8,28 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import oracle.jdbc.proxy.annotation.Pre;
+import org.development.blogApi.blog.entity.Blog;
 import org.development.blogApi.blog.repository.BlogRepository;
 import org.development.blogApi.comment.dto.LikesDislikesCountDto;
 import org.development.blogApi.comment.dto.response.ViewBloggerCommentDto;
 import org.development.blogApi.comment.dto.response.ViewPublicCommentDto;
 import org.development.blogApi.comment.entity.Comment;
+import org.development.blogApi.comment.utils.CommentMapper;
 import org.development.blogApi.infrastructure.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.infrastructure.common.dto.PaginationDto;
-import org.development.blogApi.infrastructure.common.dto.FilterResult;
 import org.development.blogApi.infrastructure.common.utils.PaginationUtil;
-import org.development.blogApi.blog.entity.Blog;
-import org.development.blogApi.comment.utils.CommentMapper;
-import org.development.blogApi.like.repository.LikeRepository;
 import org.development.blogApi.like.enums.LikeLocation;
 import org.development.blogApi.like.enums.LikeStatus;
-import org.development.blogApi.post.repository.PostRepository;
+import org.development.blogApi.like.repository.LikeRepository;
 import org.development.blogApi.post.entity.Post;
+import org.development.blogApi.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -63,7 +63,7 @@ public class CommentQueryRepositoryCustomImpl implements CommentQueryRepositoryC
         Comment comment;
         try {
             comment = query.getSingleResult();
-        } catch (EmptyResultDataAccessException e) {
+        } catch (NoResultException e) {
             return Optional.empty();
         }
 
