@@ -33,7 +33,7 @@ public class LikeQueryRepositoryCustomImpl implements LikeQueryRepositoryCustom 
             case POST:
                 return this.getLastPostLikesInfo(locationId, limitCount);
             default:
-                throw new RuntimeException("Type not found");
+                throw new RuntimeException("Type not found!");
         }
     }
 
