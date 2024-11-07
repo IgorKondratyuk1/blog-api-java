@@ -1,4 +1,4 @@
-package org.development.blogApi.infrastructure.config;
+package org.development.blogApi.infrastructure.configuration;
 
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
