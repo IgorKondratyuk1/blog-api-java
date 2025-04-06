@@ -1,0 +1,45 @@
+package org.development.blogApi.modules.quiz.question.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "quiz_question")
+public class QuizQuestionEntity {
+
+    @Id
+    @Setter(AccessLevel.PACKAGE)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "body", nullable = false)
+    private String body;
+
+    @ElementCollection
+    @CollectionTable(name = "quiz_question_correct_answers", joinColumns = @JoinColumn(name = "question_id"))
+    private List<String> correctAnswers;
+
+    @Builder.Default
+    @Column(name = "published", nullable = false)
+    private Boolean published = false;
+
+    @CreatedDate
+    @Setter(AccessLevel.PACKAGE)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Setter(AccessLevel.PACKAGE)
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+}

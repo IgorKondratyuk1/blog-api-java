@@ -2,10 +2,10 @@ package org.development.blogApi.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.development.blogApi.quiz.question.dto.request.CreateQuestionDto;
-import org.development.blogApi.quiz.question.dto.response.ViewQuestionDto;
-import org.development.blogApi.user.entity.RoleEntity;
-import org.development.blogApi.user.repository.RoleRepository;
+import org.development.blogApi.modules.quiz.question.dto.request.CreateQuestionDto;
+import org.development.blogApi.modules.quiz.question.dto.response.ViewQuestionDto;
+import org.development.blogApi.modules.user.entity.RoleEntity;
+import org.development.blogApi.modules.user.repository.RoleRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
