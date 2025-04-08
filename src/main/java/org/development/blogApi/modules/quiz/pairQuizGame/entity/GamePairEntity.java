@@ -5,6 +5,7 @@ import lombok.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.entity.UserEntity;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -23,11 +24,11 @@ public class GamePairEntity {
     @Setter(AccessLevel.PACKAGE)
     private UUID id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "first_player_id")
     private GamePlayerProgressEntity firstPlayerProgress;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "second_player_id")
     private GamePlayerProgressEntity secondPlayerProgress;
 
@@ -43,7 +44,7 @@ public class GamePairEntity {
     @Column(name = "status")
     private GamePairStatus status; // = GamePairStatus.ACTIVE; TODO check if works
 
-    @CreatedDate
+    @CreationTimestamp
     @Setter(AccessLevel.PACKAGE)
     @Column(nullable = false, updatable = false)
     private LocalDateTime pairCreatedDate;
@@ -61,7 +62,10 @@ public class GamePairEntity {
     public static GamePairEntity createInstance(UserEntity user) {
         GamePairEntity gamePairEntity = new GamePairEntity();
         gamePairEntity.setStatus(GamePairStatus.PENDING);
-        gamePairEntity.getFirstPlayerProgress().setPlayer(user);
+
+        GamePlayerProgressEntity firstPlayerProgressEntity = GamePlayerProgressEntity.createInstance(user);
+
+        gamePairEntity.setFirstPlayerProgress(firstPlayerProgressEntity);
         return gamePairEntity;
     }
 }

@@ -46,9 +46,9 @@ public class CommentController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateComment(@PathVariable("id") String id,
-                                           @RequestBody @Valid UpdateCommentDto updateCommentDto,
-                                           @AuthenticationPrincipal CustomUserDetails customUserDetails)
-    {
+                              @RequestBody @Valid UpdateCommentDto updateCommentDto,
+                              @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
 //        if (customUserDetails == null) {
 //            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
 //        }

@@ -1,11 +1,17 @@
 package org.development.blogApi.modules.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.development.blogApi.common.envHelpers.ApplicationEnvHelper;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "email_confirmation")
 public class EmailConfirmation {
@@ -31,12 +37,6 @@ public class EmailConfirmation {
         this.isConfirmed = isConfirmed;
     }
 
-    public EmailConfirmation() {}
-
-    // Getters and Setters
-    public UUID getConfirmationCode() {
-        return confirmationCode;
-    }
 
     public void setConfirmationCode(UUID confirmationCode) {
         if (this.isConfirmed()) {
@@ -45,30 +45,6 @@ public class EmailConfirmation {
 
         this.confirmationCode = confirmationCode;
         this.expirationDate = generateNewExpirationDate();
-    }
-
-    public LocalDateTime getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public boolean isConfirmed() {
-        return isConfirmed;
-    }
-
-    public void setConfirmed(boolean confirmed) {
-        isConfirmed = confirmed;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
     }
 
     // Static factory method

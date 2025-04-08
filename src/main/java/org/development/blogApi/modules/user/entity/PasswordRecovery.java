@@ -1,9 +1,16 @@
 package org.development.blogApi.modules.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "password_recovery")
 public class PasswordRecovery {
@@ -12,7 +19,6 @@ public class PasswordRecovery {
 //    @GeneratedValue(strategy = GenerationType.UUID)
 //    @Column(name = "id")
 //    private UUID id;
-
 
     @Id
     @OneToOne
@@ -33,41 +39,6 @@ public class PasswordRecovery {
         this.recoveryCode = recoveryCode;
         this.expirationDate = expirationDate;
         this.isUsed = isUsed;
-    }
-
-    public PasswordRecovery() {}
-
-    // Getters and Setters
-    public UUID getRecoveryCode() {
-        return recoveryCode;
-    }
-
-    public void setRecoveryCode(UUID recoveryCode) {
-        this.recoveryCode = recoveryCode;
-    }
-
-    public LocalDateTime getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public boolean isUsed() {
-        return isUsed;
-    }
-
-    public void setUsed(boolean used) {
-        isUsed = used;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
     }
 
     // Static factory method

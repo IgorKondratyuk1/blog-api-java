@@ -7,17 +7,29 @@ import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePlayerProgre
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.entity.UserEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GamePairMapper {
 
     public static ViewGamePairDto toView(GamePairEntity gamePairEntity) {
-        ViewGamePlayerProgressDto viewFirstPlayerGamePlayerProgressDto = GamePairMapper.gamePlayerProgressEntityToView(gamePairEntity.getFirstPlayerProgress());
-        ViewGamePlayerProgressDto viewSecondPlayerGamePlayerProgressDto = GamePairMapper.gamePlayerProgressEntityToView(gamePairEntity.getSecondPlayerProgress());
-        List<ViewQuestionLightDto> viewQuestionLightDtos = gamePairEntity.getQuestions()
-                .stream()
-                .map(GamePairMapper::questionEntityToLightView)
-                .toList();
+        ViewGamePlayerProgressDto viewFirstPlayerGamePlayerProgressDto = null;
+        if (gamePairEntity.getFirstPlayerProgress() != null) {
+            viewFirstPlayerGamePlayerProgressDto = GamePairMapper.gamePlayerProgressEntityToView(gamePairEntity.getFirstPlayerProgress());
+        }
+
+        ViewGamePlayerProgressDto viewSecondPlayerGamePlayerProgressDto = null;
+        if (gamePairEntity.getSecondPlayerProgress() != null) {
+            viewSecondPlayerGamePlayerProgressDto = GamePairMapper.gamePlayerProgressEntityToView(gamePairEntity.getSecondPlayerProgress());
+        }
+
+        List<ViewQuestionLightDto> viewQuestionLightDtos = new ArrayList<>();
+        if (gamePairEntity.getQuestions() != null) {
+            viewQuestionLightDtos = gamePairEntity.getQuestions()
+                    .stream()
+                    .map(GamePairMapper::questionEntityToLightView)
+                    .toList();
+        }
 
         return new ViewGamePairDto(
                 gamePairEntity.getId().toString(),
@@ -40,10 +52,14 @@ public class GamePairMapper {
     }
 
     private static ViewGamePlayerProgressDto gamePlayerProgressEntityToView(GamePlayerProgressEntity gamePlayerProgress) {
-        List<ViewAnswerDto> viewFirstPlayerAnswerDtoList = gamePlayerProgress.getAnswers()
-                .stream()
-                .map(GamePairMapper::answerEntityToView)
-                .toList();
+        List<ViewAnswerDto> viewFirstPlayerAnswerDtoList = new ArrayList<>();
+        if (gamePlayerProgress.getAnswers() != null) {
+            viewFirstPlayerAnswerDtoList = gamePlayerProgress.getAnswers()
+                    .stream()
+                    .map(GamePairMapper::answerEntityToView)
+                    .toList();
+        }
+
         ViewPlayerDto viewFirstPlayerDto = GamePairMapper.userEntityToView(gamePlayerProgress.getPlayer());
         return new ViewGamePlayerProgressDto(viewFirstPlayerAnswerDtoList, viewFirstPlayerDto, gamePlayerProgress.getScore());
     }

@@ -18,4 +18,28 @@ public class GamePairExceptionHandler {
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
     }
+
+    @ExceptionHandler(UserAlreadyHasGamePairException.class)
+    public ResponseEntity<APIErrorResult> userAlreadyHasGamePairException(UserAlreadyHasGamePairException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    @ExceptionHandler(NoAvailableQuestionsException.class)
+    public ResponseEntity<APIErrorResult> noAvailableQuestionsException(NoAvailableQuestionsException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    @ExceptionHandler(WrongStateOfGamePairException.class)
+    public ResponseEntity<APIErrorResult> wrongStateOfGamePairException(WrongStateOfGamePairException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
 }

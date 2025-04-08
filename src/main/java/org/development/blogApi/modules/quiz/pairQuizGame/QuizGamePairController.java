@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.request.AnswerQuestionDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewAnswerDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewGamePairDto;
+import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
+import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.GamePairNotFoundException;
 import org.development.blogApi.modules.quiz.pairQuizGame.utils.GamePairMapper;
 import org.development.blogApi.security.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/pair-game-quiz/pairs")
@@ -18,12 +22,18 @@ public class QuizGamePairController {
 
     @GetMapping("/my-current")
     public ViewGamePairDto getCurrentUserGamePair(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return GamePairMapper.toView(this.quizGamePairService.getCurrentUserGamePair(userDetails.getUserId()));
+        GamePairEntity foundedGamePair = this.quizGamePairService.getCurrentUserGamePair(userDetails.getUserId())
+                .orElseThrow(() -> new GamePairNotFoundException());
+
+        return GamePairMapper.toView(foundedGamePair);
     }
 
     @GetMapping("/{id}")
-    public ViewGamePairDto getGamePairById(@PathVariable String gamePairId) {
-        return GamePairMapper.toView(this.quizGamePairService.getGamePairById(gamePairId));
+    public ViewGamePairDto getGamePairById(@PathVariable String id) {
+        GamePairEntity foundedGamePair = this.quizGamePairService.getGamePairById(id)
+                .orElseThrow(() -> new GamePairNotFoundException());
+
+        return GamePairMapper.toView(foundedGamePair);
     }
 
     @PostMapping("/connect")

@@ -2,8 +2,8 @@ package org.development.blogApi.modules.quiz.question.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,12 +33,12 @@ public class QuizQuestionEntity {
     @Column(name = "published", nullable = false)
     private Boolean published = false;
 
-    @CreatedDate
+    @CreationTimestamp
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;

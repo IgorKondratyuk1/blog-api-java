@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.AnswerStatus;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ public class AnswerEntity {
     @Column(name = "answer_status")
     private AnswerStatus answerStatus;
 
-    @CreatedDate
+    @CreationTimestamp
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "added_at", updatable = false)
     private LocalDateTime addedAt;

@@ -88,7 +88,8 @@ public class SecurityConfig {
                         "/api/posts/*/comments",
                         "/api/posts/*/like-status",
                         "/api/blogger/**",
-                        "/api/comments/**")
+                        "/api/comments/**",
+                        "/api/pair-game-quiz/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth

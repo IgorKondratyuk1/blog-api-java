@@ -2,6 +2,7 @@ package org.development.blogApi.modules.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.development.blogApi.modules.auth.dto.request.RegistrationDto;
 
 import java.time.LocalDateTime;
