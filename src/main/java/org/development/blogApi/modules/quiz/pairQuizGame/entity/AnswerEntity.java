@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.AnswerStatus;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,6 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "quiz_game_answer")
+@EntityListeners(AuditingEntityListener.class)
 public class AnswerEntity {
 
     @Id
@@ -31,7 +32,7 @@ public class AnswerEntity {
     @Column(name = "answer_status")
     private AnswerStatus answerStatus;
 
-    @CreationTimestamp
+    @CreatedDate
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "added_at", updatable = false)
     private LocalDateTime addedAt;

@@ -2,8 +2,9 @@ package org.development.blogApi.modules.quiz.question.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "quiz_question")
+@EntityListeners(AuditingEntityListener.class)
 public class QuizQuestionEntity {
 
     @Id
@@ -33,12 +35,12 @@ public class QuizQuestionEntity {
     @Column(name = "published", nullable = false)
     private Boolean published = false;
 
-    @CreationTimestamp
+    @CreatedDate
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
