@@ -25,14 +25,6 @@ public class QuizQuestionService {
 
     private final QuizQuestionRepository quizQuestionRepository;
 
-    @Transactional(readOnly = true)
-    public PaginationDto<ViewQuestionDto> findAllQuestions() {
-        List<QuizQuestionEntity> quizQuestionEntityList = this.quizQuestionRepository.findAll();
-        List<ViewQuestionDto> viewQuestionList = quizQuestionRepository.findAll().stream().map((QuizQuestionEntity q) -> QuestionMapper.toView(q)).collect(Collectors.toList());
-        System.out.println(Arrays.toString(viewQuestionList.toArray()));
-        return null;
-    }
-
     public QuizQuestionEntity findQuestionById(String questionId) {
         return this.quizQuestionRepository.findById(UUID.fromString(questionId))
                 .orElseThrow(() -> new QuizQuestionNotFoundException());

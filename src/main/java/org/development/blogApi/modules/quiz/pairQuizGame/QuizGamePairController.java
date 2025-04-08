@@ -36,7 +36,7 @@ public class QuizGamePairController {
         return GamePairMapper.toView(foundedGamePair);
     }
 
-    @PostMapping("/connect")
+    @PostMapping("/connection")
     public ViewGamePairDto getConnectUserToGamePair(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return GamePairMapper.toView(this.quizGamePairService.connectUserToGamePair(userDetails.getUserId()));
     }

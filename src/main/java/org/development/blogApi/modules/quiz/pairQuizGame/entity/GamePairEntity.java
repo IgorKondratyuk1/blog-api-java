@@ -5,11 +5,12 @@ import lombok.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.entity.UserEntity;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,7 @@ import java.util.*;
 @Builder
 @Entity
 @Table(name = "quiz_game_pair")
+@EntityListeners(AuditingEntityListener.class)
 public class GamePairEntity {
 
     @Id
@@ -44,7 +46,7 @@ public class GamePairEntity {
     @Column(name = "status")
     private GamePairStatus status; // = GamePairStatus.ACTIVE; TODO check if works
 
-    @CreationTimestamp
+    @CreatedDate
     @Setter(AccessLevel.PACKAGE)
     @Column(nullable = false, updatable = false)
     private LocalDateTime pairCreatedDate;
