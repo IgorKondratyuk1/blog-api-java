@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/quiz/questions")
+@RequestMapping("api/sa/quiz/questions")
 @AllArgsConstructor
 public class SuperAdminQuizQuestionController {
 
