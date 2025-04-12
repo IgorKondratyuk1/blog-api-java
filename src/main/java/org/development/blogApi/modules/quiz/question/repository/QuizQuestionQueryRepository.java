@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface QuestionQueryRepository extends JpaRepository<QuizQuestionEntity, UUID>, QuestionQueryRepositoryCustom {
+public interface QuizQuestionQueryRepository extends JpaRepository<QuizQuestionEntity, UUID>, QuizQuestionQueryRepositoryCustom {
 }
