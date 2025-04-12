@@ -34,7 +34,8 @@ public class SuperAdminQuizQuestionController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateQuestion(@PathVariable String id, @RequestBody @Valid UpdateQuestionDto updateQuestionDto) {
+    public void updateQuestion(@PathVariable String id,
+                               @RequestBody @Valid UpdateQuestionDto updateQuestionDto) {
         this.quizQuestionService.updateQuestion(id, updateQuestionDto);
     }
 

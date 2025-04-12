@@ -41,9 +41,12 @@ public class QuizQuestionEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-//    @LastModifiedDate
-    @UpdateTimestamp // Added hibernate annotation to create update date in moment entity saved to db. To return null for creation
     @Setter(AccessLevel.PACKAGE)
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PreUpdate
+    private void onPreUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
