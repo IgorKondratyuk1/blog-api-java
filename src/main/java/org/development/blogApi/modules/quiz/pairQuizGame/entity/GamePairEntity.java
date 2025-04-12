@@ -34,7 +34,7 @@ public class GamePairEntity {
     @JoinColumn(name = "second_player_id")
     private GamePlayerProgressEntity secondPlayerProgress;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "quiz_game_pair_questions",
             joinColumns = @JoinColumn(name = "game_pair_id"),

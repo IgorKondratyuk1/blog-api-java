@@ -21,7 +21,7 @@ public class GamePairExceptionHandler {
 
     @ExceptionHandler(UserAlreadyHasGamePairException.class)
     public ResponseEntity<APIErrorResult> userAlreadyHasGamePairException(UserAlreadyHasGamePairException exception) {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
@@ -29,7 +29,7 @@ public class GamePairExceptionHandler {
 
     @ExceptionHandler(NoAvailableQuestionsException.class)
     public ResponseEntity<APIErrorResult> noAvailableQuestionsException(NoAvailableQuestionsException exception) {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
@@ -37,7 +37,7 @@ public class GamePairExceptionHandler {
 
     @ExceptionHandler(WrongStateOfGamePairException.class)
     public ResponseEntity<APIErrorResult> wrongStateOfGamePairException(WrongStateOfGamePairException exception) {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);

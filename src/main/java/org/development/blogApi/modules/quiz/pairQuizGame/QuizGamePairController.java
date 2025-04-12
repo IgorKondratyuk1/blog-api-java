@@ -1,5 +1,6 @@
 package org.development.blogApi.modules.quiz.pairQuizGame;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.request.AnswerQuestionDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewAnswerDto;
@@ -10,8 +11,6 @@ import org.development.blogApi.modules.quiz.pairQuizGame.utils.GamePairMapper;
 import org.development.blogApi.security.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/pair-game-quiz/pairs")
@@ -42,7 +41,8 @@ public class QuizGamePairController {
     }
 
     @PostMapping("/my-current/answers")
-    public ViewAnswerDto getConnectUserToGamePair(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AnswerQuestionDto answerQuestionDto) {
+    public ViewAnswerDto getConnectUserToGamePair(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                  @RequestBody @Valid AnswerQuestionDto answerQuestionDto) {
         return GamePairMapper.answerEntityToView(this.quizGamePairService.answerGameQuestion(userDetails.getUserId(), answerQuestionDto));
     }
 
