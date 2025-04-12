@@ -34,7 +34,7 @@ public class GamePairEntity {
     @JoinColumn(name = "second_player_id")
     private GamePlayerProgressEntity secondPlayerProgress;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "quiz_game_pair_questions",
             joinColumns = @JoinColumn(name = "game_pair_id"),
@@ -44,7 +44,7 @@ public class GamePairEntity {
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "status")
-    private GamePairStatus status; // = GamePairStatus.ACTIVE; TODO check if works
+    private GamePairStatus status = GamePairStatus.PENDING;
 
     @CreatedDate
     @Setter(AccessLevel.PACKAGE)
