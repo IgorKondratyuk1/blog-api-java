@@ -38,8 +38,8 @@ public class DeleteDataController {
         commentRepository.deleteAll();
         postRepository.deleteAll();
         blogRepository.deleteAll();
+        quizGamePairRepository.deleteAll();
+        quizQuestionRepository.deleteAll();
         userRepository.deleteAll();
-        quizQuestionRepository.deleteAll();
-        quizQuestionRepository.deleteAll();
     }
 }
