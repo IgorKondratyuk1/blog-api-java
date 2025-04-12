@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class QuestionQueryRepositoryCustomImpl implements QuestionQueryRepositoryCustom {
+public class QuizQuestionQueryRepositoryCustomImpl implements QuizQuestionQueryRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;

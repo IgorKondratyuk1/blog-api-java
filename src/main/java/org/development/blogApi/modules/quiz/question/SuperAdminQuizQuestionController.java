@@ -8,7 +8,7 @@ import org.development.blogApi.modules.quiz.question.dto.request.CreateQuestionD
 import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionDto;
 import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionPublishStatusDto;
 import org.development.blogApi.modules.quiz.question.dto.response.ViewQuestionDto;
-import org.development.blogApi.modules.quiz.question.repository.QuestionQueryRepository;
+import org.development.blogApi.modules.quiz.question.repository.QuizQuestionQueryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +19,11 @@ public class SuperAdminQuizQuestionController {
 
     private final QuizQuestionService quizQuestionService;
 
-    private final QuestionQueryRepository questionQueryRepository;
+    private final QuizQuestionQueryRepository quizQuestionQueryRepository;
 
     @GetMapping("")
     public PaginationDto<ViewQuestionDto> findAllQuestions(QuestionQueryParamsDto questionQueryParamsDto) {
-        return this.questionQueryRepository.findAllQuestions(questionQueryParamsDto);
+        return this.quizQuestionQueryRepository.findAllQuestions(questionQueryParamsDto);
     }
 
     @PostMapping("")
