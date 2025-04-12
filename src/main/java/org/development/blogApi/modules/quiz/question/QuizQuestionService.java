@@ -1,7 +1,6 @@
 package org.development.blogApi.modules.quiz.question;
 
 import lombok.AllArgsConstructor;
-import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.modules.quiz.question.dto.request.CreateQuestionDto;
 import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionDto;
 import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionPublishStatusDto;
@@ -13,10 +12,8 @@ import org.development.blogApi.modules.quiz.question.utils.QuestionMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -70,7 +67,8 @@ public class QuizQuestionService {
         this.quizQuestionRepository.save(quizQuestionEntity);
     }
 
-    public void deleteQuestion(String id) {
-        this.quizQuestionRepository.deleteById(UUID.fromString(id));
+    public void deleteQuestionById(String id) {
+        QuizQuestionEntity quizQuestion = this.findQuestionById(id);
+        this.quizQuestionRepository.deleteById(quizQuestion.getId());
     }
 }

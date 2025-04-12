@@ -2,6 +2,7 @@ package org.development.blogApi.modules.quiz.question.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,7 +25,7 @@ public class QuizQuestionEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "body", nullable = false)
+    @Column(name = "body", nullable = false, length = 1000)
     private String body;
 
     @ElementCollection
@@ -40,7 +41,8 @@ public class QuizQuestionEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+//    @LastModifiedDate
+    @UpdateTimestamp // Added hibernate annotation to create update date in moment entity saved to db. To return null for creation
     @Setter(AccessLevel.PACKAGE)
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;

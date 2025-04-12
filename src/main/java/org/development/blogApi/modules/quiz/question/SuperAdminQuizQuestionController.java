@@ -49,6 +49,6 @@ public class SuperAdminQuizQuestionController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteQuestion(@PathVariable String id) {
-        this.quizQuestionService.deleteQuestion(id);
+        this.quizQuestionService.deleteQuestionById(id);
     }
 }
