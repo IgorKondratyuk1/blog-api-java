@@ -10,10 +10,7 @@ import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePlayerProgressEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.AnswerStatus;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
-import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.GamePairNotFoundException;
-import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.NoAvailableQuestionsException;
-import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.UserAlreadyHasGamePairException;
-import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.WrongStateOfGamePairException;
+import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.AnswerRepository;
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.GamePlayerProgressRepository;
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.QuizGamePairRepository;
@@ -26,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,19 +46,30 @@ public class QuizGamePairService {
 
     private final UserService userService;
 
-
-    public Optional<GamePairEntity> getGamePairById(String gamePairId) {
-        return this.quizGamePairRepository.findById(UUID.fromString(gamePairId));
-    }
-
     public Optional<GamePairEntity> getCurrentUserGamePair(String userId) {
         return this.quizGamePairRepository.findGameByUserId(UUID.fromString(userId));
     }
 
+    public GamePairEntity getGamePairByIdAndParticipantUser(String userId, String gamePairId) {
+        GamePairEntity foundedGamePair = this.quizGamePairRepository.findById(UUID.fromString(gamePairId))
+                .orElseThrow(() -> new GamePairNotFoundException());
+
+        boolean isUserParticipateInGame =
+                Objects.equals(foundedGamePair.getFirstPlayerProgress().getPlayer().getId().toString(), userId) ||
+                Objects.equals(foundedGamePair.getSecondPlayerProgress().getPlayer().getId().toString(), userId);
+
+        // If current user not participate in game pair
+        if (!isUserParticipateInGame) {
+            throw new GamePairForbiddenException("GamePair forbidden to not owning user");
+        }
+
+        return foundedGamePair;
+    }
+
     public GamePairEntity connectUserToGamePair(String userId) {
         UserEntity user = this.userService.findById(UUID.fromString(userId));
+        Optional<GamePairEntity> activeGamePair = this.quizGamePairRepository.findGameByUserId(UUID.fromString(userId));
 
-        Optional<GamePairEntity> activeGamePair = this.getCurrentUserGamePair(userId);
         if (activeGamePair.isPresent()) {
             throw new UserAlreadyHasGamePairException(activeGamePair.get().getId().toString());
         }
@@ -110,7 +119,7 @@ public class QuizGamePairService {
 
     public AnswerEntity answerGameQuestion(String userId, AnswerQuestionDto answerQuestionDto) {
         GamePairEntity currentUserGamePair = this.getCurrentUserGamePair(userId)
-                .orElseThrow(() -> new GamePairNotFoundException());
+                .orElseThrow(() -> new GamePairForbiddenException("Forbidden to answer for question with no game pair"));
 
         if (currentUserGamePair.getStatus() != GamePairStatus.ACTIVE) {
             throw new WrongStateOfGamePairException("Can not answer the question, because game status is not \"Active\", it's " + currentUserGamePair.getStatus());
@@ -190,7 +199,7 @@ public class QuizGamePairService {
     }
 
     private void finishGame(String gamePairId) {
-        GamePairEntity gamePair = this.getGamePairById(gamePairId)
+        GamePairEntity gamePair = this.quizGamePairRepository.findById(UUID.fromString(gamePairId))
                 .orElseThrow(() -> new GamePairNotFoundException());
 
         this.calculateUserScore(gamePair.getFirstPlayerProgress(), gamePair.getSecondPlayerProgress());

@@ -66,8 +66,8 @@ public class GamePairEntity {
         gamePairEntity.setStatus(GamePairStatus.PENDING);
 
         GamePlayerProgressEntity firstPlayerProgressEntity = GamePlayerProgressEntity.createInstance(user);
-
         gamePairEntity.setFirstPlayerProgress(firstPlayerProgressEntity);
+
         return gamePairEntity;
     }
 }

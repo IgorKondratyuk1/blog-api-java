@@ -6,6 +6,7 @@ import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePlayerProgressEntity;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.entity.UserEntity;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class GamePairMapper {
             viewSecondPlayerGamePlayerProgressDto = GamePairMapper.gamePlayerProgressEntityToView(gamePairEntity.getSecondPlayerProgress());
         }
 
-        List<ViewQuestionLightDto> viewQuestionLightDtos = new ArrayList<>();
-        if (gamePairEntity.getQuestions() != null) {
+        List<ViewQuestionLightDto> viewQuestionLightDtos = null;
+        if (!CollectionUtils.isEmpty(gamePairEntity.getQuestions())) {
             viewQuestionLightDtos = gamePairEntity.getQuestions()
                     .stream()
                     .map(GamePairMapper::questionEntityToLightView)
