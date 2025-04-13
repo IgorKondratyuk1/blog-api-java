@@ -47,7 +47,7 @@ public class QuizGamePairService {
     private final UserService userService;
 
     public Optional<GamePairEntity> getCurrentUserGamePair(String userId) {
-        return this.quizGamePairRepository.findGameByUserId(UUID.fromString(userId));
+        return this.quizGamePairRepository.findGameByUserIdAndGameStatus(UUID.fromString(userId), List.of(GamePairStatus.ACTIVE, GamePairStatus.PENDING));
     }
 
     public GamePairEntity getGamePairByIdAndParticipantUser(String userId, String gamePairId) {
@@ -68,7 +68,7 @@ public class QuizGamePairService {
 
     public GamePairEntity connectUserToGamePair(String userId) {
         UserEntity user = this.userService.findById(UUID.fromString(userId));
-        Optional<GamePairEntity> activeGamePair = this.quizGamePairRepository.findGameByUserId(UUID.fromString(userId));
+        Optional<GamePairEntity> activeGamePair = this.quizGamePairRepository.findGameByUserIdAndGameStatus(user.getId(), List.of(GamePairStatus.ACTIVE, GamePairStatus.PENDING));
 
         if (activeGamePair.isPresent()) {
             throw new UserAlreadyHasGamePairException(activeGamePair.get().getId().toString());

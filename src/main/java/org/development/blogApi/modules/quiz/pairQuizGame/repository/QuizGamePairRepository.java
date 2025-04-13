@@ -1,10 +1,12 @@
 package org.development.blogApi.modules.quiz.pairQuizGame.repository;
 
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
+import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ public interface QuizGamePairRepository extends JpaRepository<GamePairEntity, UU
     @Query("SELECT gp FROM GamePairEntity gp " +
             "LEFT JOIN gp.firstPlayerProgress fp LEFT JOIN fp.player fpPlayer " +
             "LEFT JOIN gp.secondPlayerProgress sp LEFT JOIN sp.player spPlayer " +
-            "WHERE fpPlayer.id = :userId OR spPlayer.id = :userId")
-    Optional<GamePairEntity> findGameByUserId(UUID userId);
+            "WHERE gp.status IN :gamePairStatusList " +
+            "AND fpPlayer.id = :userId OR spPlayer.id = :userId")
+    Optional<GamePairEntity> findGameByUserIdAndGameStatus(UUID userId, List<GamePairStatus> gamePairStatusList);
 }
