@@ -28,10 +28,9 @@ public class QuizGamePairController {
     }
 
     @GetMapping("/{id}")
-    public ViewGamePairDto getGamePairById(@PathVariable String id) {
-        GamePairEntity foundedGamePair = this.quizGamePairService.getGamePairById(id)
-                .orElseThrow(() -> new GamePairNotFoundException());
-
+    public ViewGamePairDto getGamePairById(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                           @PathVariable String id) {
+        GamePairEntity foundedGamePair = this.quizGamePairService.getGamePairByIdAndParticipantUser(userDetails.getUserId(), id);
         return GamePairMapper.toView(foundedGamePair);
     }
 

@@ -42,4 +42,12 @@ public class GamePairExceptionHandler {
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
     }
+
+    @ExceptionHandler(GamePairForbiddenException.class)
+    public ResponseEntity<APIErrorResult> gamePairForbiddenException(GamePairForbiddenException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
 }
