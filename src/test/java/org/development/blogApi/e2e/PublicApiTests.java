@@ -202,7 +202,7 @@ public class PublicApiTests {
             );
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-            assertThat(response.getBody().getContent()).isEqualTo(createCommentDto.getContent());
+            assertThat(response.getBody().getContent()).isEqualTo(createCommentDto.content());
             assertThat(response.getBody().getLikesInfo().getLikesCount()).isEqualTo(0);
             assertThat(response.getBody().getLikesInfo().getDislikesCount()).isEqualTo(0);
             assertThat(response.getBody().getLikesInfo().getMyStatus()).isEqualTo(LikeStatus.NONE);
@@ -223,7 +223,7 @@ public class PublicApiTests {
             );
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-            assertThat(response.getBody().getContent()).isEqualTo(createCommentDto.getContent());
+            assertThat(response.getBody().getContent()).isEqualTo(createCommentDto.content());
             assertThat(response.getBody().getLikesInfo().getLikesCount()).isEqualTo(0);
             assertThat(response.getBody().getLikesInfo().getDislikesCount()).isEqualTo(0);
             assertThat(response.getBody().getLikesInfo().getMyStatus()).isEqualTo(LikeStatus.NONE);
