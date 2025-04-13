@@ -13,7 +13,7 @@ import org.development.blogApi.common.utils.SortUtil;
 import org.development.blogApi.modules.quiz.question.dto.QuestionQueryParamsDto;
 import org.development.blogApi.modules.quiz.question.dto.response.ViewQuestionDto;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
-import org.development.blogApi.modules.quiz.question.utils.QuestionMapper;
+import org.development.blogApi.modules.quiz.question.util.QuestionMapper;
 
 import java.util.ArrayList;
 import java.util.List;

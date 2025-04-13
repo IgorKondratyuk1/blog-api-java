@@ -6,9 +6,10 @@ import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionD
 import org.development.blogApi.modules.quiz.question.dto.request.UpdateQuestionPublishStatusDto;
 import org.development.blogApi.modules.quiz.question.dto.response.ViewQuestionDto;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
+import org.development.blogApi.modules.quiz.question.exceptions.QuizQuestionAlreadyInStateException;
 import org.development.blogApi.modules.quiz.question.exceptions.QuizQuestionNotFoundException;
 import org.development.blogApi.modules.quiz.question.repository.QuizQuestionRepository;
-import org.development.blogApi.modules.quiz.question.utils.QuestionMapper;
+import org.development.blogApi.modules.quiz.question.util.QuestionMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,10 @@ public class QuizQuestionService {
 
     public void updateQuestionPublishStatus(String id, UpdateQuestionPublishStatusDto updateQuestionPublishStatusDto) {
         QuizQuestionEntity quizQuestionEntity = this.quizQuestionRepository.findById(UUID.fromString(id)).orElseThrow(() -> new QuizQuestionNotFoundException());
+
+        if (updateQuestionPublishStatusDto.published() == quizQuestionEntity.getPublished()) {
+            throw new QuizQuestionAlreadyInStateException();
+        }
 
         quizQuestionEntity.setPublished(updateQuestionPublishStatusDto.published());
         this.quizQuestionRepository.save(quizQuestionEntity);

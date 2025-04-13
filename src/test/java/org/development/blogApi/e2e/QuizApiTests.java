@@ -43,11 +43,11 @@ public class QuizApiTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @BeforeAll
-    public static void beforeAll(@Autowired RoleRepository roleRepository) {
-        roleRepository.save(new RoleEntity(1, "ADMIN"));
-        roleRepository.save(new RoleEntity(2, "USER"));
-    }
+//    @BeforeAll
+//    public static void beforeAll(@Autowired RoleRepository roleRepository) {
+//        roleRepository.save(new RoleEntity(1, "ADMIN"));
+//        roleRepository.save(new RoleEntity(2, "USER"));
+//    }
 
     @Test
     @DisplayName("Create Users By SA")
