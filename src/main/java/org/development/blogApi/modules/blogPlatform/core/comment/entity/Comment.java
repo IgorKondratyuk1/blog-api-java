@@ -54,7 +54,7 @@ public class Comment {
         return new Comment(
                 UUID.randomUUID(),
                 LocalDateTime.now(),
-                createCommentDto.getContent(),
+                createCommentDto.content(),
                 user,
                 post
         );

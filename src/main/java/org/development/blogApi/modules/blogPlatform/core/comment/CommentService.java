@@ -62,7 +62,7 @@ public class CommentService {
             throw new CommentUpdateForbiddenException("User can not update not his comment");
         }
 
-        comment.setContent(updateCommentDto.getContent());
+        comment.setContent(updateCommentDto.content());
         commentRepository.save(comment);
     }
 

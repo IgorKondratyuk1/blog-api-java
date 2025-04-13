@@ -44,6 +44,7 @@ public class SuperAdminQuizQuestionController {
     public void updateQuestionPublishStatus(@PathVariable String id,
                                             @RequestBody @Valid UpdateQuestionPublishStatusDto updateQuestionPublishStatusDto
     ) {
+        // TODO find how to improve
         this.quizQuestionService.updateQuestionPublishStatus(id, updateQuestionPublishStatusDto);
     }
 

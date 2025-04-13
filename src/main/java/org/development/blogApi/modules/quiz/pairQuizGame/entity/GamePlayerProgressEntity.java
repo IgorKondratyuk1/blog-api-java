@@ -21,7 +21,7 @@ public class GamePlayerProgressEntity {
     @Setter(AccessLevel.PACKAGE)
     private UUID id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_player_progress_id")
     private List<AnswerEntity> answers = new ArrayList<>();
 

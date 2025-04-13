@@ -1,4 +1,4 @@
-package org.development.blogApi.modules.quiz.question.utils;
+package org.development.blogApi.modules.quiz.question.util;
 
 import org.development.blogApi.modules.quiz.question.dto.response.ViewQuestionDto;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
