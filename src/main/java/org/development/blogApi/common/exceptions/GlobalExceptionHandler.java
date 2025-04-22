@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<APIErrorResult> handleRuntimeException(RuntimeException exception) {
-        log.error("GlobalExceptionHandler Exception");
+        log.error("GlobalExceptionHandler caught error:", exception);
         exception.printStackTrace();
 
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), "Oops, something went wrong");

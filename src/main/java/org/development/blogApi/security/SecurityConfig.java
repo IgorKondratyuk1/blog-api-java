@@ -1,5 +1,7 @@
 package org.development.blogApi.security;
 
+import lombok.RequiredArgsConstructor;
+import org.development.blogApi.logs.LoggingFilter;
 import org.development.blogApi.security.exceptionHandlers.CustomAuthenticationEntryPoint;
 import org.development.blogApi.security.filters.JwtAccessAuthFilter;
 import org.development.blogApi.security.filters.JwtRefreshAuthFilter;
@@ -19,26 +21,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableAsync
 public class SecurityConfig {
     private final CustomBasicAuthProvider customBasicAuthProvider;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAccessAuthFilter jwtAccessAuthFilter;
     private final JwtRefreshAuthFilter jwtRefreshAuthFilter;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
-    @Autowired
-    public SecurityConfig(JwtAccessAuthFilter jwtAccessAuthFilter,
-                          JwtRefreshAuthFilter jwtRefreshAuthFilter,
-                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-                          CustomBasicAuthProvider customBasicAuthProvider) {
-        this.jwtAccessAuthFilter = jwtAccessAuthFilter;
-        this.jwtRefreshAuthFilter = jwtRefreshAuthFilter;
-        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
-        this.customBasicAuthProvider = customBasicAuthProvider;
-    }
+    private final LoggingFilter loggingFilter;
 
     @Bean
     @Order(1)
