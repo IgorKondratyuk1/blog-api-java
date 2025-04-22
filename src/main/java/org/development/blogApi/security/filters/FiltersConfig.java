@@ -1,5 +1,6 @@
 package org.development.blogApi.security.filters;
 
+import org.development.blogApi.logs.LoggingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ public class FiltersConfig {
     public FilterRegistrationBean<RateLimitFilter> rateFilter(RateLimitFilter rateLimitingFilter) {
         FilterRegistrationBean<RateLimitFilter> registrationBean = new FilterRegistrationBean<>(rateLimitingFilter);
         registrationBean.setEnabled(true);
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         registrationBean.addUrlPatterns(
                 "/api/auth/login",
                 "/api/auth/registration",
@@ -30,6 +31,14 @@ public class FiltersConfig {
                 "/api/posts",
                 "/api/posts/*"
         );
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<LoggingFilter> logFilter(LoggingFilter loggingFilter) {
+        FilterRegistrationBean<LoggingFilter> registrationBean = new FilterRegistrationBean<>(loggingFilter);
+        registrationBean.setEnabled(true);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registrationBean;
     }
 

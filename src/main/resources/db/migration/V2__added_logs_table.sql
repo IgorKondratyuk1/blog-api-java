@@ -1,0 +1,2 @@
+create table http_logs (id bigint not null, correlation_id varchar(255), method varchar(255), request_body TEXT, request_time timestamp(6), response_body TEXT, response_status integer not null, response_time timestamp(6), uri varchar(255), primary key (id));
+create sequence "http_logs_seq" start with 1 increment by 1;
