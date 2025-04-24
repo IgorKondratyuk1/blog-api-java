@@ -22,4 +22,11 @@ public interface QuizGamePairRepository extends JpaRepository<GamePairEntity, UU
             "WHERE gp.status IN :gamePairStatusList " +
             "AND fpPlayer.id = :userId OR spPlayer.id = :userId")
     Optional<GamePairEntity> findGameByUserIdAndGameStatus(UUID userId, List<GamePairStatus> gamePairStatusList);
+
+    @Query("SELECT gp FROM GamePairEntity gp " +
+            "LEFT JOIN gp.firstPlayerProgress fp LEFT JOIN fp.player fpPlayer " +
+            "LEFT JOIN gp.secondPlayerProgress sp LEFT JOIN sp.player spPlayer " +
+            "WHERE gp.id = :gamePairId " +
+            "AND fpPlayer.id = :userId OR spPlayer.id = :userId")
+    Optional<GamePairEntity> findGameByUserIdAndGameId(UUID userId, UUID gamePairId);
 }

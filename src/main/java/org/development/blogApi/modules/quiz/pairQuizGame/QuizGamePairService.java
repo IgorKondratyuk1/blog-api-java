@@ -54,9 +54,8 @@ public class QuizGamePairService {
         GamePairEntity foundedGamePair = this.quizGamePairRepository.findById(UUID.fromString(gamePairId))
                 .orElseThrow(() -> new GamePairNotFoundException());
 
-        boolean isUserParticipateInGame =
-                Objects.equals(foundedGamePair.getFirstPlayerProgress().getPlayer().getId().toString(), userId) ||
-                Objects.equals(foundedGamePair.getSecondPlayerProgress().getPlayer().getId().toString(), userId);
+        Optional<GamePairEntity> gamePairEntityByUser = this.quizGamePairRepository.findGameByUserIdAndGameId(UUID.fromString(userId), UUID.fromString(gamePairId));
+        boolean isUserParticipateInGame = gamePairEntityByUser.isPresent();
 
         // If current user not participate in game pair
         if (!isUserParticipateInGame) {
