@@ -30,11 +30,19 @@ public class AuthExceptionHandler {
     }
 
     // For wrong jwt and when jwt signature does not match
-    @ExceptionHandler({ SignatureException.class, MalformedJwtException.class })
-    public ResponseEntity<APIErrorResult> signatureException() {
-        log.error("AuthExceptionHandler SignatureException");
+    @ExceptionHandler({SignatureException.class, MalformedJwtException.class})
+    public ResponseEntity<APIErrorResult> signatureException(RuntimeException exception) {
+        log.error("AuthExceptionHandler SignatureException", exception);
 
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), "Wrong jwt signature");
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
+        return ResponseEntity
+                .status(apiErrorResult.statusCode)
+                .body(apiErrorResult);
+    }
+
+    @ExceptionHandler(JwtTokenException.class)
+    public ResponseEntity<APIErrorResult> jwtTokenException(JwtTokenException exception) {
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);

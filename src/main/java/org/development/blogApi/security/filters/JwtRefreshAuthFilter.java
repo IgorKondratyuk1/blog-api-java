@@ -62,6 +62,10 @@ public class JwtRefreshAuthFilter extends OncePerRequestFilter {
                 throw new AuthException("Refresh token is not found");
             }
 
+            if (!jwtService.isTokenValid(refreshToken)) {
+                throw new AuthException("Refresh token is not valid");
+            }
+
             if (jwtService.isTokenExpired(refreshToken)) {
                 throw new AuthException("Refresh token is expired");
             }
@@ -78,8 +82,8 @@ public class JwtRefreshAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
             CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
-            if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-                throw new AuthException("Refresh token is not valid");
+            if (!jwtService.isTokenRelatedToUser(refreshToken, userDetails)) {
+                throw new AuthException("Refresh token is not related to user");
             }
 
             // Search security device due to device session management (connect with logout)

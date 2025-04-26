@@ -11,8 +11,6 @@ import org.development.blogApi.security.CustomUserDetails;
 import org.development.blogApi.modules.securityDevice.exceptions.SecurityDeviceNotFoundException;
 import org.development.blogApi.security.JwtService;
 import org.development.blogApi.modules.securityDevice.SecurityDeviceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -55,6 +52,12 @@ public class JwtAccessAuthFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+
+        if (!jwtService.isTokenValid(jwt)) {
+            log.info("Token is not valid");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (jwtService.isTokenExpired(jwt)) {
             log.info("Token is expired");
@@ -90,8 +93,8 @@ public class JwtAccessAuthFilter extends OncePerRequestFilter {
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
-        if (!jwtService.isTokenValid(jwt, userDetails)) {
-            log.info("Token is not valid");
+        if (!jwtService.isTokenRelatedToUser(jwt, userDetails)) {
+            log.info("Token is not related to user");
             filterChain.doFilter(request, response);
             return;
         }
