@@ -67,7 +67,7 @@ public class GetUserFromJwtAspect {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(usernameOrEmail);
             CustomUserDetails customUserDetails = new CustomUserDetails(userDetails, userId, deviceId, lastActiveDate);
 
-            if (!jwtService.isTokenValid(jwt, userDetails)) {
+            if (!jwtService.isTokenRelatedToUser(jwt, userDetails)) {
                 return;
             }
 

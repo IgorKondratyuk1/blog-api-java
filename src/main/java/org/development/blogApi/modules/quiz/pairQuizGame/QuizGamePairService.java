@@ -47,7 +47,7 @@ public class QuizGamePairService {
     private final UserService userService;
 
     public Optional<GamePairEntity> getCurrentUserGamePair(String userId) {
-        return this.quizGamePairRepository.findGameByUserIdAndGameStatus(UUID.fromString(userId), List.of(GamePairStatus.ACTIVE, GamePairStatus.PENDING));
+        return this.quizGamePairRepository.findGameByUserIdAndGameStatus(UUID.fromString(userId), List.of(GamePairStatus.ACTIVE));
     }
 
     public GamePairEntity getGamePairByIdAndParticipantUser(String userId, String gamePairId) {
