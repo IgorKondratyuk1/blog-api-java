@@ -40,14 +40,6 @@ public class AuthExceptionHandler {
                 .body(apiErrorResult);
     }
 
-    @ExceptionHandler(JwtTokenException.class)
-    public ResponseEntity<APIErrorResult> jwtTokenException(JwtTokenException exception) {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
-        return ResponseEntity
-                .status(apiErrorResult.statusCode)
-                .body(apiErrorResult);
-    }
-
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<APIErrorResult> authException(AuthException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
