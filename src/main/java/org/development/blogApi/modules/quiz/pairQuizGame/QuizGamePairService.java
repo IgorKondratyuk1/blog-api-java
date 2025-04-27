@@ -220,6 +220,30 @@ public class QuizGamePairService {
     }
 
     // Calculate only in the end of the game, when all questions have been answered
+//    private int calculateAdditionalUserPoints(GamePlayerProgressEntity calculatedUserGameProgress, GamePlayerProgressEntity otherUserGameProgress) {
+//        long correctUserAnswersQuantity = this.getCorrectUserAnswersScore(calculatedUserGameProgress);
+//
+//        if (correctUserAnswersQuantity == 0) {
+//            return 0;
+//        }
+//
+//        boolean isUserAnsweredAllQuestionsFasterThanOther = true;
+//
+//        for (int i = 0; i < calculatedUserGameProgress.getAnswers().size(); i++) {
+//            AnswerEntity currentUserAnswer = calculatedUserGameProgress.getAnswers().get(i);
+//            AnswerEntity otherUserAnswer = otherUserGameProgress.getAnswers().get(i);
+//
+//            boolean isAnsweredFasterForCurrentQuestion = currentUserAnswer.getAddedAt().isBefore(otherUserAnswer.getAddedAt());
+//            if (!isAnsweredFasterForCurrentQuestion) {
+//                isUserAnsweredAllQuestionsFasterThanOther = false;
+//                break;
+//            }
+//        }
+//
+//        return isUserAnsweredAllQuestionsFasterThanOther ? 1 : 0;
+//    }
+
+    // Answered first for last question
     private int calculateAdditionalUserPoints(GamePlayerProgressEntity calculatedUserGameProgress, GamePlayerProgressEntity otherUserGameProgress) {
         long correctUserAnswersQuantity = this.getCorrectUserAnswersScore(calculatedUserGameProgress);
 
@@ -227,18 +251,9 @@ public class QuizGamePairService {
             return 0;
         }
 
-        boolean isUserAnsweredAllQuestionsFasterThanOther = true;
-
-        for (int i = 0; i < calculatedUserGameProgress.getAnswers().size(); i++) {
-            AnswerEntity currentUserAnswer = calculatedUserGameProgress.getAnswers().get(i);
-            AnswerEntity otherUserAnswer = otherUserGameProgress.getAnswers().get(i);
-
-            boolean isAnsweredFasterForCurrentQuestion = currentUserAnswer.getAddedAt().isBefore(otherUserAnswer.getAddedAt());
-            if (!isAnsweredFasterForCurrentQuestion) {
-                isUserAnsweredAllQuestionsFasterThanOther = false;
-                break;
-            }
-        }
+        AnswerEntity currentUserAnswer = calculatedUserGameProgress.getAnswers().get(calculatedUserGameProgress.getAnswers().size() - 1);
+        AnswerEntity otherUserAnswer = otherUserGameProgress.getAnswers().get(calculatedUserGameProgress.getAnswers().size() - 1);
+        boolean isUserAnsweredAllQuestionsFasterThanOther = currentUserAnswer.getAddedAt().isBefore(otherUserAnswer.getAddedAt());
 
         return isUserAnsweredAllQuestionsFasterThanOther ? 1 : 0;
     }
