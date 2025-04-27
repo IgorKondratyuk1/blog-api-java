@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface QuizQuestionRepository extends JpaRepository<QuizQuestionEntity, UUID> {
 
-    @Query(value = "SELECT * FROM quiz_question t WHERE t.published = TRUE ORDER BY RANDOM() LIMIT :quantity", nativeQuery = true)
+    @Query(value = "SELECT * FROM (SELECT * FROM quiz_question t WHERE t.published = TRUE ORDER BY RANDOM() LIMIT :quantity) ot ORDER BY ot.created_at", nativeQuery = true)
     List<QuizQuestionEntity> findRandomQuestionsByQuantity(int quantity);
 }
