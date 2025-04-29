@@ -3,10 +3,7 @@ package org.development.blogApi.modules.quiz.pairQuizGame.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.common.utils.PaginationUtil;
 import org.development.blogApi.common.utils.SortUtil;
@@ -40,10 +37,22 @@ public class QuizGamePairQueryRepositoryCustomImpl implements QuizGamePairQueryR
         Predicate filterPredicate = getFilters(gamePairEntityRoot, userId);
         criteriaQuery.where(filterPredicate);
 
-        if (sortValue.equals("ASC")) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(SortUtil.getNestedPath(gamePairEntityRoot, queryParamsDto.getSortBy())));
+        String DEFAULT_ORDER_FIELD = "pairCreatedDate";
+
+        String sortBy = queryParamsDto.getSortBy();
+        Path<?> sortPath = SortUtil.getNestedPath(gamePairEntityRoot, sortBy);
+        Path<?> defaultPath = SortUtil.getNestedPath(gamePairEntityRoot, DEFAULT_ORDER_FIELD);
+
+        Order fieldOrder = sortValue.equalsIgnoreCase("ASC")
+                ? criteriaBuilder.asc(sortPath)
+                : criteriaBuilder.desc(sortPath);
+
+        Order defaultOrder = criteriaBuilder.desc(defaultPath);
+
+        if (DEFAULT_ORDER_FIELD.equals(sortBy)) {
+            criteriaQuery.orderBy(fieldOrder);
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(SortUtil.getNestedPath(gamePairEntityRoot, queryParamsDto.getSortBy())));
+            criteriaQuery.orderBy(fieldOrder, defaultOrder);
         }
 
         TypedQuery<GamePairEntity> query = entityManager.createQuery(criteriaQuery);
