@@ -5,15 +5,14 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.request.AnswerQuestionDto;
+import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewMyStatisticDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.AnswerEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePlayerProgressEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.AnswerStatus;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
 import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.*;
-import org.development.blogApi.modules.quiz.pairQuizGame.repository.AnswerRepository;
-import org.development.blogApi.modules.quiz.pairQuizGame.repository.GamePlayerProgressRepository;
-import org.development.blogApi.modules.quiz.pairQuizGame.repository.QuizGamePairRepository;
+import org.development.blogApi.modules.quiz.pairQuizGame.repository.*;
 import org.development.blogApi.modules.quiz.question.QuizQuestionService;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.UserService;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,6 +61,83 @@ public class QuizGamePairService {
         }
 
         return foundedGamePair;
+    }
+
+    public ViewMyStatisticDto getCurrentUserStatistic(String userId) {
+        List<GamePairEntity> gamePairEntities = this.quizGamePairRepository.findAllGameByUserId(UUID.fromString(userId));
+
+        int sumScore = this.gamePlayerProgressRepository.getSumScoreOfAllPlayerGames(UUID.fromString(userId));
+        double avgScores = this.gamePlayerProgressRepository.getAvgScoreOfAllPlayerGames(UUID.fromString(userId));
+        int gamesCount = this.gamePlayerProgressRepository.getGamesCountOfAllPlayerGames(UUID.fromString(userId));
+
+        int winsCount = this.getAllWinsCountByUserId(gamePairEntities, userId);
+        int lossesCount = this.getAllLossesCountByUserId(gamePairEntities, userId);
+        int drawsCount = this.getAllDrawsCountByUserId(gamePairEntities, userId);
+
+        return new ViewMyStatisticDto(
+                sumScore,
+                avgScores,
+                gamesCount,
+                winsCount,
+                lossesCount,
+                drawsCount
+        );
+    }
+
+    private int getAllWinsCountByUserId(List<GamePairEntity> gamePairEntities, String userId) {
+        UUID userUUID = UUID.fromString(userId);
+
+        return (int) gamePairEntities
+                .stream()
+                .filter(
+                        gamePair -> {
+                            var first = gamePair.getFirstPlayerProgress();
+                            var second = gamePair.getSecondPlayerProgress();
+
+                            boolean isUserFirst = first.getPlayer().getId().equals(userUUID);
+                            int userScore = isUserFirst ? first.getScore() : second.getScore();
+                            int opponentScore = isUserFirst ? second.getScore() : first.getScore();
+
+                            return userScore > opponentScore;
+                        }
+                )
+                .count();
+    }
+
+    private int getAllLossesCountByUserId(List<GamePairEntity> gamePairEntities, String userId) {
+        UUID userUUID = UUID.fromString(userId);
+
+        return (int) gamePairEntities
+                .stream()
+                .filter(
+                        gamePair -> {
+                            var first = gamePair.getFirstPlayerProgress();
+                            var second = gamePair.getSecondPlayerProgress();
+
+                            boolean isUserFirst = first.getPlayer().getId().equals(userUUID);
+                            int userScore = isUserFirst ? first.getScore() : second.getScore();
+                            int opponentScore = isUserFirst ? second.getScore() : first.getScore();
+
+                            return userScore < opponentScore;
+                        }
+                )
+                .count();
+    }
+
+    private int getAllDrawsCountByUserId(List<GamePairEntity> gamePairEntities, String userId) {
+        UUID userUUID = UUID.fromString(userId);
+
+        return (int) gamePairEntities
+                .stream()
+                .filter(
+                        gamePair -> {
+                            var first = gamePair.getFirstPlayerProgress();
+                            var second = gamePair.getSecondPlayerProgress();
+
+                            return first.getScore() == second.getScore();
+                        }
+                )
+                .count();
     }
 
     public GamePairEntity connectUserToGamePair(String userId) {

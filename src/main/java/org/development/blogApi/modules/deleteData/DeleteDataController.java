@@ -8,7 +8,6 @@ import org.development.blogApi.modules.blogPlatform.core.post.repository.PostRep
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.QuizGamePairRepository;
 import org.development.blogApi.modules.quiz.question.repository.QuizQuestionRepository;
 import org.development.blogApi.modules.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
