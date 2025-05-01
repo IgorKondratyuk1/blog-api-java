@@ -83,7 +83,8 @@ public class SecurityConfig {
                         "/api/posts/*/like-status",
                         "/api/blogger/**",
                         "/api/comments/**",
-                        "/api/pair-game-quiz/**")
+                        "/api/pair-game-quiz/pairs/**",
+                        "/api/pair-game-quiz/users/my-statistics")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
