@@ -4,8 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.development.blogApi.common.dto.PaginationDto;
+import org.development.blogApi.common.utils.PaginationUtil;
+import org.development.blogApi.modules.quiz.pairQuizGame.dto.TopUsersQueryParams;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.request.AnswerQuestionDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewMyStatisticDto;
+import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewPlayerDto;
+import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewUserStatisticDto;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.AnswerEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePlayerProgressEntity;
@@ -13,6 +18,7 @@ import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.AnswerStat
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.enums.GamePairStatus;
 import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.*;
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.*;
+import org.development.blogApi.modules.quiz.pairQuizGame.utils.SortStatisticUtil;
 import org.development.blogApi.modules.quiz.question.QuizQuestionService;
 import org.development.blogApi.modules.quiz.question.entity.QuizQuestionEntity;
 import org.development.blogApi.modules.user.UserService;
@@ -21,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,6 +68,47 @@ public class QuizGamePairService {
         }
 
         return foundedGamePair;
+    }
+
+    public PaginationDto<ViewUserStatisticDto> getTopUsersStatistic(TopUsersQueryParams topUsersQueryParams) {
+        List<ViewUserStatisticDto> allUsersStatisticDtos = new ArrayList<>();
+        List<UUID> uniqueAllPlayerIds = this.gamePlayerProgressRepository.findAllUniquePlayerIds();
+
+        uniqueAllPlayerIds.forEach(id -> {
+            ViewMyStatisticDto userStatistic = this.getCurrentUserStatistic(id.toString());
+            UserEntity user = this.userService.findById(id);
+            ViewPlayerDto playerDto = new ViewPlayerDto(user.getId().toString(), user.getLogin());
+
+            allUsersStatisticDtos.add(new ViewUserStatisticDto(
+                    userStatistic.sumScore(),
+                    userStatistic.avgScores(),
+                    userStatistic.gamesCount(),
+                    userStatistic.winsCount(),
+                    userStatistic.lossesCount(),
+                    userStatistic.drawsCount(),
+                    playerDto
+            ));
+        });
+
+        SortStatisticUtil.sortListByFields(allUsersStatisticDtos, topUsersQueryParams.getSortBy());
+
+        int skipValue = PaginationUtil.getSkipValue(topUsersQueryParams.getPageNumber(), topUsersQueryParams.getPageSize());
+        System.out.println("skipValue " + skipValue);
+        Long totalCount = Long.valueOf(uniqueAllPlayerIds.size());
+        int pagesCount = PaginationUtil.getPagesCount(totalCount, topUsersQueryParams.getPageSize());
+
+        List<ViewUserStatisticDto> usersStatisticDtosPage = new ArrayList<>();
+        if (allUsersStatisticDtos.size() > skipValue) {
+            int lastPageElementIndex = Math.min(allUsersStatisticDtos.size(), skipValue + topUsersQueryParams.getPageSize());
+            System.out.println("lastPageElementIndex " + lastPageElementIndex);
+            usersStatisticDtosPage = allUsersStatisticDtos.subList(skipValue, lastPageElementIndex);
+        }
+
+        return new PaginationDto<>(pagesCount,
+                topUsersQueryParams.getPageNumber(),
+                topUsersQueryParams.getPageSize(),
+                totalCount,
+                usersStatisticDtosPage);
     }
 
     public ViewMyStatisticDto getCurrentUserStatistic(String userId) {
