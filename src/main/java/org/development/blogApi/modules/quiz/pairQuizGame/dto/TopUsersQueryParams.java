@@ -15,11 +15,11 @@ public class TopUsersQueryParams {
     @Min(1)
     private Integer pageSize = 10;
 
-    private List<String> sortBy = List.of("avgScores desc", "sort=sumScore desc");
+    private List<String> sort = List.of("avgScores desc", "sort=sumScore desc");
 
-    public TopUsersQueryParams(Integer pageNumber, Integer pageSize, List<String> sortBy) {
+    public TopUsersQueryParams(Integer pageNumber, Integer pageSize, List<String> sort) {
         this.pageNumber = pageNumber == null ? 1 : pageNumber;
         this.pageSize = pageSize == null ? 10 : pageSize;
-        this.sortBy = sortBy == null ? List.of("avgScores desc", "sort=sumScore desc") : sortBy;
+        this.sort = sort == null ? List.of("avgScores desc", "sort=sumScore desc") : sort;
     }
 }
