@@ -90,7 +90,7 @@ public class QuizGamePairService {
             ));
         });
 
-        SortStatisticUtil.sortListByFields(allUsersStatisticDtos, topUsersQueryParams.getSortBy());
+        SortStatisticUtil.sortListByFields(allUsersStatisticDtos, topUsersQueryParams.getSort());
 
         int skipValue = PaginationUtil.getSkipValue(topUsersQueryParams.getPageNumber(), topUsersQueryParams.getPageSize());
         System.out.println("skipValue " + skipValue);
