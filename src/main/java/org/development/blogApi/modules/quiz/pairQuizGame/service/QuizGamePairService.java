@@ -1,4 +1,4 @@
-package org.development.blogApi.modules.quiz.pairQuizGame;
+package org.development.blogApi.modules.quiz.pairQuizGame.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -34,22 +34,19 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class QuizGamePairService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     private final QuizGamePairRepository quizGamePairRepository;
-
     private final QuizQuestionService quizQuestionService;
-
     private final GamePlayerProgressRepository gamePlayerProgressRepository;
-
     private final AnswerRepository answerRepository;
-
     private final UserService userService;
+    private final QuizGamePairEventService quizGamePairEventService;
 
     public Optional<GamePairEntity> getCurrentUserGamePair(String userId) {
         return this.quizGamePairRepository.findGameByUserIdAndGameStatus(UUID.fromString(userId), List.of(GamePairStatus.ACTIVE, GamePairStatus.PENDING));
@@ -196,7 +193,6 @@ public class QuizGamePairService {
             throw new UserAlreadyHasGamePairException(activeGamePair.get().getId().toString());
         }
 
-        // TODO check
         Optional<GamePairEntity> gamePairWithOnePlayerOptional = this.quizGamePairRepository.findGameWithOnePlayer();
 
         GamePairEntity gamePair;
@@ -249,9 +245,14 @@ public class QuizGamePairService {
 
         AnswerEntity answeredQuestion = this.answerGameQuestionByUser(currentUserGamePair, userId, answerQuestionDto);
 
-        boolean isAllQuestionsInGameAnswered = this.isAllQuestionsInGameAnswered(currentUserGamePair);
+        boolean isAllQuestionsInGameAnswered = this.isAllQuestionsInGameAnsweredByBothUsers(currentUserGamePair);
         if (isAllQuestionsInGameAnswered) {
             this.finishGame(currentUserGamePair.getId().toString());
+        }
+
+        boolean isCurrentUserAnswerAllQuestions = this.isAllQuestionsInGameAnsweredByOneUser(currentUserGamePair, UUID.fromString(userId));
+        if (isCurrentUserAnswerAllQuestions) {
+            this.quizGamePairEventService.triggerUserFinishQuizGame(currentUserGamePair.getId());
         }
 
         return answeredQuestion;
@@ -302,13 +303,11 @@ public class QuizGamePairService {
         }
         this.gamePlayerProgressRepository.save(currentGamePlayerProgress);
 
-        System.out.println("need save");
         entityManager.flush();
-
         return savedAnswerEntity;
     }
 
-    private boolean isAllQuestionsInGameAnswered(GamePairEntity gamePair) {
+    private boolean isAllQuestionsInGameAnsweredByBothUsers(GamePairEntity gamePair) {
         int gameQuestionsSize = gamePair.getQuestions().size();
         int firstPlayerAnswersSize = gamePair.getFirstPlayerProgress().getAnswers().size();
         int secondPlayerAnswersSize = gamePair.getSecondPlayerProgress().getAnswers().size();
@@ -320,9 +319,34 @@ public class QuizGamePairService {
         return false;
     }
 
-    private void finishGame(String gamePairId) {
+    private boolean isAllQuestionsInGameAnsweredByOneUser(GamePairEntity gamePair, UUID userId) {
+        int gameQuestionsSize = gamePair.getQuestions().size();
+        GamePlayerProgressEntity checkingPlayerProgress = null;
+
+        UserEntity firstPlayer = gamePair.getFirstPlayerProgress().getPlayer();
+        if (firstPlayer.getId().equals(userId)) {
+            checkingPlayerProgress = gamePair.getFirstPlayerProgress();
+        }
+
+        UserEntity secondPlayer = gamePair.getSecondPlayerProgress().getPlayer();
+        if (secondPlayer.getId().equals(userId)) {
+            checkingPlayerProgress = gamePair.getSecondPlayerProgress();
+        }
+
+        int playerAnswersSize = checkingPlayerProgress.getAnswers().size();
+        if (gameQuestionsSize == playerAnswersSize) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void finishGame(String gamePairId) {
         GamePairEntity gamePair = this.quizGamePairRepository.findById(UUID.fromString(gamePairId))
-                .orElseThrow(() -> new GamePairNotFoundException());
+                .orElseThrow(() -> {
+                    System.out.println("GamePairNotFoundException: " + gamePairId);
+                    return new GamePairNotFoundException();
+                });
 
         this.calculateUserScore(gamePair.getFirstPlayerProgress(), gamePair.getSecondPlayerProgress());
         this.calculateUserScore(gamePair.getSecondPlayerProgress(), gamePair.getFirstPlayerProgress());
@@ -350,8 +374,19 @@ public class QuizGamePairService {
             return 0;
         }
 
+        // If questions size is less than in other user. Mean that current user didn't answer to all questions
+        if (calculatedUserGameProgress.getAnswers().size() < otherUserGameProgress.getAnswers().size()) {
+            return 0;
+        }
+
+        // If questions size is more than in other user. Mean that other user didn't answer to all questions
+        if (calculatedUserGameProgress.getAnswers().size() > otherUserGameProgress.getAnswers().size()) {
+            return 1;
+        }
+
+        // If answers size is equal
         AnswerEntity currentUserAnswer = calculatedUserGameProgress.getAnswers().get(calculatedUserGameProgress.getAnswers().size() - 1);
-        AnswerEntity otherUserAnswer = otherUserGameProgress.getAnswers().get(calculatedUserGameProgress.getAnswers().size() - 1);
+        AnswerEntity otherUserAnswer = otherUserGameProgress.getAnswers().get(otherUserGameProgress.getAnswers().size() - 1);
         boolean isUserAnsweredAllQuestionsFasterThanOther = currentUserAnswer.getAddedAt().isBefore(otherUserAnswer.getAddedAt());
 
         return isUserAnsweredAllQuestionsFasterThanOther ? 1 : 0;
