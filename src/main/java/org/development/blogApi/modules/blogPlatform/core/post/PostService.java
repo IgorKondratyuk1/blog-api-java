@@ -76,7 +76,7 @@ public class PostService {
             throw new IncorrectPostDataException("Can not update post with wrong user id");
         }
 
-        Blog blog = blogsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new BlogNotFoundException());
+        Blog blog = blogsRepository.findById(UUID.fromString(blogId)).orElseThrow(() -> new BlogNotFoundException());
         if (!post.getBlog().getId().toString().equals(blogId)) {
             throw new IncorrectPostDataException("Can not update with wrong blog id");
         }
