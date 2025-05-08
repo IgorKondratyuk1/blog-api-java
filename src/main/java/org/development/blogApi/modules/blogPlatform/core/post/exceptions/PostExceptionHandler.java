@@ -29,7 +29,7 @@ public class PostExceptionHandler {
 
     @ExceptionHandler(IncorrectPostDataException.class)
     public ResponseEntity<APIErrorResult> incorrectPostDataException(IncorrectPostDataException exception) {
-        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
+        APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
                 .body(apiErrorResult);
