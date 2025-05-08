@@ -70,15 +70,15 @@ public class PostService {
     }
 
     public void updateWithBlogId(String userId, String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
-        Blog blog = blogsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new BlogNotFoundException());
+//        Blog blog = blogsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new BlogNotFoundException());
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
-
-        if (!post.getBlog().getId().toString().equals(blogId)) {
-            throw new IncorrectPostDataException("Can not update with wrong blog id");
-        }
 
         if (!post.getUser().getId().toString().equals(userId)) {
             throw new IncorrectPostDataException("Can not update post with wrong user id");
+        }
+
+        if (!post.getBlog().getId().toString().equals(blogId)) {
+            throw new IncorrectPostDataException("Can not update with wrong blog id");
         }
 
         post.updatePost(updatePostDto);
