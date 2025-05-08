@@ -3,6 +3,7 @@ package org.development.blogApi.modules.blogPlatform.core.blog;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.entity.Blog;
+import org.development.blogApi.modules.blogPlatform.core.blog.exceptions.BlogChangeForbiddenException;
 import org.development.blogApi.modules.blogPlatform.core.blog.repository.BlogRepository;
 import org.development.blogApi.modules.blogPlatform.core.blog.exceptions.BlogNotFoundException;
 import org.development.blogApi.modules.user.exceptions.UserNotFoundException;
@@ -45,7 +46,7 @@ public class BlogService {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Cannot update a blog that does not belong to the user");
+            throw new BlogChangeForbiddenException("Cannot update a blog that does not belong to the user");
         }
 
         blog.updateBlog(updateBlogDto);
@@ -64,7 +65,7 @@ public class BlogService {
         Blog blog = this.blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (!blog.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Cannot delete a blog that does not belong to the user");
+            throw new BlogChangeForbiddenException("Cannot delete a blog that does not belong to the user");
         }
 
         this.blogsRepository.deleteById(blogId);
@@ -79,7 +80,7 @@ public class BlogService {
         Blog blog = blogsRepository.findById(blogId).orElseThrow(() -> new BlogNotFoundException());
 
         if (blog.getUser().getId() != null) {
-            throw new RuntimeException("blog is already bounded");
+            throw new BlogChangeForbiddenException("blog is already bounded");
         }
 
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());

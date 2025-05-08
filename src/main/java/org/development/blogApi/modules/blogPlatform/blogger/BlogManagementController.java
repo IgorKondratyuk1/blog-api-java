@@ -1,6 +1,7 @@
 package org.development.blogApi.modules.blogPlatform.blogger;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.response.ViewBlogDto;
@@ -27,28 +28,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/blogger/blogs")
 public class BlogManagementController {
+
     private final BlogService blogService;
     private final PostService postService;
     private final BlogQueryRepository blogQueryRepository;
     private final PostQueryRepository postQueryRepository;
     private final CommentQueryRepository commentQueryRepository;
-
-    @Autowired
-    public BlogManagementController(
-            BlogService blogService,
-            PostService postService,
-            BlogQueryRepository blogQueryRepository,
-            PostQueryRepository postQueryRepository,
-            CommentQueryRepository commentQueryRepository) {
-        this.blogService = blogService;
-        this.postService = postService;
-        this.blogQueryRepository = blogQueryRepository;
-        this.postQueryRepository = postQueryRepository;
-        this.commentQueryRepository = commentQueryRepository;
-    }
 
     @GetMapping("")
     public PaginationDto<ViewBlogDto> findUserBlogs(CommonQueryParamsDto commonQueryParamsDto,
@@ -57,6 +46,7 @@ public class BlogManagementController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public ViewBlogDto createBlog(@RequestBody @Valid CreateBlogDto createBlogDto,
                                   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Blog blog = blogService.create(UUID.fromString(customUserDetails.getUserId()), createBlogDto);
@@ -66,8 +56,8 @@ public class BlogManagementController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBlog(@PathVariable String id,
-                                        @RequestBody @Valid UpdateBlogDto updateBlogDto,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                           @RequestBody @Valid UpdateBlogDto updateBlogDto,
+                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         blogService.update(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(id), updateBlogDto);
     }
 
@@ -78,16 +68,15 @@ public class BlogManagementController {
     }
 
     @PostMapping("/{blogId}/posts")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public ViewPostDto createPostOfBlog(@PathVariable String blogId,
-                                              @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto,
-                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                        @RequestBody @Valid CreatePostOfBlogDto createPostOfBlogDto,
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Post createdPost = postService.create(UUID.fromString(customUserDetails.getUserId()), UUID.fromString(blogId), createPostOfBlogDto);
         return PostMapper.toView(createdPost);
     }
 
     @GetMapping("/{blogId}/posts")
-    @ResponseStatus(HttpStatus.OK)
     public PaginationDto<ViewPostDto> findUserPosts(@PathVariable String blogId,
                                                     CommonQueryParamsDto commonQueryParamsDto,
                                                     @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -97,24 +86,23 @@ public class BlogManagementController {
     @PutMapping("/{blogId}/posts/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePost(@PathVariable String blogId,
-                                        @PathVariable String postId,
-                                        @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                           @PathVariable String postId,
+                           @RequestBody @Valid UpdatePostOfBlogDto updatePostOfBlogDto,
+                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         postService.updateWithBlogId(customUserDetails.getUserId(), postId, blogId, updatePostOfBlogDto);
     }
 
     @DeleteMapping("/{blogId}/posts/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removePost(@PathVariable String blogId,
-                                        @PathVariable String postId,
-                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                           @PathVariable String postId,
+                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         postService.removeWithBlogId(customUserDetails.getUserId(), postId, blogId);
     }
 
     @GetMapping("/comments")
-    @ResponseStatus(HttpStatus.OK)
     public PaginationDto<ViewBloggerCommentDto> findCommentsOfUserBlog(CommonQueryParamsDto commonQueryParamsDto,
-                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return commentQueryRepository.findCommentsOfUserBlogs(UUID.fromString(customUserDetails.getUserId()), commonQueryParamsDto);
     }
 }

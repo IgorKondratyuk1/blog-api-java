@@ -13,15 +13,11 @@ import org.development.blogApi.modules.quiz.pairQuizGame.dto.response.ViewUserSt
 import org.development.blogApi.modules.quiz.pairQuizGame.entity.GamePairEntity;
 import org.development.blogApi.modules.quiz.pairQuizGame.exceptions.GamePairNotFoundException;
 import org.development.blogApi.modules.quiz.pairQuizGame.repository.QuizGamePairQueryRepository;
-import org.development.blogApi.modules.quiz.pairQuizGame.service.QuizGamePairEventService;
 import org.development.blogApi.modules.quiz.pairQuizGame.service.QuizGamePairService;
 import org.development.blogApi.modules.quiz.pairQuizGame.utils.GamePairMapper;
 import org.development.blogApi.security.CustomUserDetails;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/pair-game-quiz")
@@ -30,14 +26,6 @@ public class QuizGamePairController {
 
     private final QuizGamePairService quizGamePairService;
     private final QuizGamePairQueryRepository quizGamePairQueryRepository;
-
-//    private final QuizGamePairEventService quizGamePairEventService;
-//    @PostMapping("/test")
-//    public ResponseEntity<Void> test(@RequestBody UUID pairId) {
-//        System.out.println("Test trigger. Body: " + pairId);
-//        this.quizGamePairEventService.triggerUserFinishQuizGame(pairId, pairId);
-//        return ResponseEntity.ok().build();
-//    }
 
     @GetMapping("/users/top")
     public PaginationDto<ViewUserStatisticDto> getTopUsersStatistic(TopUsersQueryParams topUsersQueryParams) {

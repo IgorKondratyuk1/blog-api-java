@@ -1,12 +1,14 @@
 package org.development.blogApi.modules.blogPlatform.superAdmin;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.development.blogApi.common.dto.CommonQueryParamsDto;
 import org.development.blogApi.common.dto.PaginationDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.BlogService;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.request.CreateBlogDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.request.UpdateBlogDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.dto.response.ViewBlogDto;
+import org.development.blogApi.modules.blogPlatform.core.blog.dto.response.ViewExtendedBlogDto;
 import org.development.blogApi.modules.blogPlatform.core.blog.entity.Blog;
 import org.development.blogApi.modules.blogPlatform.core.blog.repository.BlogQueryRepository;
 import org.development.blogApi.modules.blogPlatform.core.blog.utils.BlogMapper;
@@ -21,28 +23,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/sa/blogs")
-public class SuperAdminBlogsController { // TODO write tests
+@RequiredArgsConstructor
+public class SuperAdminBlogsController {
+
     private final BlogService blogService;
     private final PostService postService;
     private final BlogQueryRepository blogQueryRepository;
     private final PostQueryRepository postQueryRepository;
 
-    @Autowired
-    public SuperAdminBlogsController(BlogService blogService,
-                                     PostService postService,
-                                     BlogQueryRepository blogQueryRepository,
-                                     PostQueryRepository postQueryRepository) {
-        this.blogService = blogService;
-        this.postService = postService;
-        this.blogQueryRepository = blogQueryRepository;
-        this.postQueryRepository = postQueryRepository;
-    }
-
     @GetMapping("")
-    public PaginationDto<ViewBlogDto> findAll(CommonQueryParamsDto query) {
-        return blogQueryRepository.findAllBlogs(query, false);
+    public PaginationDto<ViewExtendedBlogDto> findAll(CommonQueryParamsDto query) {
+        return blogQueryRepository.findBlogsWithExtendedInfo(query);
     }
 
     @PostMapping("")
