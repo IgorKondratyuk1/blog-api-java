@@ -70,6 +70,7 @@ public class PostService {
     }
 
     public void updateWithBlogId(String userId, String postId, String blogId, UpdatePostOfBlogDto updatePostDto) {
+        Blog blog = blogsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new BlogNotFoundException());
         Post post = postsRepository.findById(UUID.fromString(postId)).orElseThrow(() -> new PostNotFoundException());
 
         if (!post.getBlog().getId().toString().equals(blogId)) {

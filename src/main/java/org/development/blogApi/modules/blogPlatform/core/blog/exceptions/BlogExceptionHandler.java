@@ -19,8 +19,8 @@ public class BlogExceptionHandler {
                 .body(apiErrorResult);
     }
 
-    @ExceptionHandler(BlogUpdateForbiddenException.class)
-    public ResponseEntity<APIErrorResult> blogUpdateForbiddenException(BlogUpdateForbiddenException exception) {
+    @ExceptionHandler(BlogChangeForbiddenException.class)
+    public ResponseEntity<APIErrorResult> blogUpdateForbiddenException(BlogChangeForbiddenException exception) {
         APIErrorResult apiErrorResult = new APIErrorResult(HttpStatus.FORBIDDEN.value(), exception.getMessage());
         return ResponseEntity
                 .status(apiErrorResult.statusCode)
